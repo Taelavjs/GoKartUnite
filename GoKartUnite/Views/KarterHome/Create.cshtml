@@ -1,0 +1,44 @@
+﻿@model GoKartUnite.Models.Karter
+
+@{
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<h4>Karter</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="YearsExperience" class="control-label"></label>
+                <input asp-for="YearsExperience" class="form-control" />
+                <span asp-validation-for="YearsExperience" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TrackId">Select Track</label>
+                <select asp-for="TrackId" class="form-control" required>
+                    <option value="">-- Select a Track --</option>
+                            @foreach (var item in ViewBag.tracks)
+                            {
+                                <option value="@item.Id">@item.Title</option>
+                            }
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
