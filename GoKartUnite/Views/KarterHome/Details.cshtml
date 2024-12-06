@@ -8,23 +8,23 @@
 <div>
     <table class="table">
 
-    <thead>
-        <th scope="col">#Id</th>
-        <th scope="col">Name</th>
-        <th scope="col">Years Experience</th>
-        <th scope="col">Local Track</th>
-        <th scope="col">Options</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-    @{
-        foreach(var karter in Model){
-            <tr>
-                <th scope="row">@karter.Id</th>
-                <td>@karter.Name</td>
-                <td>@karter.YearsExperience</td>
-                <td>@karter.TrackId</td>
-                <td><a asp-action="Create" asp-route-id="@karter.Id">Edit</a></td>
+        <thead>
+            <th scope="col">#Id</th>
+            <th scope="col">Name</th>
+            <th scope="col">Years Experience</th>
+            <th scope="col">Local Track</th>
+            <th scope="col">Options</th>
+            <th scope="col"></th>
+        </thead>
+        <tbody>
+            @{
+                foreach(var karter in Model){
+                    <tr>
+                        <th scope="row">@karter.Id</th>
+                        <td>@karter.Name</td>
+                        <td>@karter.YearsExperience</td>
+                        <td>@(karter.TrackId == null ? "MISSING" : karter.TrackId.toString())</td>
+                        <td><a asp-action="Create" asp-route-id="@karter.Id">Edit</a></td>
                 <td><a asp-action="Delete" asp-route-id="@karter.Id">Delete</a></td>
             </tr>
         }

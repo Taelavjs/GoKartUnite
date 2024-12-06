@@ -1,0 +1,26 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+<div>
+    <table class="table">
+
+    <thead>
+        <th scope="col">#Id</th>
+        <th scope="col">Name</th>
+        <th scope="col">Years Experience</th>
+    </thead>
+    <tbody>
+            @{
+                foreach (var karter in Model)
+                {
+                    <tr>
+                        <th scope="row">@karter.Id</th>
+                        <td>@karter.Name</td>
+                        <td>@karter.YearsExperience</td>
+                    </tr>
+                }
+            }
+    </tbody>
+</table>
+</div>

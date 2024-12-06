@@ -3,6 +3,7 @@ using GoKartUnite.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.DependencyResolver;
 
 namespace GoKartUnite.Controllers
 {
@@ -34,6 +35,7 @@ namespace GoKartUnite.Controllers
 
             if (!ModelState.IsValid)
             {
+                ViewBag.Locations = Locations.GetNames(typeof(Locations));
                 return View("Create");
             }
             if (prevTrackRecord == null)
@@ -44,6 +46,7 @@ namespace GoKartUnite.Controllers
             {
                 prevTrackRecord.Title = track.Title;
                 prevTrackRecord.Description = track.Description;
+                prevTrackRecord.Location = track.Location;
             }
 
             await _context.SaveChangesAsync();
@@ -53,6 +56,7 @@ namespace GoKartUnite.Controllers
         [HttpGet]
         public async Task<IActionResult> Create(int? id)
         {
+            ViewBag.Locations = Locations.GetNames(typeof(Locations));
             if (id != null)
             {
                 var trackInDb = await _context.Track.SingleOrDefaultAsync(x => x.Id == id);
@@ -77,7 +81,16 @@ namespace GoKartUnite.Controllers
         [HttpGet]
         public async Task<ActionResult> Delete(int id)
         {
-            var track = await _context.Track.SingleAsync(t => t.Id == id);
+            // Find the track with its related karters
+            var track = await _context.Track
+                .Include(t => t.Karters)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            foreach(var karter in track.Karters)
+            {
+                karter.Track = null;
+                karter.TrackId = null;
+            }
             _context.Track.Remove(track);
             await _context.SaveChangesAsync();
             return RedirectToAction("Details");
@@ -86,7 +99,14 @@ namespace GoKartUnite.Controllers
         [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
-            return View(_context.Track.ToList());
+            if (id == null) return View(_context.Track.ToList());
+
+            var karters = await _context.Karter
+                .Where(k => k.TrackId == id)
+                .ToListAsync();
+
+
+            return View("KartersLocalTrack", karters);
         }
 
     }

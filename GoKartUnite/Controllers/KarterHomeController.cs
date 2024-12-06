@@ -67,6 +67,7 @@ namespace GoKartUnite.Controllers
                 prevKarterRecord.Name = karter.Name;
                 prevKarterRecord.Track = karter.Track;
                 prevKarterRecord.TrackId = karter.TrackId;
+                prevKarterRecord.TrackId = karter.TrackId;
                 prevKarterRecord.YearsExperience = karter.YearsExperience;
             }
 

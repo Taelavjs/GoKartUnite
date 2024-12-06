@@ -12,6 +12,7 @@
         <th scope="col">#Id</th>
         <th scope="col">Title</th>
         <th scope="col">Desc.</th>
+        <th scope="col">Location</th>
         <th scope="col">Options</th>
         <th scope="col"></th>
     </thead>
@@ -22,6 +23,7 @@
                 <th scope="row">@track.Id</th>
                 <td>@track.Title</td>
                 <td>@track.Description</td>
+                <td>@track.Location</td>
                 <td><a asp-action="Create" asp-route-id="@track.Id">Edit</a></td>
                 <td><a asp-action="Delete" asp-route-id="@track.Id">Delete</a></td>
             </tr>
