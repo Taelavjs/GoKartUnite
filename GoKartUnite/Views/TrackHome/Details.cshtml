@@ -25,7 +25,12 @@
                 <td>@track.Description</td>
                 <td>@track.Location</td>
                 <td><a asp-action="Create" asp-route-id="@track.Id">Edit</a></td>
-                <td><a asp-action="Delete" asp-route-id="@track.Id">Delete</a></td>
+                <td>
+                        <form asp-action="Delete" asp-route-id="@track.Id" method="post" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                        <input type="submit" value="Delete" class="btn btn-danger" />
+                    </form>   
+                </td>
             </tr>
         }
     }

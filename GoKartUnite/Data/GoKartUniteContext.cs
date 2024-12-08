@@ -14,7 +14,25 @@ namespace GoKartUnite.Data
         {
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Friendships>()
+                .HasOne(f => f.KarterFirst)
+                .WithMany()
+                .HasForeignKey(f => f.KarterFirstId)
+                .OnDelete(DeleteBehavior.Cascade); // Allow cascading delete
+
+            modelBuilder.Entity<Friendships>()
+                .HasOne(f => f.KarterSecond)
+                .WithMany()
+                .HasForeignKey(f => f.KarterSecondId)
+                .OnDelete(DeleteBehavior.Restrict); // Disable cascading delete
+
+            modelBuilder.Entity<Friendships>()
+                .HasKey(f => new { f.KarterFirstId, f.KarterSecondId });
+        }
         public DbSet<GoKartUnite.Models.Karter> Karter { get; set; } = default!;
         public DbSet<GoKartUnite.Models.Track> Track { get; set; } = default!;
+        public DbSet<GoKartUnite.Models.Friendships> Friendships { get; set; } = default!;
     }
 }

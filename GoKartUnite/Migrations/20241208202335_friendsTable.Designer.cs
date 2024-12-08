@@ -4,6 +4,7 @@ using GoKartUnite.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GoKartUnite.Migrations
 {
     [DbContext(typeof(GoKartUniteContext))]
-    partial class GoKartUniteContextModelSnapshot : ModelSnapshot
+    [Migration("20241208202335_friendsTable")]
+    partial class friendsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,24 +24,6 @@ namespace GoKartUnite.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("GoKartUnite.Models.Friendships", b =>
-                {
-                    b.Property<int>("KarterFirstId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("KarterSecondId")
-                        .HasColumnType("int");
-
-                    b.Property<DateOnly?>("DateCreated")
-                        .HasColumnType("date");
-
-                    b.HasKey("KarterFirstId", "KarterSecondId");
-
-                    b.HasIndex("KarterSecondId");
-
-                    b.ToTable("Friendships");
-                });
 
             modelBuilder.Entity("GoKartUnite.Models.Karter", b =>
                 {
@@ -88,25 +73,6 @@ namespace GoKartUnite.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Track");
-                });
-
-            modelBuilder.Entity("GoKartUnite.Models.Friendships", b =>
-                {
-                    b.HasOne("GoKartUnite.Models.Karter", "KarterFirst")
-                        .WithMany()
-                        .HasForeignKey("KarterFirstId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GoKartUnite.Models.Karter", "KarterSecond")
-                        .WithMany()
-                        .HasForeignKey("KarterSecondId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("KarterFirst");
-
-                    b.Navigation("KarterSecond");
                 });
 
             modelBuilder.Entity("GoKartUnite.Models.Karter", b =>

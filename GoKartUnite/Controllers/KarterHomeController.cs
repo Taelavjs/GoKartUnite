@@ -85,13 +85,40 @@ namespace GoKartUnite.Controllers
             return RedirectToAction("Details");
         }
 
-        [HttpGet]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<ActionResult> Delete(int id)
         {
             var karter = await _context.Karter.SingleAsync(t => t.Id == id);
             _context.Karter.Remove(karter);
             await _context.SaveChangesAsync();
             return RedirectToAction("Details");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendFriendRequest(string friendsName)
+        {
+            var karterSecond2 = await _context.Karter.SingleOrDefaultAsync(k => k.Name.ToLower() == "taela");
+
+            var karter = await _context.Karter.SingleOrDefaultAsync(k => k.Name.ToLower() == friendsName.ToLower());
+            if(karter == null || karterSecond2 == null)
+            {
+                return View("Index");
+            }
+            var newFriendShip = new Friendships { 
+                KarterFirst = karter,
+                KarterFirstId = karter.Id,
+                KarterSecond = karterSecond2,
+                KarterSecondId = karterSecond2.Id
+            };
+            _context.Attach(karter);
+            _context.Attach(karterSecond2);
+
+            await _context.Friendships.AddAsync(newFriendShip);
+            await _context.SaveChangesAsync();
+
+            return View("Index");
         }
 
 

@@ -78,13 +78,18 @@ namespace GoKartUnite.Controllers
             return View("Details");
         }
 
-        [HttpGet]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<ActionResult> Delete(int id)
         {
             // Find the track with its related karters
             var track = await _context.Track
                 .Include(t => t.Karters)
                 .FirstOrDefaultAsync(t => t.Id == id);
+
+            if(track == null) {
+                RedirectToAction("Details");
+            }
 
             foreach(var karter in track.Karters)
             {
