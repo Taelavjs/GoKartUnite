@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using GoKartUnite.Data;
 using System.Net.WebSockets;
+using GoKartUnite.SingletonServices;
 namespace GoKartUnite
 {
     public class Program
@@ -14,8 +15,15 @@ namespace GoKartUnite
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddScoped<HandleFriendsList>();
             var app = builder.Build();
+            app.UseWebSockets();
+            var webSocketOptions = new WebSocketOptions
+            {
+                KeepAliveInterval = TimeSpan.FromMinutes(2)
+            };
 
+            app.UseWebSockets(webSocketOptions);
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
@@ -24,13 +32,27 @@ namespace GoKartUnite
                 app.UseHsts();
             }
             // WEBSOCKETS +_+_+_+_+_+_+_+_+_+_+_+_+_+_
-            var webSocketOptions = new WebSocketOptions
+            app.Map("/ws", wsApp =>
             {
-                KeepAliveInterval = TimeSpan.FromMinutes(2)
-            };
+                wsApp.Run(async context =>
+                {
+                    if (context.WebSockets.IsWebSocketRequest)
+                    {
+                        using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
+                        var socketFinishedTcs = new TaskCompletionSource<object>();
 
-            app.UseWebSockets(webSocketOptions);
+                        var handleFriendsList = context.RequestServices.GetRequiredService<HandleFriendsList>();
+                        handleFriendsList.AddSocket(webSocket, socketFinishedTcs);
 
+                        await socketFinishedTcs.Task;
+                    }
+                    else
+                    {
+                        context.Response.StatusCode = 400; // Bad Request
+                        await context.Response.WriteAsync("Expected a WebSocket request.");
+                    }
+                });
+            });
             // +_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+
 
             app.UseHttpsRedirection();
