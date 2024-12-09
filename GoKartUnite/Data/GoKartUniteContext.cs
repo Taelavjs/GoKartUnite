@@ -20,7 +20,7 @@ namespace GoKartUnite.Data
                 .HasOne(f => f.KarterFirst)
                 .WithMany()
                 .HasForeignKey(f => f.KarterFirstId)
-                .OnDelete(DeleteBehavior.Cascade); // Allow cascading delete
+                .OnDelete(DeleteBehavior.Restrict); // Allow cascading delete
 
             modelBuilder.Entity<Friendships>()
                 .HasOne(f => f.KarterSecond)

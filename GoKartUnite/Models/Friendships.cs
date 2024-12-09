@@ -5,16 +5,33 @@ namespace GoKartUnite.Models
 {
     public class Friendships
     {
-        public required int KarterFirstId { get; set; }
+        public int KarterFirstId { get; set; }
 
         [ForeignKey(nameof(KarterFirstId))]
-        public required Karter KarterFirst { get; set; }
+        public Karter KarterFirst { get; set; }
 
-        public required int KarterSecondId { get; set; }
+        public int KarterSecondId { get; set; }
 
         [ForeignKey(nameof(KarterSecondId))]
-        public required Karter KarterSecond { get; set; }
+        public Karter KarterSecond { get; set; }
 
-        public DateOnly? DateCreated { get; set; } // Made public for EF mapping
+        public DateOnly? DateCreated { get; set; } = DateOnly.FromDateTime(DateTime.Now); // Made public for EF mapping
+
+        public Friendships(int karterFirstId, int karterSecondId)
+        {
+            if (karterFirstId > karterSecondId)
+            {
+                KarterFirstId = karterSecondId;
+                KarterSecondId = karterFirstId;
+            }
+            else
+            {
+                KarterFirstId = karterFirstId;
+                KarterSecondId = karterSecondId;
+            }
+            DateCreated = DateOnly.FromDateTime(DateTime.Now);
+        }
+
+
     }
 }

@@ -22,7 +22,11 @@ namespace GoKartUnite
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
+            var webSocketOptions = new WebSocketOptions
+            {
+                KeepAliveInterval = TimeSpan.FromMinutes(2)
+            };
+            app.UseWebSockets(webSocketOptions);
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 

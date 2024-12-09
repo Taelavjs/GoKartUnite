@@ -89,9 +89,19 @@ namespace GoKartUnite.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Delete(int id)
         {
-            var karter = await _context.Karter.SingleAsync(t => t.Id == id);
-            _context.Karter.Remove(karter);
-            await _context.SaveChangesAsync();
+            var karter = await _context.Karter
+                .FirstOrDefaultAsync(k => k.Id == id);
+
+            if (karter != null)
+            {
+                var friendshipsToRemove = await _context.Friendships
+                    .Where(f => f.KarterFirstId == karter.Id || f.KarterSecondId == karter.Id).ToListAsync();
+
+                _context.Friendships.RemoveRange(friendshipsToRemove);
+                _context.Karter.Remove(karter);
+                await _context.SaveChangesAsync();
+            }
+
             return RedirectToAction("Details");
         }
 
@@ -106,16 +116,17 @@ namespace GoKartUnite.Controllers
             {
                 return View("Index");
             }
-            var newFriendShip = new Friendships { 
-                KarterFirst = karter,
-                KarterFirstId = karter.Id,
-                KarterSecond = karterSecond2,
-                KarterSecondId = karterSecond2.Id
-            };
+            var ifExists = await _context.Friendships.FindAsync(karter.Id, karterSecond2.Id);  
+            if (ifExists != null)
+            {
+                return View("Index");
+            }
+
+            var friendship = new Friendships(karter.Id, karterSecond2.Id);
             _context.Attach(karter);
             _context.Attach(karterSecond2);
 
-            await _context.Friendships.AddAsync(newFriendShip);
+            await _context.Friendships.AddAsync(friendship);
             await _context.SaveChangesAsync();
 
             return View("Index");

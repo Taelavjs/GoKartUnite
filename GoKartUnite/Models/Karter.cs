@@ -16,6 +16,8 @@ namespace GoKartUnite.Models
         [Display(Name = "Local Track Id")]
         public int? TrackId { get; set; }
         public Track? Track { get; set; }
-        
+        public virtual ICollection<Friendships>? Friendships { get; set; }
+
+
     }
 }
