@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using GoKartUnite.Data;
+using System.Net.WebSockets;
 namespace GoKartUnite
 {
     public class Program
@@ -22,11 +23,16 @@ namespace GoKartUnite
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            // WEBSOCKETS +_+_+_+_+_+_+_+_+_+_+_+_+_+_
             var webSocketOptions = new WebSocketOptions
             {
                 KeepAliveInterval = TimeSpan.FromMinutes(2)
             };
+
             app.UseWebSockets(webSocketOptions);
+
+            // +_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
@@ -40,5 +46,7 @@ namespace GoKartUnite
 
             app.Run();
         }
+
+
     }
 }
