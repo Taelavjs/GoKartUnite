@@ -1,4 +1,6 @@
-﻿using GoKartUnite.Data;
+﻿using AspNetCoreGeneratedDocument;
+using GoKartUnite.Data;
+using GoKartUnite.Handlers;
 using GoKartUnite.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,8 +12,10 @@ namespace GoKartUnite.Controllers
     public class KarterHomeController : Controller
     {
         private readonly GoKartUniteContext _context;
-        public KarterHomeController(GoKartUniteContext context) { 
+        private readonly KarterHandler _karters;
+        public KarterHomeController(GoKartUniteContext context, KarterHandler karters) { 
             _context = context;
+            _karters = karters;
         }
         [HttpGet]
         public async Task<ActionResult> Index(string kartersName)
@@ -29,7 +33,7 @@ namespace GoKartUnite.Controllers
         [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
-            return View(_context.Karter.Include(k => k.Track).ToList());
+            return View(await _karters.getAllUsers(true));
         }
         [HttpGet]
         public async Task<ActionResult> Create(int? id)
@@ -38,7 +42,7 @@ namespace GoKartUnite.Controllers
 
             if (id != null)
             {
-                var karterInDb = await _context.Karter.SingleOrDefaultAsync(x => x.Id == id);
+                var karterInDb = await _karters.getUser(id.Value);
                 ViewData["Title"] = "Editing Karter Details";
                 return View(karterInDb);
             }
@@ -52,7 +56,7 @@ namespace GoKartUnite.Controllers
         public async Task<ActionResult> Create(Karter karter)
         {
             karter.Track = await _context.Track.SingleOrDefaultAsync(t => t.Id == karter.TrackId);
-            var prevKarterRecord =  await _context.Karter.SingleOrDefaultAsync(t => t.Id == karter.Id);
+            var prevKarterRecord =  await _karters.getUser(karter.Id);
 
             if (!ModelState.IsValid)
             {
@@ -77,29 +81,13 @@ namespace GoKartUnite.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id)
-        {
-            var karter = await _context.Karter.SingleAsync(t => t.Id == id);
-            _context.Karter.Remove(karter);
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Details");
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<ActionResult> Delete(int id)
         {
-            var karter = await _context.Karter
-                .FirstOrDefaultAsync(k => k.Id == id);
+            var karter = await _karters.getUser(id);
 
             if (karter != null)
             {
-                var friendshipsToRemove = await _context.Friendships
-                    .Where(f => f.KarterFirstId == karter.Id || f.KarterSecondId == karter.Id).ToListAsync();
-
-                _context.Friendships.RemoveRange(friendshipsToRemove);
-                _context.Karter.Remove(karter);
-                await _context.SaveChangesAsync();
+                await _karters.deleteUser(karter.Id);
             }
 
             return RedirectToAction("Details");
@@ -109,27 +97,15 @@ namespace GoKartUnite.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SendFriendRequest(string friendsName)
         {
-            var karterSecond2 = await _context.Karter.SingleOrDefaultAsync(k => k.Name.ToLower() == "taela");
-
-            var karter = await _context.Karter.SingleOrDefaultAsync(k => k.Name.ToLower() == friendsName.ToLower());
-            if(karter == null || karterSecond2 == null)
-            {
-                return View("Index");
-            }
-            var ifExists = await _context.Friendships.FindAsync(karter.Id, karterSecond2.Id);  
-            if (ifExists != null)
+            if (!await _karters.sendFriendRequest(friendsName))
             {
                 return View("Index");
             }
 
-            var friendship = new Friendships(karter.Id, karterSecond2.Id);
-            _context.Attach(karter);
-            _context.Attach(karterSecond2);
-
-            await _context.Friendships.AddAsync(friendship);
-            await _context.SaveChangesAsync();
 
             return View("Index");
+
+
         }
 
 

@@ -1,4 +1,5 @@
 ﻿using GoKartUnite.Data;
+using GoKartUnite.Handlers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,15 +8,10 @@ namespace GoKartUnite.Controllers
     public class FriendshipController : Controller
     {
         private readonly GoKartUniteContext _context;
-        public FriendshipController(GoKartUniteContext context)
+        private readonly RelationshipHandler _relationship;
+        public FriendshipController(RelationshipHandler relationships)
         {
-            _context = context;
-        }
-        [HttpGet]
-        public async Task<IActionResult> GetNumberFriends(int id)
-        {
-            int numFriends = await _context.Friendships.CountAsync(k => k.KarterFirstId == id || k.KarterSecondId == id);
-            return Json(numFriends);
+            _relationship = relationships;
         }
     }
 }

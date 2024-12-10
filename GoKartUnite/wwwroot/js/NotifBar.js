@@ -1,22 +1,22 @@
 ﻿"use strict";
 
-var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub?username=tvjs").build();
 
-console.log(connection);
 connection.on("ReceiveMessage", function (user, message) {
-    console.log("Dead");
+    $("#NumberFriends").text(message);
+    console.log(message);
 
 });
 
-connection.start().then(function () {
+connection.start().then(function (ret) {
 
-    console.log("here");
+    console.log(ret);
 }).catch(function (err) {
     return console.error(err.toString());
 });
 
 connection.onclose(err => {
-    console.error("Connection closed:", err);
+    console.log("Connection closed:", err);
 });
 
 $("#Test").on("click", function () {

@@ -13,8 +13,7 @@
 </form>
 
 <form asp-action="SendFriendRequest" method="post">
-    <p>
-        <label>Friends Name: <input type="text" name="friendsName" /></label>
-        <input type="submit" value="Filter" />
-    </p>
+    <label>Friends Name: <input type="text" name="friendsName" /></label>
+    <input type="submit" value="Filter" />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger font-weight-bold" })  
 </form>

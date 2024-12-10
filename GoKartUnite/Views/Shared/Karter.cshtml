@@ -6,7 +6,7 @@
 <tr>
     <td>@Model.Name</td>
     <td>@Model.YearsExperience</td>
-    <td>@(Model.TrackId == null ? "MISSING" : Model.TrackId)</td>
+    <td>@(Model.TrackId == null ? "MISSING" : Model.Track.Title)</td>
     <td><a asp-action="Create" asp-route-id="@Model.Id">Edit</a></td>
     <td>
         <form asp-action="Delete" asp-route-id="@Model.Id" method="post" style="display:inline;">

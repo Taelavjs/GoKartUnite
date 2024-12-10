@@ -4,6 +4,8 @@ using GoKartUnite.Data;
 using System.Net.WebSockets;
 using GoKartUnite.SingletonServices;
 using GoKartUnite.SignalRFiles;
+using GoKartUnite.Handlers;
+using Microsoft.AspNet.SignalR;
 
 
 namespace GoKartUnite
@@ -16,6 +18,8 @@ namespace GoKartUnite
             builder.Services.AddDbContext<GoKartUniteContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("GoKartUniteContext") ?? throw new InvalidOperationException("Connection string 'GoKartUniteContext' not found.")));
             builder.Services.AddSignalR();
+            builder.Services.AddTransient<RelationshipHandler>();
+            builder.Services.AddTransient<KarterHandler>();
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
