@@ -11,22 +11,21 @@ namespace GoKartUnite.Controllers
 {
     public class KarterHomeController : Controller
     {
-        private readonly GoKartUniteContext _context;
         private readonly KarterHandler _karters;
-        public KarterHomeController(GoKartUniteContext context, KarterHandler karters) { 
-            _context = context;
+        private readonly TrackHandler _tracks;
+        public KarterHomeController(KarterHandler karters, TrackHandler tracks) { 
             _karters = karters;
+            _tracks = tracks;
         }
         [HttpGet]
         public async Task<ActionResult> Index(string kartersName)
         {
-            var karters = from m in _context.Karter
-                         select m;
+
 
             if (!String.IsNullOrEmpty(kartersName))
             {
-                karters = karters.Where(s=>s.Name.ToUpper() == kartersName.ToUpper());
-                return View("Details", karters);
+                var karters = await _karters.getUser(kartersName);
+                return View("Details", new List<Karter> { karters });
             }
             return View();
         }
@@ -38,7 +37,7 @@ namespace GoKartUnite.Controllers
         [HttpGet]
         public async Task<ActionResult> Create(int? id)
         {
-            ViewBag.tracks = _context.Track.ToList();
+            ViewBag.tracks = await _tracks.getAllTracks();
 
             if (id != null)
             {
@@ -55,27 +54,12 @@ namespace GoKartUnite.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(Karter karter)
         {
-            karter.Track = await _context.Track.SingleOrDefaultAsync(t => t.Id == karter.TrackId);
-            var prevKarterRecord =  await _karters.getUser(karter.Id);
-
             if (!ModelState.IsValid)
             {
-                ViewBag.tracks = _context.Track.ToList();
+                ViewBag.tracks = await _tracks.getAllTracks();
                 return View("Create");  
             }
-            if (prevKarterRecord == null)
-            {
-                _context.Karter.Add(karter);
-            } else
-            {
-                prevKarterRecord.Name = karter.Name;
-                prevKarterRecord.Track = karter.Track;
-                prevKarterRecord.TrackId = karter.TrackId;
-                prevKarterRecord.TrackId = karter.TrackId;
-                prevKarterRecord.YearsExperience = karter.YearsExperience;
-            }
-
-            await _context.SaveChangesAsync();
+            await _karters.createUser(karter);
             return RedirectToAction("Details");
         }
 

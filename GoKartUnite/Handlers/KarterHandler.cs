@@ -1,6 +1,7 @@
 ﻿using GoKartUnite.Data;
 using GoKartUnite.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Web.Mvc;
 
 namespace GoKartUnite.Handlers
 {
@@ -20,7 +21,7 @@ namespace GoKartUnite.Handlers
 
         public async Task<Karter> getUser(string name)
         {
-            var karterInDb = await _context.Karter.SingleOrDefaultAsync(k => k.Name.ToLower() == "taela");
+            var karterInDb = await _context.Karter.SingleOrDefaultAsync(k => k.Name.ToLower() == name);
             return karterInDb;
         }
         public async Task deleteUser(Karter karter)
@@ -72,6 +73,37 @@ namespace GoKartUnite.Handlers
         public async Task<List<Karter>> getAllUsers(bool fetchTracks)
         {
             return await _context.Karter.Include(k => k.Track).ToListAsync();
+        }
+
+        public async Task<List<Karter>> getAllUsersByTrackId(int id)
+        {
+            var karters = await _context.Karter
+                .Where(k => k.TrackId == id)
+                .ToListAsync();
+
+            return karters;
+        }
+
+        public async Task createUser(Karter karter)
+        {
+            karter.Track = await _context.Track.SingleOrDefaultAsync(t => t.Id == karter.TrackId);
+            var prevKarterRecord = await getUser(karter.Id);
+
+            if (prevKarterRecord == null)
+            {
+                _context.Karter.Add(karter);
+            }
+            else
+            {
+                prevKarterRecord.Name = karter.Name;
+                prevKarterRecord.Track = karter.Track;
+                prevKarterRecord.TrackId = karter.TrackId;
+                prevKarterRecord.TrackId = karter.TrackId;
+                prevKarterRecord.YearsExperience = karter.YearsExperience;
+            }
+
+            await _context.SaveChangesAsync();
+            
         }
     }
 }

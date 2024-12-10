@@ -1,4 +1,5 @@
 ﻿using GoKartUnite.Data;
+using GoKartUnite.Handlers;
 using GoKartUnite.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +11,13 @@ namespace GoKartUnite.Controllers
     public class TrackHomeController : Controller
     {
         private readonly GoKartUniteContext _context;
-        public TrackHomeController(GoKartUniteContext context)
+        private readonly TrackHandler _tracks;
+        private readonly KarterHandler _karters;
+        public TrackHomeController(GoKartUniteContext context, TrackHandler tracks, KarterHandler karters)
         {
             _context = context;
+            _tracks = tracks;
+            _karters = karters;
         }
         
         // GET: TrackHomeController
@@ -31,25 +36,12 @@ namespace GoKartUnite.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(Track track)
         {
-            var prevTrackRecord = await _context.Track.SingleOrDefaultAsync(t => t.Id == track.Id);
-
             if (!ModelState.IsValid)
             {
                 ViewBag.Locations = Locations.GetNames(typeof(Locations));
                 return View("Create");
             }
-            if (prevTrackRecord == null)
-            {
-                _context.Track.Add(track);
-            }
-            else
-            {
-                prevTrackRecord.Title = track.Title;
-                prevTrackRecord.Description = track.Description;
-                prevTrackRecord.Location = track.Location;
-            }
-
-            await _context.SaveChangesAsync();
+            _ = await _tracks.addTrack(track);
             return RedirectToAction("Details");
         }
 
@@ -59,7 +51,7 @@ namespace GoKartUnite.Controllers
             ViewBag.Locations = Locations.GetNames(typeof(Locations));
             if (id != null)
             {
-                var trackInDb = await _context.Track.SingleOrDefaultAsync(x => x.Id == id);
+                var trackInDb = await _tracks.getTrack(id.Value, false);
                 ViewData["Title"] = "Editing Track Details";
                 return View(trackInDb);
             }
@@ -72,9 +64,7 @@ namespace GoKartUnite.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id)
         {
-            var track = await _context.Track.SingleAsync(t => t.Id == id);
-            _context.Track.Remove(track);
-            await _context.SaveChangesAsync();
+            _tracks.updateTrack(id);
             return View("Details");
         }
 
@@ -83,35 +73,24 @@ namespace GoKartUnite.Controllers
         public async Task<ActionResult> Delete(int id)
         {
             // Find the track with its related karters
-            var track = await _context.Track
-                .Include(t => t.Karters)
-                .FirstOrDefaultAsync(t => t.Id == id);
+            bool res = await _tracks.deleteTrack(id);
 
-            if(track == null) {
-                RedirectToAction("Details");
-            }
-
-            foreach(var karter in track.Karters)
+            if(res)
             {
-                karter.Track = null;
-                karter.TrackId = null;
+                return RedirectToAction("Details");
             }
-            _context.Track.Remove(track);
-            await _context.SaveChangesAsync();
             return RedirectToAction("Details");
         }
 
         [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null) return View(_context.Track.ToList());
+            if (id == null) return View(await _tracks.getAllTracks());
 
-            var karters = await _context.Karter
-                .Where(k => k.TrackId == id)
-                .ToListAsync();
+            
 
 
-            return View("KartersLocalTrack", karters);
+            return View("KartersLocalTrack", await _karters.getAllUsersByTrackId(id.Value));
         }
 
     }

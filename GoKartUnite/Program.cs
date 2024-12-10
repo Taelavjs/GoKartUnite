@@ -20,6 +20,7 @@ namespace GoKartUnite
             builder.Services.AddSignalR();
             builder.Services.AddTransient<RelationshipHandler>();
             builder.Services.AddTransient<KarterHandler>();
+            builder.Services.AddTransient<TrackHandler>();
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
