@@ -3,6 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 using GoKartUnite.Data;
 using System.Net.WebSockets;
 using GoKartUnite.SingletonServices;
+using GoKartUnite.SignalRFiles;
+
+
 namespace GoKartUnite
 {
     public class Program
@@ -12,18 +15,17 @@ namespace GoKartUnite
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddDbContext<GoKartUniteContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("GoKartUniteContext") ?? throw new InvalidOperationException("Connection string 'GoKartUniteContext' not found.")));
+            builder.Services.AddSignalR();
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddSingleton<IHandleFriendsList, HandleFriendsList>();
             var app = builder.Build();
-            app.UseWebSockets();
             var webSocketOptions = new WebSocketOptions
             {
                 KeepAliveInterval = TimeSpan.FromMinutes(2)
             };
 
-            app.UseWebSockets(webSocketOptions);
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
@@ -32,25 +34,7 @@ namespace GoKartUnite
                 app.UseHsts();
             }
             // WEBSOCKETS +_+_+_+_+_+_+_+_+_+_+_+_+_+_
-            app.Map("/ws", wsApp =>
-            {
-                wsApp.Run(async context =>
-                {
-                    if (context.WebSockets.IsWebSocketRequest)
-                    {
-                        using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
-                        var socketFinishedTcs = new TaskCompletionSource<object>();
-                        var handleFriendsList = context.RequestServices.GetRequiredService<IHandleFriendsList>();
-                        handleFriendsList.AddSocket(webSocket, socketFinishedTcs);
-                        await socketFinishedTcs.Task;
-                    }
-                    else
-                    {
-                        context.Response.StatusCode = 400; // Bad Request
-                        await context.Response.WriteAsync("Expected a WebSocket request.");
-                    }
-                });
-            });
+
             // +_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+
 
             app.UseHttpsRedirection();
@@ -59,10 +43,12 @@ namespace GoKartUnite
             app.UseRouting();
 
             app.UseAuthorization();
+            app.MapHub<ChatHub>("/chatHub");
 
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
 
             app.Run();
         }
