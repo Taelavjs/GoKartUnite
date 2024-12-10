@@ -15,7 +15,7 @@ namespace GoKartUnite
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-            builder.Services.AddScoped<HandleFriendsList>();
+            builder.Services.AddSingleton<IHandleFriendsList, HandleFriendsList>();
             var app = builder.Build();
             app.UseWebSockets();
             var webSocketOptions = new WebSocketOptions
@@ -40,10 +40,8 @@ namespace GoKartUnite
                     {
                         using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
                         var socketFinishedTcs = new TaskCompletionSource<object>();
-
-                        var handleFriendsList = context.RequestServices.GetRequiredService<HandleFriendsList>();
+                        var handleFriendsList = context.RequestServices.GetRequiredService<IHandleFriendsList>();
                         handleFriendsList.AddSocket(webSocket, socketFinishedTcs);
-
                         await socketFinishedTcs.Task;
                     }
                     else

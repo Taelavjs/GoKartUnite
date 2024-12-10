@@ -5,15 +5,9 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GoKartUnite.SingletonServices
 {
-    public class HandleFriendsList
+    public class HandleFriendsList : IHandleFriendsList
     {
         private readonly List<ClientHandler> _clients = new();
-
-        private readonly GoKartUniteContext _context;
-        public HandleFriendsList(GoKartUniteContext context)
-        {
-            _context = context;
-        }
 
         public void AddSocket(WebSocket webSocket, TaskCompletionSource<object> socketFinishedTcs)
         {
@@ -90,7 +84,7 @@ namespace GoKartUnite.SingletonServices
 
             }
 
-            private async Task SendMessagesAsync()
+            public async Task SendMessagesAsync()
             {
                 var messageBuffer = Encoding.UTF8.GetBytes("Hello");
                 try
