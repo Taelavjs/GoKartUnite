@@ -1,4 +1,5 @@
 ﻿using GoKartUnite.Handlers;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.SignalR;
 using System.Collections.Concurrent;
 using System.Security.Claims;
@@ -8,20 +9,20 @@ namespace GoKartUnite.SignalRFiles
     public class ChatHub : Hub
     {
         private readonly RelationshipHandler _relationships;
-        private ConcurrentDictionary<string, string> connectedGroups;
+        private static ConcurrentDictionary<string, string> connectedGroups = new ConcurrentDictionary<string, string>();
         public ChatHub(RelationshipHandler relationship )
         {
             _relationships = relationship;
-            connectedGroups = new ConcurrentDictionary<string, string>();
         }
 
         public async Task SendMessage(string user, string message)
         {
             try
             {
+                
                 System.Diagnostics.Debug.WriteLine($"ChatHub instance created: {this.GetHashCode()}"); // Unique instance ID
                 string usn = connectedGroups.GetValueOrDefault(Context.ConnectionId);
-                await Clients.Group(usn).SendAsync("ReceiveMessage", await _relationships.getFriends(1031));
+                await Clients.Group(usn).SendAsync("ReceiveMessage", await _relationships.getFriends(4030));
             }
             catch (Exception ex)
             {
@@ -30,9 +31,10 @@ namespace GoKartUnite.SignalRFiles
             }
         }
 
-        public override Task OnConnectedAsync()
+        public override async Task OnConnectedAsync()
         {
             var username = Context.GetHttpContext().Request.Query["username"];
+            await Context.GetHttpContext().AuthenticateAsync();
             System.Diagnostics.Debug.WriteLine($"ChatHub instance created: {this.GetHashCode()}"); // Unique instance ID
             connectedGroups.AddOrUpdate(
                 Context.ConnectionId,
@@ -40,7 +42,10 @@ namespace GoKartUnite.SignalRFiles
                 (key, oldValue) => username
                 );
 
-            return base.OnConnectedAsync();
+            await Groups.AddToGroupAsync(Context.ConnectionId, username);
+            await base.OnConnectedAsync();
+            SendMessage(username, "");
+            return;
         }
     }
 }

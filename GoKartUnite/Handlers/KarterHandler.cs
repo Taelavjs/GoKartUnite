@@ -2,6 +2,7 @@
 using GoKartUnite.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Web.Mvc;
+using System.Security.Claims;
 
 namespace GoKartUnite.Handlers
 {
@@ -84,13 +85,18 @@ namespace GoKartUnite.Handlers
             return karters;
         }
 
-        public async Task createUser(Karter karter)
+        public async Task createUser(Karter karter, string email)
         {
             karter.Track = await _context.Track.SingleOrDefaultAsync(t => t.Id == karter.TrackId);
+            karter.Email = email;
             var prevKarterRecord = await getUser(karter.Id);
 
             if (prevKarterRecord == null)
             {
+                if(await _context.Karter.FirstOrDefaultAsync(k => k.Email == email) != null)
+                {
+                    return;
+                }
                 _context.Karter.Add(karter);
             }
             else
@@ -98,12 +104,17 @@ namespace GoKartUnite.Handlers
                 prevKarterRecord.Name = karter.Name;
                 prevKarterRecord.Track = karter.Track;
                 prevKarterRecord.TrackId = karter.TrackId;
-                prevKarterRecord.TrackId = karter.TrackId;
                 prevKarterRecord.YearsExperience = karter.YearsExperience;
             }
 
             await _context.SaveChangesAsync();
             
+        }
+
+        public async Task<Karter> getUserByEmail(string email)
+        {
+            var karterInDb = await _context.Karter.FirstOrDefaultAsync(k => k.Email == email);
+            return karterInDb;
         }
     }
 }

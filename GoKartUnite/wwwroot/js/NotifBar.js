@@ -3,9 +3,7 @@
 var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub?username=tvjs").build();
 
 connection.on("ReceiveMessage", function (user, message) {
-    $("#NumberFriends").text(message);
-    console.log(message);
-
+    $("#NumberFriends").text(user);
 });
 
 connection.start().then(function (ret) {

@@ -4,6 +4,7 @@ using GoKartUnite.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GoKartUnite.Migrations
 {
     [DbContext(typeof(GoKartUniteContext))]
-    partial class GoKartUniteContextModelSnapshot : ModelSnapshot
+    [Migration("20241216161904_emailAddr")]
+    partial class emailAddr
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,32 +24,6 @@ namespace GoKartUnite.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("GoKartUnite.Models.BlogPost", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AuthorId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Descripttion")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AuthorId");
-
-                    b.ToTable("BlogPost");
-                });
 
             modelBuilder.Entity("GoKartUnite.Models.Friendships", b =>
                 {
@@ -125,17 +102,6 @@ namespace GoKartUnite.Migrations
                     b.ToTable("Track");
                 });
 
-            modelBuilder.Entity("GoKartUnite.Models.BlogPost", b =>
-                {
-                    b.HasOne("GoKartUnite.Models.Karter", "Author")
-                        .WithMany("BlogPosts")
-                        .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Author");
-                });
-
             modelBuilder.Entity("GoKartUnite.Models.Friendships", b =>
                 {
                     b.HasOne("GoKartUnite.Models.Karter", "KarterFirst")
@@ -170,8 +136,6 @@ namespace GoKartUnite.Migrations
 
             modelBuilder.Entity("GoKartUnite.Models.Karter", b =>
                 {
-                    b.Navigation("BlogPosts");
-
                     b.Navigation("Friendships");
                 });
 

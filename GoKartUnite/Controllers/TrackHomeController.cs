@@ -1,4 +1,5 @@
-﻿using GoKartUnite.Data;
+﻿using GoKartUnite.CustomAttributes;
+using GoKartUnite.Data;
 using GoKartUnite.Handlers;
 using GoKartUnite.Models;
 using Microsoft.AspNetCore.Http;
@@ -19,21 +20,27 @@ namespace GoKartUnite.Controllers
             _tracks = tracks;
             _karters = karters;
         }
-        
+
         // GET: TrackHomeController
+
+        [HttpGet]
+        [AccountConfirmed]
+        [Microsoft.AspNetCore.Authorization.Authorize]
         public async Task<ActionResult> Index()
         {
             return View();
         }
 
-        // GET: TrackHomeController/Create
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        [AccountConfirmed]
         public async Task<ActionResult> Create()
         {
             return View();
         }
 
-        // POST: TrackHomeController/Create
         [HttpPost]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        [AccountConfirmed]
         public async Task<IActionResult> Create(Track track)
         {
             if (!ModelState.IsValid)
@@ -46,6 +53,8 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpGet]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        [AccountConfirmed]
         public async Task<IActionResult> Create(int? id)
         {
             ViewBag.Locations = Locations.GetNames(typeof(Locations));
@@ -62,6 +71,8 @@ namespace GoKartUnite.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        [AccountConfirmed]
         public async Task<IActionResult> Edit(int id)
         {
             _tracks.updateTrack(id);
@@ -70,6 +81,8 @@ namespace GoKartUnite.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        [AccountConfirmed]
         public async Task<ActionResult> Delete(int id)
         {
             // Find the track with its related karters
@@ -83,6 +96,8 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpGet]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        [AccountConfirmed]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return View(await _tracks.getAllTracks());

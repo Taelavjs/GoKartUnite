@@ -1,4 +1,5 @@
 ﻿using AspNetCoreGeneratedDocument;
+using GoKartUnite.CustomAttributes;
 using GoKartUnite.Data;
 using GoKartUnite.Handlers;
 using GoKartUnite.Models;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
+using System.Security.Claims;
 
 namespace GoKartUnite.Controllers
 {
@@ -18,6 +20,8 @@ namespace GoKartUnite.Controllers
             _tracks = tracks;
         }
         [HttpGet]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        [AccountConfirmed]
         public async Task<ActionResult> Index(string kartersName)
         {
 
@@ -30,11 +34,17 @@ namespace GoKartUnite.Controllers
             return View();
         }
         [HttpGet]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        [AccountConfirmed]
         public async Task<IActionResult> Details(int? id)
         {
+            Console.WriteLine(User.Claims);
+
             return View(await _karters.getAllUsers(true));
         }
         [HttpGet]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        [AccountConfirmed]
         public async Task<ActionResult> Create(int? id)
         {
             ViewBag.tracks = await _tracks.getAllTracks();
@@ -52,6 +62,7 @@ namespace GoKartUnite.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Microsoft.AspNetCore.Authorization.Authorize]
         public async Task<ActionResult> Create(Karter karter)
         {
             if (!ModelState.IsValid)
@@ -59,12 +70,14 @@ namespace GoKartUnite.Controllers
                 ViewBag.tracks = await _tracks.getAllTracks();
                 return View("Create");  
             }
-            await _karters.createUser(karter);
+            await _karters.createUser(karter, User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value);
             return RedirectToAction("Details");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        [AccountConfirmed]
         public async Task<ActionResult> Delete(int id)
         {
             var karter = await _karters.getUser(id);
@@ -79,6 +92,8 @@ namespace GoKartUnite.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        [AccountConfirmed]
         public async Task<IActionResult> SendFriendRequest(string friendsName)
         {
             if (!await _karters.sendFriendRequest(friendsName))

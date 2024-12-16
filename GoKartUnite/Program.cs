@@ -6,7 +6,10 @@ using GoKartUnite.SingletonServices;
 using GoKartUnite.SignalRFiles;
 using GoKartUnite.Handlers;
 using Microsoft.AspNet.SignalR;
-
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 
 namespace GoKartUnite
 {
@@ -21,7 +24,20 @@ namespace GoKartUnite
             builder.Services.AddTransient<RelationshipHandler>();
             builder.Services.AddTransient<KarterHandler>();
             builder.Services.AddTransient<TrackHandler>();
-
+            var services = builder.Services;
+            var configuration = builder.Configuration;
+            builder.Services
+                    .AddAuthentication(options =>
+                    {
+                        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                        options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+                    })
+                    .AddCookie() // Cookie-based authentication for maintaining login session
+                    .AddGoogle(googleOptions =>
+                    {
+                        googleOptions.ClientId = configuration["Authentication:Google:ClientId"];
+                        googleOptions.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+                    });
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddSingleton<IHandleFriendsList, HandleFriendsList>();
@@ -48,8 +64,7 @@ namespace GoKartUnite
             app.UseRouting();
 
             app.UseAuthorization();
-            app.MapHub<ChatHub>("/chatHub");
-
+            app.MapHub<ChatHub>("/chatHub").RequireAuthorization();
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
