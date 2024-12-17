@@ -15,8 +15,15 @@
                     <li class="list-group-item w-100 text-break">@post.Title</li>
                     <li class="list-group-item w-100 text-break">@post.Author</li>
                     <li class="list-group-item w-100 text-break" >@post.Descripttion</li>
-                    <li class="list-group-item w-100 text-break" >@post.Upvotes</li>
+                            <li class="list-group-item w-100 text-break" >@post.Upvotes
+                            <button type="button" class="btn btn-success upvote-btn" 
+                            data-id="@post.Id",
+                            data-upvoteCount="@post.Upvotes">
+                            Upvote
+                    </button>
+                    </li>
             </div>
     }
 
 </div>
+    <script src="~/js/UpvoteBlogPost.js" asp-append-version="true"></script>

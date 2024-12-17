@@ -18,7 +18,7 @@ namespace GoKartUnite.Handlers
 
         public async Task<List<BlogPost>> getAllPosts()
         {
-            List<BlogPost> posts = await _context.BlogPosts.ToListAsync();
+            List<BlogPost> posts = await _context.BlogPosts.Include(k=>k.Upvotes).OrderBy(i => i.DateTimePosted).ToListAsync();
 
             return posts;
         }
@@ -46,7 +46,7 @@ namespace GoKartUnite.Handlers
             foreach(BlogPost bp in posts)
             {
                 BlogPostView post = new BlogPostView();
-
+                post.Id = bp.Id;
                 post.Title = bp.Title;
                 post.Descripttion = bp.Descripttion;
                 Karter Author = await _context.Karter.SingleOrDefaultAsync(k => k.Id == bp.AuthorId);
@@ -56,6 +56,20 @@ namespace GoKartUnite.Handlers
             }
 
             return retPosts;
+        }
+
+        public async Task<BlogPost> getPost(int Id, bool inclUpvotes = false)
+        {
+            if(inclUpvotes) return await _context.BlogPosts.Include(k => k.Upvotes).SingleOrDefaultAsync(k => k.Id == Id);
+            return await _context.BlogPosts.SingleOrDefaultAsync(k => k.Id == Id);
+        }
+
+        public async Task upvotePost(int Id, Upvotes upvoteToAdd)
+        {
+            BlogPost post = await getPost(Id);
+            post.Upvotes.Add(upvoteToAdd);
+
+            await _context.SaveChangesAsync();
         }
 
         

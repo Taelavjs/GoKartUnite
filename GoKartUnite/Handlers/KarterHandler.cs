@@ -41,9 +41,9 @@ namespace GoKartUnite.Handlers
             await deleteUser(await getUser(id));
         }
 
-        public async Task<bool> sendFriendRequest(string friendsName)
+        public async Task<bool> sendFriendRequest(string friendsName, string GoogleId)
         {
-            var karter2 = await getUser("taela");
+            var karter2 = await getUserByGoogleId(GoogleId);
             var karter = await getUser(friendsName);
             if (karter == null || karter2 == null)
             {
@@ -95,7 +95,7 @@ namespace GoKartUnite.Handlers
 
             if (prevKarterRecord == null)
             {
-                if(await _context.Karter.FirstOrDefaultAsync(k => k.Email == email) != null)
+                if(await _context.Karter.FirstOrDefaultAsync(k => k.GoogleId == karter.GoogleId) != null)
                 {
                     return;
                 }
@@ -113,9 +113,9 @@ namespace GoKartUnite.Handlers
             
         }
 
-        public async Task<Karter> getUserByEmail(string email)
+        public async Task<Karter> getUserByGoogleId(string GoogleId)
         {
-            var karterInDb = await _context.Karter.FirstOrDefaultAsync(k => k.Email == email);
+            var karterInDb = await _context.Karter.FirstOrDefaultAsync(k => k.GoogleId == GoogleId);
             return karterInDb;
         }
 

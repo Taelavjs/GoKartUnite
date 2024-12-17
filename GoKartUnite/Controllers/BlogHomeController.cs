@@ -5,6 +5,7 @@ using GoKartUnite.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Security.Claims;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace GoKartUnite.Controllers
 {
@@ -46,14 +47,36 @@ namespace GoKartUnite.Controllers
                 return View("Create");
             }
 
-            string email = User.Claims
-                .FirstOrDefault(c => c.Type == ClaimTypes.Email).Value;
+            string GoogleId = User.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
 
-            Karter k = await _karter.getUserByEmail(email);
+            Karter k = await _karter.getUserByGoogleId(GoogleId);
             
-            _blog.addPost(post, k);
+            await _blog.addPost(post, k);
 
             return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task UpvoteBlog(int id)
+        {
+            string GoogleId = User.Claims
+    .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            BlogPost post = await _blog.getPost(id, inclUpvotes : true);
+            Karter karter = await _karter.getUserByGoogleId(GoogleId);
+
+            bool alreadyUpvoted = post.Upvotes
+                .Any(upvote => upvote.VoterId == karter.Id);
+
+            if (alreadyUpvoted)
+            {
+
+                return;
+            }
+            var upvote = new Upvotes();
+            upvote.PostId = id;
+            upvote.VoterId = karter.Id;
+            await _blog.upvotePost(id, upvote);
         }
     }
 }

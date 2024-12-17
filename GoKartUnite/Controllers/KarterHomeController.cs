@@ -26,8 +26,6 @@ namespace GoKartUnite.Controllers
         [AccountConfirmed]
         public async Task<ActionResult> Index(string kartersName)
         {
-
-
             if (!String.IsNullOrEmpty(kartersName))
             {
                 var karters = await _karters.getUser(kartersName);
@@ -47,7 +45,6 @@ namespace GoKartUnite.Controllers
         }
         [HttpGet]
         [Microsoft.AspNetCore.Authorization.Authorize]
-        [AccountConfirmed]
         public async Task<ActionResult> Create(int? id)
         {
             ViewBag.tracks = await _tracks.getAllTracks();
@@ -75,14 +72,19 @@ namespace GoKartUnite.Controllers
                 return View("Create");  
             }
 
+            string NameIdentifier = User.Claims
+    .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+
             Karter karter = new Karter();
             karter.Id = kv.Id == 0 ? 0 : kv.Id;  
             karter.Name = kv.Name;
             karter.TrackId = kv.TrackId;
             karter.YearsExperience = kv.YearsExperience;
+            karter.GoogleId = NameIdentifier;
 
 
-            await _karters.createUser(karter, User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value);
+            await _karters.createUser(karter, 
+                User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value);
             return RedirectToAction("Details");
         }
 
@@ -108,7 +110,9 @@ namespace GoKartUnite.Controllers
         [AccountConfirmed]
         public async Task<IActionResult> SendFriendRequest(string friendsName)
         {
-            if (!await _karters.sendFriendRequest(friendsName))
+            string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+
+            if (!await _karters.sendFriendRequest(friendsName, googleId))
             {
                 return View("Index");
             }

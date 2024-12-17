@@ -17,10 +17,10 @@ namespace GoKartUnite.CustomAttributes
                 .RequestServices
                 .GetService(typeof(GoKartUniteContext)) as GoKartUniteContext;
 
-            var userEmailClaim = context.HttpContext.User.Claims
-                .FirstOrDefault(c => c.Type == ClaimTypes.Email);
+            var userGoogleId = context.HttpContext.User.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
 
-            if (userEmailClaim == null || userEmailClaim.Value == String.Empty)
+            if (userGoogleId == null || userGoogleId.Value == String.Empty)
             {
                 // Fail if the user ID claim is missing or invalid
                 context.Result = new RedirectResult("/login");
@@ -29,7 +29,7 @@ namespace GoKartUnite.CustomAttributes
 
             // Check if the user exists in the database and is confirmed
             var userExists = dbContext.Karter
-                .Any(u => u.Email == userEmailClaim.Value);
+                .Any(u => u.GoogleId == userGoogleId.Value);
 
             if (!userExists)
             {

@@ -1,4 +1,5 @@
 ﻿using GoKartUnite.Handlers;
+using GoKartUnite.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.SignalR;
 using System.Collections.Concurrent;
@@ -10,10 +11,12 @@ namespace GoKartUnite.SignalRFiles
     public class ChatHub : Hub
     {
         private readonly RelationshipHandler _relationships;
+        private readonly KarterHandler _karters;
         private static ConcurrentDictionary<string, string> connectedGroups = new ConcurrentDictionary<string, string>();
-        public ChatHub(RelationshipHandler relationship )
+        public ChatHub(RelationshipHandler relationship, KarterHandler karter )
         {
             _relationships = relationship;
+            _karters = karter;
         }
 
         public async Task SendMessage(string user, string message)
@@ -23,7 +26,10 @@ namespace GoKartUnite.SignalRFiles
                 
                 System.Diagnostics.Debug.WriteLine($"ChatHub instance created: {this.GetHashCode()}"); // Unique instance ID
                 string usn = connectedGroups.GetValueOrDefault(Context.ConnectionId);
-                await Clients.Group(usn).SendAsync("ReceiveMessage", await _relationships.getFriends(4030));
+                string usr = Context.GetHttpContext().User.Claims.FirstOrDefault(k => k.Type == ClaimTypes.NameIdentifier).Value;
+                Karter src = await _karters.getUserByGoogleId(usr);
+                int friendsNo = await _relationships.getFriends(src.Id);
+                await Clients.Group(usn).SendAsync("ReceiveMessage", friendsNo);
             }
             catch (Exception ex)
             {
