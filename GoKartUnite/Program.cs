@@ -27,6 +27,17 @@ namespace GoKartUnite
             builder.Services.AddTransient<BlogHandler>();
             var services = builder.Services;
             var configuration = builder.Configuration;
+            var secretFilePath = Path.Combine(Directory.GetCurrentDirectory(), "secrets.txt");
+            var secretsContent = File.ReadAllText(secretFilePath);
+            var secretPairs = secretsContent.Split(',');
+            foreach (var secret in secretPairs)
+            {
+                var keyValue = secret.Split('=');
+                if (keyValue.Length == 2)
+                {
+                    builder.Configuration[keyValue[0].Trim()] = keyValue[1].Trim();
+                }
+            }
             builder.Services
                     .AddAuthentication(options =>
                     {
@@ -36,8 +47,8 @@ namespace GoKartUnite
                     .AddCookie() // Cookie-based authentication for maintaining login session
                     .AddGoogle(googleOptions =>
                     {
-                        googleOptions.ClientId = configuration["Authentication:Google:ClientId"];
-                        googleOptions.ClientSecret = configuration["Authentication:Google:ClientSecret"];
+                        googleOptions.ClientId = configuration["ClientId"];
+                        googleOptions.ClientSecret = configuration["ClientSecret"];
                     });
             // Add services to the container.
             builder.Services.AddControllersWithViews();
