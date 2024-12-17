@@ -24,6 +24,7 @@ namespace GoKartUnite
             builder.Services.AddTransient<RelationshipHandler>();
             builder.Services.AddTransient<KarterHandler>();
             builder.Services.AddTransient<TrackHandler>();
+            builder.Services.AddTransient<BlogHandler>();
             var services = builder.Services;
             var configuration = builder.Configuration;
             builder.Services

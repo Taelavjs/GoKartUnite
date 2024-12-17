@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.SignalR;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Security.Claims;
 
 namespace GoKartUnite.SignalRFiles
@@ -46,6 +47,17 @@ namespace GoKartUnite.SignalRFiles
             await base.OnConnectedAsync();
             SendMessage(username, "");
             return;
+        }
+
+        public override async Task OnDisconnectedAsync(Exception? exception)
+        {
+            Trace.WriteLine(Context.ConnectionId + " - disconnected");
+
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, Context.GetHttpContext().Request.Query["username"]);
+            string res;
+            connectedGroups.Remove(Context.ConnectionId, out res);
+
+            await base.OnDisconnectedAsync(exception);
         }
     }
 }

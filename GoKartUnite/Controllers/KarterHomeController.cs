@@ -3,8 +3,10 @@ using GoKartUnite.CustomAttributes;
 using GoKartUnite.Data;
 using GoKartUnite.Handlers;
 using GoKartUnite.Models;
+using GoKartUnite.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using System.Security.Claims;
@@ -40,7 +42,8 @@ namespace GoKartUnite.Controllers
         {
             Console.WriteLine(User.Claims);
 
-            return View(await _karters.getAllUsers(true));
+            List<Karter> karters = await _karters.getAllUsers(true);
+            return View(await _karters.karterModelToView(karters));
         }
         [HttpGet]
         [Microsoft.AspNetCore.Authorization.Authorize]
@@ -53,7 +56,8 @@ namespace GoKartUnite.Controllers
             {
                 var karterInDb = await _karters.getUser(id.Value);
                 ViewData["Title"] = "Editing Karter Details";
-                return View(karterInDb);
+                
+                return View(await _karters.karterModelToView(karterInDb));
             }
             ViewData["Title"] = "Creating Karter Profile";
 
@@ -63,13 +67,21 @@ namespace GoKartUnite.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Microsoft.AspNetCore.Authorization.Authorize]
-        public async Task<ActionResult> Create(Karter karter)
+        public async Task<ActionResult> Create(KarterView kv)
         {
             if (!ModelState.IsValid)
             {
                 ViewBag.tracks = await _tracks.getAllTracks();
                 return View("Create");  
             }
+
+            Karter karter = new Karter();
+            karter.Id = kv.Id == 0 ? 0 : kv.Id;  
+            karter.Name = kv.Name;
+            karter.TrackId = kv.TrackId;
+            karter.YearsExperience = kv.YearsExperience;
+
+
             await _karters.createUser(karter, User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value);
             return RedirectToAction("Details");
         }
@@ -106,6 +118,7 @@ namespace GoKartUnite.Controllers
 
 
         }
+
 
 
     }

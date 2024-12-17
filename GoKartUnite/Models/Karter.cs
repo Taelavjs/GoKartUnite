@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using GoKartUnite.Data;
+﻿using GoKartUnite.Data;
 using GoKartUnite.Migrations;
 using Humanizer.Localisation;
 using Microsoft.EntityFrameworkCore;
@@ -16,20 +15,15 @@ namespace GoKartUnite.Models
     public class Karter
     {
         public int Id { get; set; }
-        [MaxLength(255)]
-        [EmailAddress]
         public string? Email { get; set; }
+        public string? GoogleId { get; set; }
 
-        [Display(Name = "Karter")]
-        [MinLength(3)]
-        [StringLength(15)]
 
-        public required string Name { get; set; }
-        [Range(0, 20)]
-        public required int YearsExperience { get; set; }
+
+        public string Name { get; set; }
+        public int YearsExperience { get; set; }
 
         // Relationships
-        [Display(Name = "Local Track Id")]
         public int? TrackId { get; set; }
         public Track? Track { get; set; }
         

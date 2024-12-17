@@ -1,0 +1,21 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@using GoKartUnite.ViewModel;
+
+@model IEnumerable<BlogPostView>
+
+<div class="parent container d-flex flex-column justify-content-center align-items-center h-100">
+
+    @foreach (BlogPostView post in Model)
+    {
+        <div class="container list-group justify-content-center align-items-center w-100 bg-info mt-5">
+                    <li class="list-group-item w-100 text-break">@post.Title</li>
+                    <li class="list-group-item w-100 text-break">@post.Author</li>
+                    <li class="list-group-item w-100 text-break" >@post.Descripttion</li>
+        </div>
+    }
+
+</div>

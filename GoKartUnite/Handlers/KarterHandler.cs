@@ -3,6 +3,7 @@ using GoKartUnite.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Web.Mvc;
 using System.Security.Claims;
+using GoKartUnite.ViewModel;
 
 namespace GoKartUnite.Handlers
 {
@@ -25,6 +26,7 @@ namespace GoKartUnite.Handlers
             var karterInDb = await _context.Karter.SingleOrDefaultAsync(k => k.Name.ToLower() == name);
             return karterInDb;
         }
+
         public async Task deleteUser(Karter karter)
         {
             var friendshipsToRemove = await _context.Friendships
@@ -115,6 +117,35 @@ namespace GoKartUnite.Handlers
         {
             var karterInDb = await _context.Karter.FirstOrDefaultAsync(k => k.Email == email);
             return karterInDb;
+        }
+
+        public async Task<List<KarterView>> karterModelToView(List<Karter> karters)
+        {
+            List<KarterView> kvs = new List<KarterView>();
+            foreach (var karter in karters)
+            {
+                
+                KarterView kv = new KarterView();
+                kv.Id = karter.Id;
+                kv.YearsExperience = karter.YearsExperience;
+                kv.Name = karter.Name;
+                kv.LocalTrack = karter.Track;
+
+
+                kvs.Add(kv);
+            }
+
+            return kvs;
+        }
+
+        public async Task<KarterView> karterModelToView(Karter karter)
+        {
+
+            KarterView kv = new KarterView();
+            kv.YearsExperience = karter.YearsExperience;
+            kv.Name = karter.Name;
+            kv.LocalTrack = karter.Track;
+            return kv;
         }
     }
 }
