@@ -39,6 +39,7 @@ namespace GoKartUnite.Handlers
 
         }
 
+
         public async Task<List<BlogPostView>> getModelToView(List<BlogPost> posts)
         {
             List<BlogPostView> retPosts = new List<BlogPostView>();
@@ -50,11 +51,14 @@ namespace GoKartUnite.Handlers
                 post.Descripttion = bp.Descripttion;
                 Karter Author = await _context.Karter.SingleOrDefaultAsync(k => k.Id == bp.AuthorId);
                 post.Author = Author.Name;
+                post.Upvotes = bp.Upvotes.Count();
                 retPosts.Add(post);
             }
 
             return retPosts;
         }
+
+        
 
     }
 }

@@ -14,6 +14,8 @@ namespace GoKartUnite.Models
         public string Descripttion { get; set; } = string.Empty;
         private DateTime DateTimePosted { get; set; } = DateTime.UtcNow;
 
+        public ICollection<Upvotes> Upvotes { get; set; } = new List<Upvotes>();
+
 
     }
 }
