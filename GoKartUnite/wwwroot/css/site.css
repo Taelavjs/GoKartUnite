@@ -20,3 +20,49 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.navBarDyn {
+    width: 90%;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    border-top: 10px unset;
+    border-color: #b8d5b4;
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+    background-color: #7a8179;
+    
+}
+
+.textEven {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-left: -15px;
+    margin-right: -15px;
+}
+.activeColor {
+    border-bottom: 2px solid #b8d5b4;
+    border-radius: 7px;
+    animation: borderFadeIn 0.25s forwards; 
+}
+@media (min-width: 768px) {
+    .navBarDyn {
+        width: 40%;
+        justify-self: center;
+    }
+}
+
+@keyframes borderFadeIn {
+    from {
+        border-bottom-color: transparent;
+        margin-bottom: 0;
+    }
+
+    to {
+        border-bottom-color: #b8d5b4;
+        margin-bottom: 0.5%;
+    }
+}
