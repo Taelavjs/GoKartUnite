@@ -19,7 +19,7 @@ namespace GoKartUnite
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddDbContext<GoKartUniteContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("GoKartUniteContext") ?? throw new InvalidOperationException("Connection string 'GoKartUniteContext' not found.")));
+                            options.UseSqlServer(builder.Configuration.GetConnectionString("GoKartUniteContext") ?? throw new InvalidOperationException("Connection string 'GoKartUniteContext' not found.")));
             builder.Services.AddSignalR();
             builder.Services.AddTransient<RelationshipHandler>();
             builder.Services.AddTransient<KarterHandler>();

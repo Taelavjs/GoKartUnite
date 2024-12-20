@@ -1,19 +1,126 @@
 ﻿
 @{
-    ViewData["Title"] = "Index";
+	ViewData["Title"] = "Index";
 }
 
 <h1>GoKartersHome</h1>
+@* <form asp-action="Index" method="get"> *@
+@*     <p> *@
+@*         <label>Title: <input type="text" name="kartersName" /></label> *@
+@*         <input type="submit" value="Filter" /> *@
+@*     </p> *@
+@* </form> *@
 
-<form asp-action="Index" method="get">
-    <p>
-        <label>Title: <input type="text" name="kartersName" /></label>
-        <input type="submit" value="Filter" />
-    </p>
-</form>
+@* <form asp-action="SendFriendRequest" method="post"> *@
+@*     <label>Friends Name: <input type="text" name="friendsName" /></label> *@
+@*     <input type="submit" value="Filter" /> *@
+@*     @Html.ValidationSummary(true, "", new { @class = "text-danger font-weight-bold" })   *@
+@* </form> *@
 
-<form asp-action="SendFriendRequest" method="post">
-    <label>Friends Name: <input type="text" name="friendsName" /></label>
-    <input type="submit" value="Filter" />
-    @Html.ValidationSummary(true, "", new { @class = "text-danger font-weight-bold" })  
-</form>
+@* <div> *@
+
+@* </div> *@
+<div class="container">
+	<!-- Profile Section -->
+	<div class="profile-section">
+	<div class="profile-header">
+		<div class="profile-image"></div>
+		<div class="profile-details">
+		<div class="profile-name">Senio9r</div>
+		<div class="profile-info">
+			<div><label>Local Track:</label> Sandown Park</div>
+			<div><label>Email:</label> Example@hotmail.com</div>
+		</div>
+		</div>
+	</div>
+	</div>
+
+	<!-- Table Section -->
+	<div class="table-section">
+	<!-- Friends Table -->
+	<div class="table-container">
+		<table>
+		<thead>
+			<tr>
+			<th></th>
+			<th>Friends</th>
+			<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+			<td>Img</td>
+			<td>Tae Boo</td>
+			<td>X</td>
+			</tr>
+			<tr>
+			<td>Img</td>
+			<td>Tae Boo</td>
+			<td>X</td>
+			</tr>
+		</tbody>
+		</table>
+	</div>
+
+	<!-- Local Karters Table -->
+	<div class="table-container">
+		<table>
+		<thead>
+			<tr>
+			<th></th>
+			<th>Local Karters</th>
+			<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+			<td>Img</td>
+			<td>Tae Boo</td>
+			<td>X</td>
+			</tr>
+			<tr>
+			<td>Img</td>
+			<td>Tae Boo</td>
+			<td>X</td>
+			</tr>              <tr>
+			<td>Img</td>
+			<td>Tae Boo</td>
+			<td>X</td>
+			</tr>
+			<tr>
+			<td>Img</td>
+			<td>Tae Boo</td>
+			<td>X</td>
+			</tr>              <tr>
+			<td>Img</td>
+			<td>Tae Boo</td>
+			<td>X</td>
+			</tr>
+			<tr>
+			<td>Img</td>
+			<td>Tae Boo</td>
+			<td>X</td>
+			</tr>              <tr>
+			<td>Img</td>
+			<td>Tae Boo</td>
+			<td>X</td>
+			</tr>
+			<tr>
+			<td>Img</td>
+			<td>Tae Boo</td>
+			<td>X</td>
+			</tr>              <tr>
+			<td>Img</td>
+			<td>Tae Boo</td>
+			<td>X</td>
+			</tr>
+			<tr>
+			<td>Img</td>
+			<td>Tae Boo</td>
+			<td>X</td>
+			</tr>
+		</tbody>
+		</table>
+	</div>
+	</div>
+</div>
