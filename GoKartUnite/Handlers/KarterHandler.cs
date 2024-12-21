@@ -95,7 +95,7 @@ namespace GoKartUnite.Handlers
 
             if (prevKarterRecord == null)
             {
-                if(await _context.Karter.FirstOrDefaultAsync(k => k.GoogleId == karter.GoogleId) != null)
+                if (await _context.Karter.FirstOrDefaultAsync(k => k.GoogleId == karter.GoogleId) != null)
                 {
                     return;
                 }
@@ -110,11 +110,17 @@ namespace GoKartUnite.Handlers
             }
 
             await _context.SaveChangesAsync();
-            
+
         }
 
-        public async Task<Karter> getUserByGoogleId(string GoogleId)
+        public async Task<Karter> getUserByGoogleId(string GoogleId, bool withTrack = false)
         {
+
+            if (withTrack)
+            {
+                var karterInDbD = await _context.Karter.Include(k => k.Track).FirstOrDefaultAsync(k => k.GoogleId == GoogleId);
+                return karterInDbD;
+            }
             var karterInDb = await _context.Karter.FirstOrDefaultAsync(k => k.GoogleId == GoogleId);
             return karterInDb;
         }
@@ -124,7 +130,7 @@ namespace GoKartUnite.Handlers
             List<KarterView> kvs = new List<KarterView>();
             foreach (var karter in karters)
             {
-                
+
                 KarterView kv = new KarterView();
                 kv.Id = karter.Id;
                 kv.YearsExperience = karter.YearsExperience;

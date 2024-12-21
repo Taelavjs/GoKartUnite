@@ -73,5 +73,18 @@ namespace GoKartUnite.Handlers
         {
             return await _context.Track.ToListAsync();
         }
+
+        public async Task<List<Track>> getTrackByTitle(string title, List<Locations> location)
+        {
+            if (title == "" || title == null) return new List<Track>();
+            List<Track> tracks = _context.Track.Where(t => t.Title.ToLower().Contains(title.ToLower()) && location.Contains(t.Location)).ToList();
+            if (tracks.Count == 0)
+            {
+                return new List<Track>();
+            }
+
+
+            return tracks;
+        }
     }
 }

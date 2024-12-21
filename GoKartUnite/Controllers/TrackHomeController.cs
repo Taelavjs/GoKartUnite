@@ -88,7 +88,7 @@ namespace GoKartUnite.Controllers
             // Find the track with its related karters
             bool res = await _tracks.deleteTrack(id);
 
-            if(res)
+            if (res)
             {
                 return RedirectToAction("Details");
             }
@@ -102,11 +102,26 @@ namespace GoKartUnite.Controllers
         {
             if (id == null) return View(await _tracks.getAllTracks());
 
-            
+
 
 
             return View("KartersLocalTrack", await _karters.getAllUsersByTrackId(id.Value));
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        [AccountConfirmed]
+        public async Task<IActionResult> SearchTracks(string trackSearched, List<Locations> location)
+        {
+            List<Track> tracks = await _tracks.getTrackByTitle(trackSearched, location);
+
+            return View("Details", tracks);
+
+        }
+
+
+
 
     }
 }

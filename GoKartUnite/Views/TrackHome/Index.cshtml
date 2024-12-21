@@ -4,4 +4,12 @@
 }
 
 <h1>Track Home</h1>
-
+<form asp-action="SearchTracks" method="post"> 
+    <label>Friends Name: <input type="text" name="TrackSearched" /></label> 
+    @foreach (var location in Enum.GetValues(typeof(GoKartUnite.Models.Locations)))
+    {
+            <label>@location: <input type="checkbox" name="Location" value="@location" /></label>
+    }
+    <input type="submit" value="Filter" /> 
+    @Html.ValidationSummary(true, "", new { @class = "text-danger font-weight-bold" })   
+</form> 

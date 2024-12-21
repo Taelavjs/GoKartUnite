@@ -3,6 +3,7 @@
 	ViewData["Title"] = "Index";
 }
 
+@model Karter
 <h1>GoKartersHome</h1>
 @* <form asp-action="Index" method="get"> *@
 @*     <p> *@
@@ -26,10 +27,10 @@
 	<div class="profile-header">
 		<div class="profile-image"></div>
 		<div class="profile-details">
-		<div class="profile-name">Senio9r</div>
+		<div class="profile-name">@Model.Name</div>
 		<div class="profile-info">
-			<div><label>Local Track:</label> Sandown Park</div>
-			<div><label>Email:</label> Example@hotmail.com</div>
+			<div><label>Local Track:</label> @(Model.Track == null ? "None" : Model.Track.Title)</div>
+			<div><label>Email:</label> @Model.Email</div>
 		</div>
 		</div>
 	</div>
