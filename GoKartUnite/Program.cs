@@ -3,9 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using GoKartUnite.Data;
 using System.Net.WebSockets;
 using GoKartUnite.SingletonServices;
-using GoKartUnite.SignalRFiles;
 using GoKartUnite.Handlers;
-using Microsoft.AspNet.SignalR;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication;
@@ -76,7 +74,6 @@ namespace GoKartUnite
             app.UseRouting();
 
             app.UseAuthorization();
-            app.MapHub<ChatHub>("/chatHub").RequireAuthorization();
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");

@@ -23,7 +23,7 @@ namespace GoKartUnite.Controllers
         public async Task<IActionResult> Index()
         {
             List<BlogPost> allPosts = await _blog.getAllPosts();
-            
+
 
 
             return View(await _blog.getModelToView(allPosts));
@@ -51,18 +51,21 @@ namespace GoKartUnite.Controllers
                 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
 
             Karter k = await _karter.getUserByGoogleId(GoogleId);
-            
+
             await _blog.addPost(post, k);
 
             return RedirectToAction("Index");
         }
 
+        [ValidateAntiForgeryToken]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        [AccountConfirmed]
         [HttpPost]
         public async Task UpvoteBlog(int id)
         {
             string GoogleId = User.Claims
     .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            BlogPost post = await _blog.getPost(id, inclUpvotes : true);
+            BlogPost post = await _blog.getPost(id, inclUpvotes: true);
             Karter karter = await _karter.getUserByGoogleId(GoogleId);
 
             bool alreadyUpvoted = post.Upvotes
@@ -78,5 +81,7 @@ namespace GoKartUnite.Controllers
             upvote.VoterId = karter.Id;
             await _blog.upvotePost(id, upvote);
         }
+
+
     }
 }
