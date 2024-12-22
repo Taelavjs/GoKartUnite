@@ -4,36 +4,43 @@
 @using GoKartUnite.ViewModel;
 
 @model IEnumerable<BlogPostView>
-    <link rel="stylesheet" href="~/css/Blog.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/Blog.css" asp-append-version="true" />
 
-    <div class="container">
-        <H1>Blog</H1>
-        @foreach (var post in Model)
-        {
-            <div class="blog-post">
-              <div class="blog-post-title">@post.Title</div>
-              <div class="blog-post-author">By: @post.Author</div>
-              <div class="blog-post-description">@post.Descripttion</div>
-              <div class="blog-post-upvotes">
+<div class="container">
+    <H1>Blog</H1>
+    @foreach (var post in Model)
+    {
+        <div class="blog-post">
+            <div class="blog-post-title">@post.Title</div>
+            <div class="blog-post-author">By: @post.Author</div>
+            <div class="blog-post-description">@post.Descripttion</div>
+            <div class="blog-post-upvotes">
                 <span>Upvotes: @post.Upvotes</span>
                 <button
-                  type="button"
-                  class="upvote-btn"
-                  data-id="@post.Id"
-                  data-upvoteCount="@post.Upvotes"
+                type="button"
+                class="upvote-btn"
+                data-id="@post.Id"
+                data-upvoteCount="@post.Upvotes"
                 >
-                  Upvote
+                    Upvote
                 </button>
-              </div>
             </div>
-        }
-    </div>
-    <ul class="pagination">
-        <li class="page-item @(ViewBag.Page == 1 ? "disabled" : "")">
-            <a class="page-link" href="?page=@(ViewBag.Page - 1)">Previous</a>
-        </li>
+        </div>
+    }
+</div>
+<ul class="pagination">
+    <li class="page-item @(ViewBag.Page == 1 ? "disabled" : "")">
+        <a class="page-link" href="?page=@(ViewBag.Page - 1)">Previous</a>
+        <a class="page-link" href="?page=1"> Start </a>
+    </li>
 
-        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+    @{
+        int leftCounter = Math.Max(ViewBag.Page - 2, 1);
+        int rightCounter = Math.Min(ViewBag.Page + 2, ViewBag.TotalPages);
+
+    }
+
+    @for (int i = leftCounter; i <= rightCounter; i++)
         {
             <li class="page-item @(i == ViewBag.Page ? "active" : "")">
                 <a class="page-link" href="?page=@i">@i</a>
@@ -42,6 +49,8 @@
 
         <li class="page-item @(ViewBag.Page == ViewBag.TotalPages ? "disabled" : "")">
             <a class="page-link" href="?page=@(ViewBag.Page + 1)">Next</a>
+            <a class="page-link" href="?page=@(ViewBag.TotalPages)"> End </a>
+
         </li>
     </ul>
     <script src="~/js/UpvoteBlogPost.js" asp-append-version="true"></script>

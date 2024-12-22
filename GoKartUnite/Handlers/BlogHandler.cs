@@ -57,7 +57,7 @@ namespace GoKartUnite.Handlers
                 post.Descripttion = bp.Descripttion;
                 Karter Author = await _context.Karter.SingleOrDefaultAsync(k => k.Id == bp.AuthorId);
                 post.Author = Author.Name;
-                post.Upvotes = bp.Upvotes.Count();
+                post.Upvotes = bp.Upvotes.Count;
                 retPosts.Add(post);
             }
 

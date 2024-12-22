@@ -22,9 +22,14 @@ namespace GoKartUnite.Controllers
         }
         public async Task<IActionResult> Index(int page = 1)
         {
-            List<BlogPost> allPosts = await _blog.getAllPosts(page);
             ViewBag.TotalPages = await _blog.getTotalPageCount();
+            page = Math.Min(page, ViewBag.TotalPages);
+            page = Math.Max(page, 1);
             ViewBag.page = page;
+
+
+            List<BlogPost> allPosts = await _blog.getAllPosts(page);
+
 
 
             return View(await _blog.getModelToView(allPosts));

@@ -1,11 +1,18 @@
 ﻿body {
-    margin-bottom: 70%;
+    padding-bottom: 0;
+    margin-bottom: 0;
 }
 
-ul {
-    margin: auto;
-    padding: auto;
+.pagination {
+    margin-bottom: 9vh;
+    margin-top: 0;
     width: 100%;
     justify-content: center;
     align-content: center;
+}
+
+.container {
+    padding-bottom: 0;
+    margin-bottom: 3vh;
+    height: fit-content;
 }
