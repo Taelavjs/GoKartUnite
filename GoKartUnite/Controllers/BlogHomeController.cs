@@ -28,7 +28,7 @@ namespace GoKartUnite.Controllers
             ViewBag.page = page;
 
 
-            List<BlogPost> allPosts = await _blog.getAllPosts(page);
+            List<BlogPost> allPosts = await _blog.getAllPosts(page, getTaggedTrack: true);
 
 
 

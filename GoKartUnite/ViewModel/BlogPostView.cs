@@ -12,5 +12,6 @@ namespace GoKartUnite.ViewModel
         public string Descripttion { get; set; } = string.Empty;
         public string? Author { get; set; }
         public int Upvotes { get; set; } = 0;
+        public string TaggedTrack { get; set; } = string.Empty;
     }
 }

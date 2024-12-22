@@ -18,10 +18,15 @@ namespace GoKartUnite.Handlers
             _context = context;
         }
 
-        public async Task<List<BlogPost>> getAllPosts(int page = 1, int pageSize = 10)
+        public async Task<List<BlogPost>> getAllPosts(int page = 1, int pageSize = 10, bool getTaggedTrack = false)
         {
 
+            if (getTaggedTrack)
+            {
+                List<BlogPost> postsTracks = await _context.BlogPosts.Include(k => k.Upvotes).Include(k => k.TaggedTrack).OrderBy(i => i.DateTimePosted).Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+                return postsTracks;
 
+            }
             List<BlogPost> posts = await _context.BlogPosts.Include(k => k.Upvotes).OrderBy(i => i.DateTimePosted).Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
 
             // List<BlogPost> posts = await _context.BlogPosts.Include(k => k.Upvotes).OrderBy(i => i.DateTimePosted).ToListAsync();
@@ -58,6 +63,7 @@ namespace GoKartUnite.Handlers
                 Karter Author = await _context.Karter.SingleOrDefaultAsync(k => k.Id == bp.AuthorId);
                 post.Author = Author.Name;
                 post.Upvotes = bp.Upvotes.Count;
+                post.TaggedTrack = bp.TaggedTrack?.Title;
                 retPosts.Add(post);
             }
 

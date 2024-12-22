@@ -4,6 +4,7 @@ using GoKartUnite.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GoKartUnite.Migrations
 {
     [DbContext(typeof(GoKartUniteContext))]
-    partial class GoKartUniteContextModelSnapshot : ModelSnapshot
+    [Migration("20241222161911_taggedTrackBlogUpdate2")]
+    partial class taggedTrackBlogUpdate2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,7 +43,10 @@ namespace GoKartUnite.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("TaggedTrackId")
+                    b.Property<int?>("TaggedTrackId1")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TaggedTrackIdId")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
@@ -51,7 +57,9 @@ namespace GoKartUnite.Migrations
 
                     b.HasIndex("AuthorId");
 
-                    b.HasIndex("TaggedTrackId");
+                    b.HasIndex("TaggedTrackId1");
+
+                    b.HasIndex("TaggedTrackIdId");
 
                     b.ToTable("BlogPosts");
                 });
@@ -170,11 +178,17 @@ namespace GoKartUnite.Migrations
 
                     b.HasOne("GoKartUnite.Models.Track", "TaggedTrack")
                         .WithMany()
-                        .HasForeignKey("TaggedTrackId");
+                        .HasForeignKey("TaggedTrackId1");
+
+                    b.HasOne("GoKartUnite.Models.Track", "TaggedTrackId")
+                        .WithMany()
+                        .HasForeignKey("TaggedTrackIdId");
 
                     b.Navigation("Author");
 
                     b.Navigation("TaggedTrack");
+
+                    b.Navigation("TaggedTrackId");
                 });
 
             modelBuilder.Entity("GoKartUnite.Models.Friendships", b =>

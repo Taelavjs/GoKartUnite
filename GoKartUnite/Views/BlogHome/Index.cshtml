@@ -10,22 +10,7 @@
     <H1>Blog</H1>
     @foreach (var post in Model)
     {
-        <div class="blog-post">
-            <div class="blog-post-title">@post.Title</div>
-            <div class="blog-post-author">By: @post.Author</div>
-            <div class="blog-post-description">@post.Descripttion</div>
-            <div class="blog-post-upvotes">
-                <span>Upvotes: @post.Upvotes</span>
-                <button
-                type="button"
-                class="upvote-btn"
-                data-id="@post.Id"
-                data-upvoteCount="@post.Upvotes"
-                >
-                    Upvote
-                </button>
-            </div>
-        </div>
+        @await Html.PartialAsync("Blog", post);
     }
 </div>
 <ul class="pagination">

@@ -16,3 +16,9 @@
     margin-bottom: 3vh;
     height: fit-content;
 }
+
+.blog-post-description {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 5ch;
+}

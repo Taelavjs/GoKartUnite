@@ -16,6 +16,7 @@ namespace GoKartUnite.Models
 
         public ICollection<Upvotes> Upvotes { get; set; } = new List<Upvotes>();
 
-
+        public Track? TaggedTrack { get; set; }
+        public int? TaggedTrackId { get; set; }
     }
 }

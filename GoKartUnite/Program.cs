@@ -91,23 +91,21 @@ namespace GoKartUnite
 
         private static void dummyDbData(GoKartUniteContext context)
         {
-            if (context.BlogPosts.Count() > 100) return;
+            if (context.BlogPosts.Count() > 300) return;
             for (int i = 0; i < 100; i++)
             {
                 BlogPost post = new BlogPost
                 {
                     AuthorId = 4032,
                     Title = "Test",
-                    Descripttion = "Test"
+                    Descripttion = "Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum ",
+                    TaggedTrackId = 1014
                 };
 
                 context.BlogPosts.Add(post);
                 context.SaveChanges();
             }
 
-
         }
-
-
     }
 }
