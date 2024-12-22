@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
+using GoKartUnite.Models;
 
 namespace GoKartUnite
 {
@@ -78,8 +79,31 @@ namespace GoKartUnite
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
-
+            using (var scope = app.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<GoKartUniteContext>();
+                dummyDbData(context);
+            }
             app.Run();
+        }
+
+        private static void dummyDbData(GoKartUniteContext context)
+        {
+            if (context.BlogPosts.Count() > 100) return;
+            for (int i = 0; i < 100; i++)
+            {
+                BlogPost post = new BlogPost
+                {
+                    AuthorId = 4032,
+                    Title = "Test",
+                    Descripttion = "Test"
+                };
+
+                context.BlogPosts.Add(post);
+                context.SaveChanges();
+            }
+
+
         }
 
 
