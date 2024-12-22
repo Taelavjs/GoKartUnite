@@ -20,10 +20,11 @@ namespace GoKartUnite.Controllers
             _blog = blog;
             _karter = karter;
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
-            List<BlogPost> allPosts = await _blog.getAllPosts();
-
+            List<BlogPost> allPosts = await _blog.getAllPosts(page);
+            ViewBag.TotalPages = await _blog.getTotalPageCount();
+            ViewBag.page = page;
 
 
             return View(await _blog.getModelToView(allPosts));
@@ -57,7 +58,6 @@ namespace GoKartUnite.Controllers
             return RedirectToAction("Index");
         }
 
-        [ValidateAntiForgeryToken]
         [Microsoft.AspNetCore.Authorization.Authorize]
         [AccountConfirmed]
         [HttpPost]
