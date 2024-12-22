@@ -1,5 +1,6 @@
 ﻿using GoKartUnite.Data;
 using GoKartUnite.Models;
+using GoKartUnite.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using System.Web.Mvc;
 
@@ -85,6 +86,32 @@ namespace GoKartUnite.Handlers
 
 
             return tracks;
+        }
+
+
+        public async Task<List<TrackView>> modelToView(List<Track> tracks)
+        {
+            List<TrackView> trackRet = new List<TrackView>();
+            foreach (Track track in tracks)
+            {
+                TrackView trackView = new TrackView();
+                trackView.Title = track.Title;
+                trackView.Description = track.Description;
+                trackRet.Add(trackView);
+            }
+
+
+            return trackRet;
+        }
+
+        public async Task<TrackView> modelToView(Track track)
+        {
+            TrackView trackView = new TrackView();
+            trackView.Title = track.Title;
+            trackView.Description = track.Description;
+
+
+            return trackView;
         }
     }
 }

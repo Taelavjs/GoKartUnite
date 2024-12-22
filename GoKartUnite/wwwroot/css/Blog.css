@@ -22,3 +22,8 @@
     text-overflow: ellipsis;
     max-height: 5ch;
 }
+
+
+.right {
+    margin-left: auto;
+}

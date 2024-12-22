@@ -5,35 +5,51 @@
     ViewData["Title"] = "Details";
 }
 
-<div>
-    <table class="table">
+@* <div> *@
+@*     <table class="table"> *@
 
-    <thead>
-        <th scope="col">#Id</th>
-        <th scope="col">Title</th>
-        <th scope="col">Desc.</th>
-        <th scope="col">Location</th>
-        <th scope="col">Options</th>
-        <th scope="col"></th>
-    </thead>
-    <tbody>
-    @{
-        foreach(var track in Model){
-            <tr>
-                <th scope="row">@track.Id</th>
-                <td>@track.Title</td>
-                <td>@track.Description</td>
-                <td>@track.Location</td>
-                <td><a asp-action="Create" asp-route-id="@track.Id">Edit</a></td>
-                <td>
-                        <form asp-action="Delete" asp-route-id="@track.Id" method="post" style="display:inline;">
-                                @Html.AntiForgeryToken()
-                        <input type="submit" value="Delete" class="btn btn-danger" />
-                    </form>   
-                </td>
-            </tr>
-        }
+@*     <thead> *@
+@*         <th scope="col">#Id</th> *@
+@*         <th scope="col">Title</th> *@
+@*         <th scope="col">Desc.</th> *@
+@*         <th scope="col">Location</th> *@
+@*         <th scope="col">Options</th> *@
+@*         <th scope="col"></th> *@
+@*     </thead> *@
+@*     <tbody> *@
+@*     @{ *@
+@*         foreach(var track in Model){ *@
+@*             <tr> *@
+@*                 <th scope="row">@track.Id</th> *@
+@*                 <td>@track.Title</td> *@
+@*                 <td>@track.Description</td> *@
+@*                 <td>@track.Location</td> *@
+@*                 <td><a asp-action="Create" asp-route-id="@track.Id">Edit</a></td> *@
+@*                 <td> *@
+@*                         <form asp-action="Delete" asp-route-id="@track.Id" method="post" style="display:inline;"> *@
+@*                                 @Html.AntiForgeryToken() *@
+@*                         <input type="submit" value="Delete" class="btn btn-danger" /> *@
+@*                     </form>    *@
+@*                 </td> *@
+@*             </tr> *@
+@*         } *@
+@*     } *@
+@*     </tbody> *@
+@* </table> *@
+@* </div> *@
+
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@using GoKartUnite.ViewModel;
+
+@model IEnumerable<TrackView>
+<link rel="stylesheet" href="~/css/Blog.css" asp-append-version="true" />
+
+<div class="container">
+    <H1>Blog</H1>
+    @foreach (var track in Model)
+    {
+        @await Html.PartialAsync("Track", track);
     }
-    </tbody>
-</table>
 </div>

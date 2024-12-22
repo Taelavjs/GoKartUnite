@@ -2,10 +2,12 @@
 using GoKartUnite.Data;
 using GoKartUnite.Handlers;
 using GoKartUnite.Models;
+using GoKartUnite.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NuGet.DependencyResolver;
+using NuGet.Protocol.Core.Types;
 
 namespace GoKartUnite.Controllers
 {
@@ -100,10 +102,8 @@ namespace GoKartUnite.Controllers
         [AccountConfirmed]
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null) return View(await _tracks.getAllTracks());
-
-
-
+            var tracksRender = _tracks.modelToView(await _tracks.getAllTracks());
+            if (id == null) return View(await tracksRender);
 
             return View("KartersLocalTrack", await _karters.getAllUsersByTrackId(id.Value));
         }
@@ -114,7 +114,7 @@ namespace GoKartUnite.Controllers
         [AccountConfirmed]
         public async Task<IActionResult> SearchTracks(string trackSearched, List<Locations> location)
         {
-            List<Track> tracks = await _tracks.getTrackByTitle(trackSearched, location);
+            List<TrackView> tracks = await _tracks.modelToView(await _tracks.getTrackByTitle(trackSearched, location));
 
             return View("Details", tracks);
 
