@@ -13,6 +13,7 @@ namespace GoKartUnite.Models
 
         // Relationships
         public ICollection<Karter>? Karters { get; set; }
+        public ICollection<BlogPost>? BlogPosts { get; set; }
     }
 
     public enum Locations

@@ -94,9 +94,14 @@ namespace GoKartUnite.Handlers
             List<TrackView> trackRet = new List<TrackView>();
             foreach (Track track in tracks)
             {
+                int kartersCount = _context.Track.Entry(track).Collection(p => p.Karters).Query().Count();
+                int blogCount = _context.Track.Entry(track).Collection(p => p.BlogPosts).Query().Count();
+
                 TrackView trackView = new TrackView();
                 trackView.Title = track.Title;
                 trackView.Description = track.Description;
+                trackView.karters = kartersCount;
+                trackView.blogPosts = blogCount;
                 trackRet.Add(trackView);
             }
 
