@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Web.Mvc;
 using System.Security.Claims;
 using GoKartUnite.ViewModel;
+using Microsoft.IdentityModel.Tokens;
 
 namespace GoKartUnite.Handlers
 {
@@ -73,8 +74,20 @@ namespace GoKartUnite.Handlers
             return true;
         }
 
-        public async Task<List<Karter>> getAllUsers(bool fetchTracks)
+        public async Task<List<Karter>> getAllUsers(bool fetchTracks, string? track = null)
         {
+            if (fetchTracks)
+            {
+                return await _context.Karter.Include(k => k.Track).ToListAsync();
+
+            }
+
+            if (!track.IsNullOrEmpty())
+            {
+                return await _context.Karter.Include(k => k.Track).Where(k => k.Track != null && k.Track.Title == track).ToListAsync();
+
+            }
+
             return await _context.Karter.Include(k => k.Track).ToListAsync();
         }
 

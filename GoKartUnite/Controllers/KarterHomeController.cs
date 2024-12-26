@@ -35,8 +35,10 @@ namespace GoKartUnite.Controllers
 
 
             return View(await _karters.getUserByGoogleId(User.Claims
-    .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack:true));
+    .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true));
         }
+
+
         [HttpGet]
         [Microsoft.AspNetCore.Authorization.Authorize]
         [AccountConfirmed]
@@ -47,6 +49,19 @@ namespace GoKartUnite.Controllers
             List<Karter> karters = await _karters.getAllUsers(true);
             return View(await _karters.karterModelToView(karters));
         }
+
+
+        [HttpGet]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        [AccountConfirmed]
+        public async Task<IActionResult> DetailsByTrack(string? track)
+        {
+            Console.WriteLine(User.Claims);
+
+            List<Karter> karters = await _karters.getAllUsers(false, track);
+            return View("Details", await _karters.karterModelToView(karters));
+        }
+
         [HttpGet]
         [Microsoft.AspNetCore.Authorization.Authorize]
         public async Task<ActionResult> Create(int? id)
@@ -64,6 +79,7 @@ namespace GoKartUnite.Controllers
 
             return View();
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

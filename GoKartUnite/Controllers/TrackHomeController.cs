@@ -130,5 +130,14 @@ namespace GoKartUnite.Controllers
             return RedirectToAction("Index", "BlogHome", new { track });
         }
 
+        [HttpGet]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        [AccountConfirmed]
+        public async Task<IActionResult> FilteredKarterIndex(string track = "")
+        {
+
+            return RedirectToAction("DetailsByTrack", "KarterHome", new { track });
+        }
+
     }
 }
