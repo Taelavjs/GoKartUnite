@@ -97,6 +97,13 @@ namespace GoKartUnite.Handlers
         }
 
 
+        public async Task<List<BlogPost>> AllBlogsAtTrackAfterDate(string trackTitle, DateTime date)
+        {
+            return await _context.BlogPosts.Include(X => X.TaggedTrack)
+                            .Where(x => x.TaggedTrack != null && x.DateTimePosted > date && x.TaggedTrack.Title == trackTitle)
+                            .OrderByDescending(x => x.DateTimePosted)
+                            .ToListAsync();
 
+        }
     }
 }

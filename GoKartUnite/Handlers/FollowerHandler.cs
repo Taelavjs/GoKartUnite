@@ -31,5 +31,10 @@ namespace GoKartUnite.Handlers
             return await _context.FollowTracks.AnyAsync(x => x.KarterId == karterId && x.TrackId == trackId);
         }
 
+        public async Task<List<FollowTrack>> GetUsersFollowList(int karterId)
+        {
+            return await _context.FollowTracks.Include(x => x.track).Where(t => t.KarterId == karterId).ToListAsync();
+        }
+
     }
 }
