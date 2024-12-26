@@ -9,7 +9,7 @@ namespace GoKartUnite.Data
 {
     public class GoKartUniteContext : DbContext
     {
-        public GoKartUniteContext (DbContextOptions<GoKartUniteContext> options)
+        public GoKartUniteContext(DbContextOptions<GoKartUniteContext> options)
             : base(options)
         {
         }
@@ -20,20 +20,24 @@ namespace GoKartUnite.Data
                 .HasOne(f => f.KarterFirst)
                 .WithMany()
                 .HasForeignKey(f => f.KarterFirstId)
-                .OnDelete(DeleteBehavior.Restrict); // Allow cascading delete
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Friendships>()
                 .HasOne(f => f.KarterSecond)
                 .WithMany()
                 .HasForeignKey(f => f.KarterSecondId)
-                .OnDelete(DeleteBehavior.Restrict); // Disable cascading delete
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Friendships>()
                 .HasKey(f => new { f.KarterFirstId, f.KarterSecondId });
+
+            modelBuilder.Entity<FollowTrack>()
+                .HasKey(f => new { f.KarterId, f.TrackId });
         }
         public DbSet<GoKartUnite.Models.Karter> Karter { get; set; } = default!;
         public DbSet<GoKartUnite.Models.Track> Track { get; set; } = default!;
         public DbSet<GoKartUnite.Models.Friendships> Friendships { get; set; } = default!;
         public DbSet<GoKartUnite.Models.BlogPost> BlogPosts { get; set; } = default!;
+        public DbSet<GoKartUnite.Models.FollowTrack> FollowTracks { get; set; } = default!;
     }
 }

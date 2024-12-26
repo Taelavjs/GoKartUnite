@@ -9,5 +9,6 @@ namespace GoKartUnite.ViewModel
         public Location location { get; set; }
         public int karters = 0;
         public int blogPosts = 0;
+        public bool isFollowed = false;
     }
 }

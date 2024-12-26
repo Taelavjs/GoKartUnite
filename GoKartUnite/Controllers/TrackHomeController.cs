@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using NuGet.DependencyResolver;
 using NuGet.Protocol.Core.Types;
 using System.Reflection.Metadata;
+using System.Security.Claims;
 
 namespace GoKartUnite.Controllers
 {
@@ -17,11 +18,13 @@ namespace GoKartUnite.Controllers
         private readonly GoKartUniteContext _context;
         private readonly TrackHandler _tracks;
         private readonly KarterHandler _karters;
-        public TrackHomeController(GoKartUniteContext context, TrackHandler tracks, KarterHandler karters)
+        private readonly FollowerHandler _follows;
+        public TrackHomeController(GoKartUniteContext context, TrackHandler tracks, FollowerHandler follows, KarterHandler karters)
         {
             _context = context;
             _tracks = tracks;
             _karters = karters;
+            _follows = follows;
         }
 
         // GET: TrackHomeController
@@ -109,13 +112,24 @@ namespace GoKartUnite.Controllers
             return View("KartersLocalTrack", await _karters.getAllUsersByTrackId(id.Value));
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        [HttpGet]
         [Microsoft.AspNetCore.Authorization.Authorize]
         [AccountConfirmed]
         public async Task<IActionResult> SearchTracks(string trackSearched, List<Locations> location)
         {
+            string GoogleId = User.Claims
+    .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            Karter usr = await _karters.getUserByGoogleId(GoogleId);
+
             List<TrackView> tracks = await _tracks.modelToView(await _tracks.getTrackByTitle(trackSearched, location));
+            foreach (TrackView track in tracks)
+            {
+                if (await _follows.doesUserFollow(usr.Id, await _tracks.getTrackIdByTitle(track.Title)))
+                {
+                    track.isFollowed = true;
+                }
+            }
+
 
             return View("Details", tracks);
 

@@ -2,6 +2,8 @@
 using GoKartUnite.Models;
 using GoKartUnite.ViewModel;
 using Microsoft.EntityFrameworkCore;
+using NuGet.DependencyResolver;
+using System.Collections.Generic;
 using System.Web.Mvc;
 
 namespace GoKartUnite.Handlers
@@ -75,9 +77,21 @@ namespace GoKartUnite.Handlers
             return await _context.Track.ToListAsync();
         }
 
-        public async Task<List<Track>> getTrackByTitle(string title, List<Locations> location)
+        public async Task<List<Track>> getTrackByTitle(string title, List<Locations>? location = null)
         {
             if (title == "" || title == null) return new List<Track>();
+            if (location == null)
+            {
+                List<Track> tracks2 = _context.Track.Where(t => t.Title.ToLower().Contains(title.ToLower())).ToList();
+                if (tracks2.Count == 0)
+                {
+                    return new List<Track>();
+                }
+
+
+                return tracks2;
+            }
+
             List<Track> tracks = _context.Track.Where(t => t.Title.ToLower().Contains(title.ToLower()) && location.Contains(t.Location)).ToList();
             if (tracks.Count == 0)
             {
@@ -117,6 +131,13 @@ namespace GoKartUnite.Handlers
 
 
             return trackView;
+        }
+
+        public async Task<int> getTrackIdByTitle(string g)
+        {
+            Track t = await _context.Track.Where(t => t.Title == g).SingleAsync();
+
+            return t.Id;
         }
     }
 }
