@@ -20,7 +20,7 @@ namespace GoKartUnite.Controllers
             _blog = blog;
             _karter = karter;
         }
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1, string? track = null)
         {
             ViewBag.TotalPages = await _blog.getTotalPageCount();
             page = Math.Min(page, ViewBag.TotalPages);
@@ -28,12 +28,14 @@ namespace GoKartUnite.Controllers
             ViewBag.page = page;
 
 
-            List<BlogPost> allPosts = await _blog.getAllPosts(page, getTaggedTrack: true);
+            List<BlogPost> allPosts = await _blog.GetAllPosts(page, getTaggedTrack: true, trackFilter: track);
 
-
+            if (allPosts.Count == 0) return View(await _blog.getModelToView(await _blog.GetAllPosts()));
 
             return View(await _blog.getModelToView(allPosts));
         }
+
+
         [HttpGet]
         [Microsoft.AspNetCore.Authorization.Authorize]
         [AccountConfirmed]
@@ -86,6 +88,7 @@ namespace GoKartUnite.Controllers
             upvote.VoterId = karter.Id;
             await _blog.upvotePost(id, upvote);
         }
+
 
 
     }

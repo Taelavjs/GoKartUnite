@@ -18,20 +18,25 @@ namespace GoKartUnite.Handlers
             _context = context;
         }
 
-        public async Task<List<BlogPost>> getAllPosts(int page = 1, int pageSize = 10, bool getTaggedTrack = false)
+        public async Task<List<BlogPost>> GetAllPosts(int page = 1, int pageSize = 10, bool getTaggedTrack = false, string? trackFilter = null)
         {
+            IQueryable<BlogPost> query = _context.BlogPosts.Include(k => k.Upvotes).AsQueryable();
 
             if (getTaggedTrack)
             {
-                List<BlogPost> postsTracks = await _context.BlogPosts.Include(k => k.Upvotes).Include(k => k.TaggedTrack).OrderBy(i => i.DateTimePosted).Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-                return postsTracks;
+                query = query.Include(k => k.TaggedTrack);
 
+                if (!string.IsNullOrEmpty(trackFilter))
+                {
+                    query = query.Where(k => k.TaggedTrack != null && k.TaggedTrack.Title == trackFilter);
+                }
             }
-            List<BlogPost> posts = await _context.BlogPosts.Include(k => k.Upvotes).OrderBy(i => i.DateTimePosted).Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
 
-            // List<BlogPost> posts = await _context.BlogPosts.Include(k => k.Upvotes).OrderBy(i => i.DateTimePosted).ToListAsync();
-
-            return posts;
+            return await query
+                .OrderBy(i => i.DateTimePosted)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
         }
 
         public async Task addPost(BlogPostView post, Karter author)

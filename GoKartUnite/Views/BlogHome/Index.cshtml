@@ -13,29 +13,34 @@
         @await Html.PartialAsync("Blog", post);
     }
 </div>
+@{
+    var query = ViewContext.HttpContext.Request.Query
+        .Where(q => q.Key != "page")
+        .Select(q => $"{q.Key}={q.Value}")
+        .ToList();
+    var queryString = query.Any() ? "&" + string.Join("&", query) : "";
+}
 <ul class="pagination">
     <li class="page-item @(ViewBag.Page == 1 ? "disabled" : "")">
-        <a class="page-link" href="?page=@(ViewBag.Page - 1)">Previous</a>
-        <a class="page-link" href="?page=1"> Start </a>
+        <a class="page-link" href="?page=@(ViewBag.Page - 1)@queryString">Previous</a>
+        <a class="page-link" href="?page=1@queryString">Start</a>
     </li>
 
     @{
         int leftCounter = Math.Max(ViewBag.Page - 2, 1);
         int rightCounter = Math.Min(ViewBag.Page + 2, ViewBag.TotalPages);
-
     }
 
     @for (int i = leftCounter; i <= rightCounter; i++)
-        {
+    {
             <li class="page-item @(i == ViewBag.Page ? "active" : "")">
-                <a class="page-link" href="?page=@i">@i</a>
+                <a class="page-link" href="?page=@i@queryString">@i</a>
             </li>
-        }
+    }
 
-        <li class="page-item @(ViewBag.Page == ViewBag.TotalPages ? "disabled" : "")">
-            <a class="page-link" href="?page=@(ViewBag.Page + 1)">Next</a>
-            <a class="page-link" href="?page=@(ViewBag.TotalPages)"> End </a>
-
-        </li>
-    </ul>
+    <li class="page-item @(ViewBag.Page == ViewBag.TotalPages ? "disabled" : "")">
+        <a class="page-link" href="?page=@(ViewBag.Page + 1)@queryString">Next</a>
+        <a class="page-link" href="?page=@(ViewBag.TotalPages)@queryString">End</a>
+    </li>
+</ul>
     <script src="~/js/UpvoteBlogPost.js" asp-append-version="true"></script>

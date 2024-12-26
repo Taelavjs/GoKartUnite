@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NuGet.DependencyResolver;
 using NuGet.Protocol.Core.Types;
+using System.Reflection.Metadata;
 
 namespace GoKartUnite.Controllers
 {
@@ -120,8 +121,14 @@ namespace GoKartUnite.Controllers
 
         }
 
+        [HttpGet]
+        [Microsoft.AspNetCore.Authorization.Authorize]
+        [AccountConfirmed]
+        public async Task<IActionResult> FilteredIndex(string track = "")
+        {
 
-
+            return RedirectToAction("Index", "BlogHome", new { track });
+        }
 
     }
 }

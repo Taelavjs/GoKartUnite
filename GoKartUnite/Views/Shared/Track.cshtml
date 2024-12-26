@@ -8,9 +8,9 @@
 
 @model GoKartUnite.ViewModel.TrackView
 
-        <div class="blog-post">
+        <div class="blog-post TrackContainer">
             <div class="blog-post-title">@Model.Title</div>
             <div class="blog-post-description">@Model.Description</div>
-            <div class="blog-post-description right">@Model.karters</div>
-            <div class="blog-post-description right">@Model.blogPosts</div>
+            <div class="blog-post-description right">@Model.karters Local Karters</div>
+            <div class="blog-post-description right">@Model.blogPosts <a asp-controller="TrackHome" asp-action="FilteredIndex" asp-route-track="@Model.Title">Posts</a> </div>
         </div>
