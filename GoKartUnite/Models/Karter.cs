@@ -26,9 +26,11 @@ namespace GoKartUnite.Models
         // Relationships
         public int? TrackId { get; set; }
         public Track? Track { get; set; }
-        
+
         public virtual ICollection<Friendships>? Friendships { get; set; }
         public virtual ICollection<BlogPost>? BlogPosts { get; set; }
+        public ICollection<Notifications>? Notification { get; set; }
+
 
     }
 }
