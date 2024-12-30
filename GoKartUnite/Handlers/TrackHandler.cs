@@ -77,7 +77,12 @@ namespace GoKartUnite.Handlers
             return await _context.Track.ToListAsync();
         }
 
-        public async Task<List<Track>> getTrackByTitle(string title, List<Locations>? location = null)
+        public async Task<List<string>> GetAllTrackTitles()
+        {
+            return await _context.Track.Select(track => track.Title).ToListAsync();
+        }
+
+        public async Task<List<Track>> getTracksByTitle(string title, List<Locations>? location = null)
         {
             if (title == "" || title == null) return new List<Track>();
             if (location == null)
@@ -100,6 +105,12 @@ namespace GoKartUnite.Handlers
 
 
             return tracks;
+        }
+
+
+        public async Task<Track> getSingleTrackByTitle(string title)
+        {
+            return await _context.Track.SingleOrDefaultAsync(t => t.Title == title);
         }
 
 

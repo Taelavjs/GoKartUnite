@@ -27,6 +27,7 @@ namespace GoKartUnite
             builder.Services.AddTransient<TrackHandler>();
             builder.Services.AddTransient<BlogHandler>();
             builder.Services.AddTransient<FollowerHandler>();
+            builder.Services.AddTransient<NotificationHandler>();
             var services = builder.Services;
             var configuration = builder.Configuration;
             var secretFilePath = Path.Combine(Directory.GetCurrentDirectory(), "secrets.txt");

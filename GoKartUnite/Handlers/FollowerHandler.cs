@@ -1,6 +1,7 @@
 ﻿using GoKartUnite.Data;
 using GoKartUnite.Models;
 using Microsoft.EntityFrameworkCore;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace GoKartUnite.Handlers
 {
@@ -34,6 +35,17 @@ namespace GoKartUnite.Handlers
         public async Task<List<FollowTrack>> GetUsersFollowList(int karterId)
         {
             return await _context.FollowTracks.Include(x => x.track).Where(t => t.KarterId == karterId).ToListAsync();
+        }
+
+        public async Task<List<int>> AllUserIdsWhoFollowTrack(int track)
+        {
+            var karters = await _context.FollowTracks.Where(t => t.TrackId == track).ToListAsync();
+            List<int> Ids = new List<int>();
+            foreach (var k in karters)
+            {
+                Ids.Add(k.KarterId);
+            }
+            return Ids;
         }
 
     }

@@ -121,7 +121,7 @@ namespace GoKartUnite.Controllers
     .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
             Karter usr = await _karters.getUserByGoogleId(GoogleId);
 
-            List<TrackView> tracks = await _tracks.modelToView(await _tracks.getTrackByTitle(trackSearched, location));
+            List<TrackView> tracks = await _tracks.modelToView(await _tracks.getTracksByTitle(trackSearched, location));
             foreach (TrackView track in tracks)
             {
                 if (await _follows.doesUserFollow(usr.Id, await _tracks.getTrackIdByTitle(track.Title)))

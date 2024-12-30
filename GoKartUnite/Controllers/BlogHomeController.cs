@@ -15,10 +15,15 @@ namespace GoKartUnite.Controllers
         private readonly KarterHandler _karter;
 
         private readonly TrackHandler _tracks;
-        public BlogHomeController(BlogHandler blog, KarterHandler karter)
+        private readonly NotificationHandler _notification;
+        private readonly FollowerHandler _followerHandler;
+        public BlogHomeController(TrackHandler tracks, FollowerHandler followerHandler, BlogHandler blog, KarterHandler karter, NotificationHandler notification)
         {
             _blog = blog;
             _karter = karter;
+            _notification = notification;
+            _followerHandler = followerHandler;
+            _tracks = tracks;
         }
         public async Task<IActionResult> Index(int page = 1, string? track = null)
         {
@@ -41,6 +46,7 @@ namespace GoKartUnite.Controllers
         [AccountConfirmed]
         public async Task<IActionResult> Create()
         {
+            ViewBag.TrackTitles = await _tracks.GetAllTrackTitles();
             return View();
         }
 
@@ -52,16 +58,32 @@ namespace GoKartUnite.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View("Create");
+                return RedirectToAction("Create");
             }
 
             string GoogleId = User.Claims
                 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
 
             Karter k = await _karter.getUserByGoogleId(GoogleId);
+            if (post.TaggedTrack != "")
+            {
+                Track taggedT = await _tracks.getSingleTrackByTitle(post.TaggedTrack);
+                await _blog.addPost(post, k, taggedT);
+            }
+            else
+            {
+                await _blog.addPost(post, k);
+            }
+            int track = await _tracks.getTrackIdByTitle(post.TaggedTrack);
 
-            await _blog.addPost(post, k);
-
+            List<int> kartersWhoNeedNotif = await _followerHandler.AllUserIdsWhoFollowTrack(track);
+            if (post.TaggedTrack != "")
+            {
+                foreach (int kar in kartersWhoNeedNotif)
+                {
+                    await _notification.CreateNotification(NotificationType.Blog, kar);
+                }
+            }
             return RedirectToAction("Index");
         }
 

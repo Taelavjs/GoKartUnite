@@ -39,7 +39,7 @@ namespace GoKartUnite.Handlers
                 .ToListAsync();
         }
 
-        public async Task addPost(BlogPostView post, Karter author)
+        public async Task addPost(BlogPostView post, Karter author, Track taggedT)
         {
             BlogPost dbPost = new BlogPost();
 
@@ -47,6 +47,7 @@ namespace GoKartUnite.Handlers
             dbPost.Title = post.Title;
             dbPost.AuthorId = author.Id;
             dbPost.Descripttion = post.Descripttion;
+            dbPost.TaggedTrack = taggedT;
 
 
             await _context.BlogPosts.AddAsync(dbPost);
@@ -55,7 +56,19 @@ namespace GoKartUnite.Handlers
 
         }
 
+        public async Task addPost(BlogPostView post, Karter author)
+        {
+            BlogPost dbPost = new BlogPost();
 
+            dbPost.Author = author;
+            dbPost.Title = post.Title;
+            dbPost.AuthorId = author.Id;
+            dbPost.Descripttion = post.Descripttion;
+            await _context.BlogPosts.AddAsync(dbPost);
+
+            await _context.SaveChangesAsync();
+
+        }
         public async Task<List<BlogPostView>> getModelToView(List<BlogPost> posts)
         {
             List<BlogPostView> retPosts = new List<BlogPostView>();

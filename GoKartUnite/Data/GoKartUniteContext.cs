@@ -39,5 +39,6 @@ namespace GoKartUnite.Data
         public DbSet<GoKartUnite.Models.Friendships> Friendships { get; set; } = default!;
         public DbSet<GoKartUnite.Models.BlogPost> BlogPosts { get; set; } = default!;
         public DbSet<GoKartUnite.Models.FollowTrack> FollowTracks { get; set; } = default!;
+        public DbSet<GoKartUnite.Models.Notifications> Notifications { get; set; } = default!;
     }
 }

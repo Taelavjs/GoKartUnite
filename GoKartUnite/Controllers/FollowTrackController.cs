@@ -25,7 +25,7 @@ namespace GoKartUnite.Controllers
     .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
             int h = await getNotifCount();
             Karter k = await _karters.getUserByGoogleId(GoogleId);
-            List<Track> T = await _tracks.getTrackByTitle(track);
+            List<Track> T = await _tracks.getTracksByTitle(track);
 
             if (k == null && T.Count == 0)
             {
@@ -50,5 +50,7 @@ namespace GoKartUnite.Controllers
             }
             return test.Sum(t => t.Count);
         }
+
+
     }
 }

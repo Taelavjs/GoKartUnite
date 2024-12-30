@@ -27,10 +27,10 @@
                 <label asp-for="TrackId">Select Track</label>
                 <select asp-for="TrackId" class="form-control">
                     <option value="">-- Select a Track --</option>
-                            @foreach (var item in ViewBag.tracks)
-                            {
+                        @foreach (var item in ViewBag.TrackTitles)
+                        {
                             <option value="@item.Id">@item.Title</option>
-                            }
+                        }
                 </select>
             </div>
             <div class="form-group">
