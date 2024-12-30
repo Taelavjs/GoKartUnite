@@ -1,7 +1,7 @@
 ﻿"use strict";
 
 
-const baseUrl = `${window.location.origin}/FollowTrack/GetNotifCount`;
+const baseUrl = `${window.location.origin}/Notification/GetNotifCount`;
 
 console.log('ID:', baseUrl);
 fetch(baseUrl, {

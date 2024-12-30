@@ -23,7 +23,6 @@ namespace GoKartUnite.Controllers
         {
             string GoogleId = User.Claims
     .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            int h = await getNotifCount();
             Karter k = await _karters.getUserByGoogleId(GoogleId);
             List<Track> T = await _tracks.getTracksByTitle(track);
 
@@ -35,22 +34,5 @@ namespace GoKartUnite.Controllers
             return Redirect(fullUrl);
 
         }
-
-        public async Task<int> getNotifCount()
-        {
-            string GoogleId = User.Claims
-.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-
-            Karter k = await _karters.getUserByGoogleId(GoogleId);
-            List<FollowTrack> followList = await _follows.GetUsersFollowList(k.Id);
-            List<List<BlogPost>> test = new List<List<BlogPost>>();
-            foreach (FollowTrack track in followList)
-            {
-                test.Add(await _blogs.AllBlogsAtTrackAfterDate(track.track.Title, track.FollowedAt));
-            }
-            return test.Sum(t => t.Count);
-        }
-
-
     }
 }
