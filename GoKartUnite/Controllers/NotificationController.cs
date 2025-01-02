@@ -21,7 +21,7 @@ namespace GoKartUnite.Controllers
                 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
 
             Karter k = await _karters.getUserByGoogleId(GoogleId);
-            List<BlogNotifications> notifications = await _notifs.GetUsersNotifications(k.Id);
+            List<BlogNotifications> notifications = await _notifs.GetUserBlogNotifications(k.Id);
             return notifications.Count;
         }
     }

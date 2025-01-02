@@ -12,16 +12,17 @@ namespace GoKartUnite.Handlers
             _context = context;
         }
 
-        public async Task CreateNotification(int userId)
+        public async Task CreateBlogNotification(int userId, int postId)
         {
             BlogNotifications notif = new BlogNotifications();
             notif.userId = userId;
+            notif.BlogID = postId;
 
             await _context.BlogNotifications.AddAsync(notif);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<BlogNotifications>> GetUsersNotifications(int userId, bool isViewed = false)
+        public async Task<List<BlogNotifications>> GetUserBlogNotifications(int userId, bool isViewed = false)
         {
             if (isViewed)
             {
@@ -36,14 +37,9 @@ namespace GoKartUnite.Handlers
 
         }
 
-        public async Task<List<BlogNotifications>> getBlogNotifs(int userId)
-        {
-            return await _context.BlogNotifications.Where(n => n.userId == userId && n.isViewed == false).ToListAsync();
-        }
-
         public async Task setAllBlogNotifsViewed(int userId)
         {
-            List<BlogNotifications> allBlogNotifs = await getBlogNotifs(userId);
+            List<BlogNotifications> allBlogNotifs = await GetUserBlogNotifications(userId);
 
             foreach (BlogNotifications notif in allBlogNotifs)
             {
@@ -51,6 +47,11 @@ namespace GoKartUnite.Handlers
             }
 
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<BlogPost>> GetAllUsersUnseenPosts(int userId)
+        {
+            return await _context.BlogNotifications.Include(t => t.LinkedPost).Where(t => t.userId == userId && t.isViewed == false).Select(t => t.LinkedPost).ToListAsync();
         }
 
     }

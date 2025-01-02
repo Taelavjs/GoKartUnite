@@ -4,6 +4,7 @@ using GoKartUnite.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GoKartUnite.Migrations
 {
     [DbContext(typeof(GoKartUniteContext))]
-    partial class GoKartUniteContextModelSnapshot : ModelSnapshot
+    [Migration("20250102133716_noLinkedPostId")]
+    partial class noLinkedPostId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -86,36 +89,6 @@ namespace GoKartUnite.Migrations
                     b.HasIndex("TaggedTrackId");
 
                     b.ToTable("BlogPosts");
-                });
-
-            modelBuilder.Entity("GoKartUnite.Models.Comment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AuthorId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BlogPostId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AuthorId");
-
-                    b.HasIndex("BlogPostId");
-
-                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("GoKartUnite.Models.FollowTrack", b =>
@@ -274,25 +247,6 @@ namespace GoKartUnite.Migrations
                     b.Navigation("TaggedTrack");
                 });
 
-            modelBuilder.Entity("GoKartUnite.Models.Comment", b =>
-                {
-                    b.HasOne("GoKartUnite.Models.Karter", "Author")
-                        .WithMany()
-                        .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GoKartUnite.Models.BlogPost", "BlogPost")
-                        .WithMany("Comments")
-                        .HasForeignKey("BlogPostId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Author");
-
-                    b.Navigation("BlogPost");
-                });
-
             modelBuilder.Entity("GoKartUnite.Models.FollowTrack", b =>
                 {
                     b.HasOne("GoKartUnite.Models.Karter", "karter")
@@ -363,8 +317,6 @@ namespace GoKartUnite.Migrations
 
             modelBuilder.Entity("GoKartUnite.Models.BlogPost", b =>
                 {
-                    b.Navigation("Comments");
-
                     b.Navigation("Upvotes");
                 });
 

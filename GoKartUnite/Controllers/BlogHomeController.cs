@@ -3,6 +3,7 @@ using GoKartUnite.Handlers;
 using GoKartUnite.Models;
 using GoKartUnite.ViewModel;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using System.Diagnostics;
 using System.Security.Claims;
 
@@ -34,10 +35,10 @@ namespace GoKartUnite.Controllers
                 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
 
             Karter k = await _karter.getUserByGoogleId(GoogleId);
-            List<BlogNotifications> notifications = await _notification.getBlogNotifs(k.Id);
+            List<BlogNotifications> notifications = await _notification.GetUserBlogNotifications(k.Id);
             await _notification.setAllBlogNotifsViewed(k.Id);
             ViewBag.Notifcount = notifications.Count;
-            ViewBag.FollowedTracks = await _followerHandler.getAllFollowedTracks(k.Id);
+            ViewBag.NotifiedTracks = await _notification.GetAllUsersUnseenPosts(k.Id);
             page = Math.Min(page, ViewBag.TotalPages);
             page = Math.Max(page, 1);
             ViewBag.page = page;
@@ -46,8 +47,15 @@ namespace GoKartUnite.Controllers
             List<BlogPost> allPosts = await _blog.GetAllPosts(page, getTaggedTrack: true, trackFilter: track);
 
             if (allPosts.Count == 0) return View(await _blog.getModelToView(await _blog.GetAllPosts()));
+            List<BlogPost> notifiedPosts = await _notification.GetAllUsersUnseenPosts(k.Id);
+            await _notification.setAllBlogNotifsViewed(k.Id);
+            BlogPage blogPage = new BlogPage
+            {
+                posts = await _blog.getModelToView(allPosts),
+                notifiedPosts = await _blog.getModelToView(notifiedPosts)
+            };
 
-            return View(await _blog.getModelToView(allPosts));
+            return View(blogPage);
         }
 
 
@@ -75,14 +83,15 @@ namespace GoKartUnite.Controllers
                 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
 
             Karter k = await _karter.getUserByGoogleId(GoogleId);
+            int postId;
             if (post.TaggedTrack != "")
             {
                 Track taggedT = await _tracks.getSingleTrackByTitle(post.TaggedTrack);
-                await _blog.addPost(post, k, taggedT);
+                postId = await _blog.addPost(post, k, taggedT);
             }
             else
             {
-                await _blog.addPost(post, k);
+                postId = await _blog.addPost(post, k);
             }
             int track = await _tracks.getTrackIdByTitle(post.TaggedTrack);
 
@@ -91,7 +100,7 @@ namespace GoKartUnite.Controllers
             {
                 foreach (int kar in kartersWhoNeedNotif)
                 {
-                    await _notification.CreateNotification(kar);
+                    await _notification.CreateBlogNotification(kar, postId);
                 }
             }
             return RedirectToAction("Index");
@@ -122,6 +131,12 @@ namespace GoKartUnite.Controllers
         }
 
 
+        [HttpGet]
 
+        public async Task<ActionResult<IEnumerable<Comment>>> GetCommentsForBlog(int blogId)
+        {
+            List<Comment> comments = await _blog.GetAllCommentsForPost(blogId);
+            return Ok(await _blog.CommentModelToView(comments));
+        }
     }
 }

@@ -1,34 +1,31 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
-@using GoKartUnite.ViewModel;
+@model GoKartUnite.ViewModel.BlogPage
 
-@model IEnumerable<BlogPostView>
 <link rel="stylesheet" href="~/css/Blog.css" asp-append-version="true" />
 
 <div class="container">
     <H1>Blog</H1>
-    @if (ViewBag.NotifCount > 0)
-    {
-        <div>Followed Track Blog Updates:</div>
-    }
     @{
-        foreach (var post in Model)
+        foreach (var post in Model.notifiedPosts)
         {
-            if (ViewBag.NotifCount <= 0) break;
-            if (!ViewBag.FollowedTracks.Contains(post.TaggedTrack)) continue;
             @await Html.PartialAsync("Blog", post);
-            ViewBag.Notifcount -= 1;
+            <button data-postid="@post.Id" class="commentBtn">Comments</button>
         }
         <hr style="width:50%;text-align:left;margin-left:0">
     }
-    @foreach (var post in Model)
+    @foreach (var post in Model.posts)
     {
         @await Html.PartialAsync("Blog", post);
+        <button data-postid="@post.Id" class="commentBtn">Comments</button>
+            <ul class="comment-section-@post.Id">
+            
+
+        </ul>
+
     }
 </div>
-
-
 @{
     var query = ViewContext.HttpContext.Request.Query
         .Where(q => q.Key != "page")

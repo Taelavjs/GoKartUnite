@@ -15,6 +15,7 @@ namespace GoKartUnite.Models
         public DateTime DateTimePosted { get; set; } = DateTime.UtcNow;
 
         public ICollection<Upvotes> Upvotes { get; set; } = new List<Upvotes>();
+        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
         public Track? TaggedTrack { get; set; }
         public int? TaggedTrackId { get; set; }

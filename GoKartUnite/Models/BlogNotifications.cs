@@ -1,4 +1,6 @@
-﻿namespace GoKartUnite.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace GoKartUnite.Models
 {
     public class BlogNotifications
     {
@@ -8,7 +10,7 @@
         public bool isViewed { get; set; } = false;
         public DateTime? createdAt { get; set; } = DateTime.UtcNow;
         public int BlogID { get; set; }
-
+        [ForeignKey("BlogID")]
         public BlogPost? LinkedPost { get; set; }
     }
 }

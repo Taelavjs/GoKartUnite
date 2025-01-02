@@ -39,7 +39,7 @@ namespace GoKartUnite.Handlers
                 .ToListAsync();
         }
 
-        public async Task addPost(BlogPostView post, Karter author, Track taggedT)
+        public async Task<int> addPost(BlogPostView post, Karter author, Track taggedT)
         {
             BlogPost dbPost = new BlogPost();
 
@@ -53,10 +53,10 @@ namespace GoKartUnite.Handlers
             await _context.BlogPosts.AddAsync(dbPost);
 
             await _context.SaveChangesAsync();
-
+            return dbPost.Id;
         }
 
-        public async Task addPost(BlogPostView post, Karter author)
+        public async Task<int> addPost(BlogPostView post, Karter author)
         {
             BlogPost dbPost = new BlogPost();
 
@@ -67,7 +67,7 @@ namespace GoKartUnite.Handlers
             await _context.BlogPosts.AddAsync(dbPost);
 
             await _context.SaveChangesAsync();
-
+            return dbPost.Id;
         }
         public async Task<List<BlogPostView>> getModelToView(List<BlogPost> posts)
         {
@@ -88,10 +88,18 @@ namespace GoKartUnite.Handlers
             return retPosts;
         }
 
-        public async Task<BlogPost> getPost(int Id, bool inclUpvotes = false)
+        public async Task<BlogPost> getPost(int Id, bool inclUpvotes = false, bool inclComments = false)
         {
-            if (inclUpvotes) return await _context.BlogPosts.Include(k => k.Upvotes).SingleOrDefaultAsync(k => k.Id == Id);
-            return await _context.BlogPosts.SingleOrDefaultAsync(k => k.Id == Id);
+            IQueryable<BlogPost> query = _context.BlogPosts.AsQueryable();
+            if (inclUpvotes)
+            {
+                query = query.Include(k => k.Upvotes);
+            }
+            if (inclComments)
+            {
+                query = query.Include(k => k.Comments);
+            }
+            return await query.SingleOrDefaultAsync(k => k.Id == Id);
         }
 
         public async Task upvotePost(int Id, Upvotes upvoteToAdd)
@@ -117,6 +125,34 @@ namespace GoKartUnite.Handlers
                             .OrderByDescending(x => x.DateTimePosted)
                             .ToListAsync();
 
+        }
+
+        public async Task<List<Comment>> GetAllCommentsForPost(int blogPostId)
+        {
+            BlogPost post = await getPost(blogPostId, false, true);
+
+
+            return post.Comments.ToList();
+        }
+
+        public async Task<List<CommentView>> CommentModelToView(List<Comment> comments)
+        {
+            List<CommentView> viewComments = new List<CommentView>();
+
+            foreach (Comment comment in comments)
+            {
+                CommentView commentToAdd = new CommentView
+                {
+                    Text = comment.Text,
+                    AuthorName = "Taeka",
+                    TypedAt = comment.CreatedDate
+                };
+
+                viewComments.Add(commentToAdd);
+            }
+
+
+            return viewComments;
         }
     }
 }

@@ -12,7 +12,6 @@ namespace GoKartUnite.CustomAttributes
     {
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            // Retrieve the database context
             var dbContext = context.HttpContext
                 .RequestServices
                 .GetService(typeof(GoKartUniteContext)) as GoKartUniteContext;
@@ -22,18 +21,15 @@ namespace GoKartUnite.CustomAttributes
 
             if (userGoogleId == null || userGoogleId.Value == String.Empty)
             {
-                // Fail if the user ID claim is missing or invalid
                 context.Result = new RedirectResult("/login");
                 return;
             }
 
-            // Check if the user exists in the database and is confirmed
             var userExists = dbContext.Karter
                 .Any(u => u.GoogleId == userGoogleId.Value);
 
             if (!userExists)
             {
-                // Deny access if the user doesn't exist or the account is not confirmed
                 context.Result = new RedirectResult("/karterHome/Create");
             }
         }

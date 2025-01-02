@@ -33,6 +33,26 @@ namespace GoKartUnite.Data
 
             modelBuilder.Entity<FollowTrack>()
                 .HasKey(f => new { f.KarterId, f.TrackId });
+
+            modelBuilder.Entity<BlogNotifications>()
+                .HasOne(bn => bn.LinkedPost)
+                .WithMany()
+                .HasForeignKey(bn => bn.BlogID);
+
+            modelBuilder.Entity<BlogNotifications>()
+                .ToTable("BlogNotifications", "dbo");
+
+            modelBuilder.Entity<Comment>()
+                .HasOne(c => c.Author)
+                .WithMany()
+                .HasForeignKey(c => c.AuthorId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Comment>()
+                .HasOne(c => c.BlogPost)
+                .WithMany(bp => bp.Comments)
+                .HasForeignKey(c => c.BlogPostId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
         public DbSet<GoKartUnite.Models.Karter> Karter { get; set; } = default!;
         public DbSet<GoKartUnite.Models.Track> Track { get; set; } = default!;
@@ -40,5 +60,6 @@ namespace GoKartUnite.Data
         public DbSet<GoKartUnite.Models.BlogPost> BlogPosts { get; set; } = default!;
         public DbSet<GoKartUnite.Models.FollowTrack> FollowTracks { get; set; } = default!;
         public DbSet<GoKartUnite.Models.BlogNotifications> BlogNotifications { get; set; } = default!;
+        public DbSet<GoKartUnite.Models.Comment> Comments { get; set; } = default!;
     }
 }

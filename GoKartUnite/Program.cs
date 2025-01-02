@@ -28,6 +28,9 @@ namespace GoKartUnite
             builder.Services.AddTransient<BlogHandler>();
             builder.Services.AddTransient<FollowerHandler>();
             builder.Services.AddTransient<NotificationHandler>();
+            builder.Services.AddControllers().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            );
             var services = builder.Services;
             var configuration = builder.Configuration;
             var secretFilePath = Path.Combine(Directory.GetCurrentDirectory(), "secrets.txt");
@@ -87,6 +90,7 @@ namespace GoKartUnite
             {
                 var context = scope.ServiceProvider.GetRequiredService<GoKartUniteContext>();
                 dummyDbData(context);
+                dummyDbComments(context);
             }
             app.Run();
         }
@@ -115,6 +119,26 @@ namespace GoKartUnite
 
                 context.BlogPosts.Add(post2);
                 context.SaveChanges();
+            }
+
+        }
+
+        private static void dummyDbComments(GoKartUniteContext context)
+        {
+            if (context.Comments.Count() > 400) return;
+
+            for (int i = 0; i < 100; i++)
+            {
+                Comment comment = new Comment
+                {
+                    Text = "This is testData",
+                    AuthorId = 4032,
+                    BlogPostId = 3026
+                };
+
+                context.Comments.Add(comment);
+                context.SaveChanges();
+
             }
 
         }
