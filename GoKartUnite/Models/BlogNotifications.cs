@@ -1,23 +1,14 @@
 ﻿namespace GoKartUnite.Models
 {
-    public class Notifications
+    public class BlogNotifications
     {
         public int Id { get; set; }
-        public NotificationType type { get; set; }
         public Karter? Author { get; set; }
         public int userId { get; set; }
         public bool isViewed { get; set; } = false;
         public DateTime? createdAt { get; set; } = DateTime.UtcNow;
+        public int BlogID { get; set; }
 
-    }
-
-
-    public enum NotificationType : int
-    {
-        Any = 0,
-        Blog = 1,
-        Comment = 2,
-        Upvote = 3,
-        Track = 4
+        public BlogPost? LinkedPost { get; set; }
     }
 }

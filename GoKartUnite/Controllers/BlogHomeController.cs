@@ -5,6 +5,7 @@ using GoKartUnite.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Security.Claims;
+
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace GoKartUnite.Controllers
@@ -28,6 +29,15 @@ namespace GoKartUnite.Controllers
         public async Task<IActionResult> Index(int page = 1, string? track = null)
         {
             ViewBag.TotalPages = await _blog.getTotalPageCount();
+
+            string GoogleId = User.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+
+            Karter k = await _karter.getUserByGoogleId(GoogleId);
+            List<BlogNotifications> notifications = await _notification.getBlogNotifs(k.Id);
+            await _notification.setAllBlogNotifsViewed(k.Id);
+            ViewBag.Notifcount = notifications.Count;
+            ViewBag.FollowedTracks = await _followerHandler.getAllFollowedTracks(k.Id);
             page = Math.Min(page, ViewBag.TotalPages);
             page = Math.Max(page, 1);
             ViewBag.page = page;
@@ -81,7 +91,7 @@ namespace GoKartUnite.Controllers
             {
                 foreach (int kar in kartersWhoNeedNotif)
                 {
-                    await _notification.CreateNotification(NotificationType.Blog, kar);
+                    await _notification.CreateNotification(kar);
                 }
             }
             return RedirectToAction("Index");

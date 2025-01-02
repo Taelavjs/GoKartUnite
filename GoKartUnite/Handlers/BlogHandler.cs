@@ -33,7 +33,7 @@ namespace GoKartUnite.Handlers
             }
 
             return await query
-                .OrderBy(i => i.DateTimePosted)
+                .OrderByDescending(i => i.DateTimePosted)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

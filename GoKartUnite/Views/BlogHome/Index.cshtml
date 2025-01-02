@@ -8,11 +8,27 @@
 
 <div class="container">
     <H1>Blog</H1>
+    @if (ViewBag.NotifCount > 0)
+    {
+        <div>Followed Track Blog Updates:</div>
+    }
+    @{
+        foreach (var post in Model)
+        {
+            if (ViewBag.NotifCount <= 0) break;
+            if (!ViewBag.FollowedTracks.Contains(post.TaggedTrack)) continue;
+            @await Html.PartialAsync("Blog", post);
+            ViewBag.Notifcount -= 1;
+        }
+        <hr style="width:50%;text-align:left;margin-left:0">
+    }
     @foreach (var post in Model)
     {
         @await Html.PartialAsync("Blog", post);
     }
 </div>
+
+
 @{
     var query = ViewContext.HttpContext.Request.Query
         .Where(q => q.Key != "page")
@@ -20,6 +36,8 @@
         .ToList();
     var queryString = query.Any() ? "&" + string.Join("&", query) : "";
 }
+
+
 <ul class="pagination">
     <li class="page-item @(ViewBag.Page == 1 ? "disabled" : "")">
         <a class="page-link" href="?page=@(ViewBag.Page - 1)@queryString">Previous</a>

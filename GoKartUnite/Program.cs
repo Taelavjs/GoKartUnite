@@ -93,7 +93,7 @@ namespace GoKartUnite
 
         private static void dummyDbData(GoKartUniteContext context)
         {
-            if (context.BlogPosts.Count() > 100) return;
+            if (context.BlogPosts.Count() > 400) return;
             for (int i = 0; i < 100; i++)
             {
                 BlogPost post = new BlogPost
