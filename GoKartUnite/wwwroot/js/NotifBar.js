@@ -4,6 +4,9 @@
 const baseUrl = `${window.location.origin}/Notification/GetNotifCount`;
 
 console.log('ID:', baseUrl);
+
+
+
 fetch(baseUrl, {
     method: "POST"
 })

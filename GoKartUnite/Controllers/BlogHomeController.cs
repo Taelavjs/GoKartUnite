@@ -133,9 +133,9 @@ namespace GoKartUnite.Controllers
 
         [HttpGet]
 
-        public async Task<ActionResult<IEnumerable<Comment>>> GetCommentsForBlog(int blogId)
+        public async Task<ActionResult<IEnumerable<Comment>>> GetCommentsForBlog(int blogId, int lastCommentId)
         {
-            List<Comment> comments = await _blog.GetAllCommentsForPost(blogId);
+            List<Comment> comments = await _blog.GetAllCommentsForPost(blogId, lastCommentId);
             return Ok(await _blog.CommentModelToView(comments));
         }
 

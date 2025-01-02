@@ -127,12 +127,15 @@ namespace GoKartUnite.Handlers
 
         }
 
-        public async Task<List<Comment>> GetAllCommentsForPost(int blogPostId)
+        public async Task<List<Comment>> GetAllCommentsForPost(int blogPostId, int lastIdSent)
         {
             BlogPost post = await getPost(blogPostId, false, true);
 
-
-            return post.Comments.ToList();
+            if (lastIdSent == 0)
+            {
+                return post.Comments.Take(10).ToList();
+            }
+            return post.Comments.SkipWhile(t => t.Id != lastIdSent).Take(10).ToList();
         }
 
         public async Task<List<CommentView>> CommentModelToView(List<Comment> comments)
@@ -143,6 +146,7 @@ namespace GoKartUnite.Handlers
             {
                 CommentView commentToAdd = new CommentView
                 {
+                    Id = comment.Id,
                     Text = comment.Text,
                     AuthorName = "Taeka",
                     TypedAt = comment.CreatedDate

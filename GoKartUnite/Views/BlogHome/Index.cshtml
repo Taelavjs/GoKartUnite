@@ -17,13 +17,15 @@
     }
     @foreach (var post in Model.posts)
     {
+        <div class="post" data-postid="@post.Id" data-lastcommentid=0> <!-- Add lastCommentId here -->
+
         @await Html.PartialAsync("Blog", post);
         <button data-postid="@post.Id" class="commentBtn">Comments</button>
         <div class="comment-section-@post.Id comment">
 
         </div>
     <button class="create-comment-btn btn btn-primary" data-postid="@post.Id">Create Comment</button>
-
+    </div>
     }
 </div>
 @{
@@ -85,6 +87,7 @@
 
                 // Get the post ID
                 var postId = $(this).data("postid");
+                    var lastCommentId = $(this).closest('.post').data('lastcommentid');
 
                 // Log the post ID for debugging
                 console.log("Post ID:", postId);

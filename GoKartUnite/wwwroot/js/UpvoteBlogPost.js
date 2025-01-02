@@ -24,8 +24,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     commentBtns.forEach(button => {
         button.addEventListener("click", function () {
+
+            var lastCommentId = $(this).closest('.post').data('lastcommentid');
+
             const postId = button.getAttribute('data-postid');
-            fetch(`BlogHome/GetCommentsForBlog?blogId=${postId}`, {
+            fetch(`BlogHome/GetCommentsForBlog?blogId=${postId}&lastCommentId=${lastCommentId}`, {
                 method: "GET",
                 headers: {
                     'Content-Type': 'application/json',
@@ -41,8 +44,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     console.log(data);
                     const commentSection = document.getElementsByClassName(`comment-section-${postId}`)[0];
 
-                    data.forEach(comment => {
+                    commentSection.innerHTML = '';
 
+                    const lastCommentId = data[data.length - 1]?.id;
+
+                    $(this).closest('.post').data('lastcommentid', lastCommentId);
+
+                    data.forEach(comment => {
                         const commentContainer = document.createElement('div');
                         commentContainer.classList.add('comment-item');
 
