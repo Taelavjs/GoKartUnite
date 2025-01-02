@@ -27,3 +27,30 @@
 .right {
     margin-left: auto;
 }
+
+
+.comment {
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+}
+
+.comment-item {
+    margin-top: 2ch;
+    padding-top: 1ch;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    height: fit-content;
+    border-top: 2px solid var(--border-color);
+}
+
+.CommentContent {
+}
+
+.CommentDate {
+    margin-left: auto;
+    margin-right: 2ch;
+}

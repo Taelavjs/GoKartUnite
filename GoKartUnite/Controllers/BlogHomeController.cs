@@ -138,5 +138,36 @@ namespace GoKartUnite.Controllers
             List<Comment> comments = await _blog.GetAllCommentsForPost(blogId);
             return Ok(await _blog.CommentModelToView(comments));
         }
+
+        [HttpGet]
+        public ActionResult CreateComment(int blogId)
+        {
+            CommentView cv = new CommentView();
+            cv.blogId = blogId;
+            return PartialView("CreateComment", cv);
+        }
+
+        [HttpPost]
+
+        public async Task<IActionResult> CreateComment(CommentView cv)
+        {
+            string GoogleId = User.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+
+            Karter k = await _karter.getUserByGoogleId(GoogleId);
+
+            Comment comment = new Comment
+            {
+                AuthorId = k.Id,
+                BlogPostId = cv.blogId ?? 0,
+                Text = cv.Text,
+            };
+
+            await _blog.CreateComment(comment);
+
+            string previousUrl = Request.Headers["Referer"].ToString();
+
+            return Redirect(previousUrl);
+        }
     }
 }

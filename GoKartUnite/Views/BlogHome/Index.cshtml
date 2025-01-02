@@ -19,10 +19,10 @@
     {
         @await Html.PartialAsync("Blog", post);
         <button data-postid="@post.Id" class="commentBtn">Comments</button>
-            <ul class="comment-section-@post.Id">
-            
+        <div class="comment-section-@post.Id comment">
 
-        </ul>
+        </div>
+    <button class="create-comment-btn btn btn-primary" data-postid="@post.Id">Create Comment</button>
 
     }
 </div>
@@ -58,4 +58,52 @@
         <a class="page-link" href="?page=@(ViewBag.TotalPages)@queryString">End</a>
     </li>
 </ul>
+
+<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"></span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+@section Scripts {
+        <script>
+            $(".container").on("click", ".create-comment-btn", function (e) {
+                e.preventDefault();
+
+                // Log to confirm button click
+                console.log("Create Comment button clicked");
+
+                // Get the post ID
+                var postId = $(this).data("postid");
+
+                // Log the post ID for debugging
+                console.log("Post ID:", postId);
+
+                // Perform the AJAX request
+                $.ajax({
+                    url: '@Url.Action("CreateComment", "BlogHome")',
+                    type: "GET", 
+                    data: { blogId: postId }, 
+                    success: function (data) {
+                        $('.modal-body').html(data);
+                        $('#exampleModalLong').modal('show');
+                    },
+                    error: function (err) {
+                        console.error("Error:", err);
+                    }
+                });
+            });
+        </script>
+}
+
     <script src="~/js/UpvoteBlogPost.js" asp-append-version="true"></script>

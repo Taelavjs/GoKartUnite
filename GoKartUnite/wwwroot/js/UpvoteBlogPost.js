@@ -42,9 +42,27 @@ document.addEventListener("DOMContentLoaded", function () {
                     const commentSection = document.getElementsByClassName(`comment-section-${postId}`)[0];
 
                     data.forEach(comment => {
-                        const li = document.createElement('li');
-                        li.textContent = comment.Text;
-                        commentSection.appendChild(li);
+
+                        const commentContainer = document.createElement('div');
+                        commentContainer.classList.add('comment-item');
+
+                        const commentAuthor = document.createElement('div');
+                        commentAuthor.classList.add('CommentAuthor');
+                        commentAuthor.textContent = comment.authorName;
+
+                        const commentContent = document.createElement('div');
+                        commentContent.classList.add('CommentContent');
+                        commentContent.textContent = comment.text;
+
+                        const commentDate = document.createElement('div');
+                        commentDate.classList.add('CommentDate');
+                        commentDate.textContent = new Date(comment.typedAt).toLocaleDateString();
+
+                        commentContainer.appendChild(commentAuthor);
+                        commentContainer.appendChild(commentContent);
+                        commentContainer.appendChild(commentDate);
+
+                        commentSection.appendChild(commentContainer);
                     });
                 })
                 .catch(err => {

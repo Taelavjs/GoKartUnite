@@ -154,5 +154,12 @@ namespace GoKartUnite.Handlers
 
             return viewComments;
         }
+
+
+        public async Task CreateComment(Comment comment)
+        {
+            await _context.Comments.AddAsync(comment);
+            await _context.SaveChangesAsync();
+        }
     }
 }
