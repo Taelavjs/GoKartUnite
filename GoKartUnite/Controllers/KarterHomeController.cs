@@ -17,10 +17,12 @@ namespace GoKartUnite.Controllers
     {
         private readonly KarterHandler _karters;
         private readonly TrackHandler _tracks;
-        public KarterHomeController(KarterHandler karters, TrackHandler tracks)
+        private readonly RoleHandler _roles;
+        public KarterHomeController(KarterHandler karters, TrackHandler tracks, RoleHandler roles)
         {
             _karters = karters;
             _tracks = tracks;
+            _roles = roles;
         }
         [HttpGet]
         [Microsoft.AspNetCore.Authorization.Authorize]
@@ -103,8 +105,11 @@ namespace GoKartUnite.Controllers
             karter.NameIdentifier = NameIdentifier;
 
 
+
             await _karters.createUser(karter,
                 User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value);
+            await _roles.AddRoleToUser(karter.Id, "User");
+
             return RedirectToAction("Details");
         }
 

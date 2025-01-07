@@ -16,8 +16,10 @@
             <th scope="col">Name</th>
             <th scope="col">Years Experience</th>
             <th scope="col">Local Track</th>
-            <th scope="col">Options</th>
-            <th scope="col"></th>
+            @if(User.IsInRole("User")){
+                <th scope="col">Options</th>
+                <th scope="col"></th>
+            }
         </thead>
         <tbody>
             @foreach (var karterDb in Model)

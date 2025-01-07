@@ -10,6 +10,11 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using GoKartUnite.Models;
 using X.PagedList;
+using Microsoft.Extensions.Options;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using System.Security.Claims;
+using System.Diagnostics;
+
 
 
 namespace GoKartUnite
@@ -44,6 +49,8 @@ namespace GoKartUnite
                     builder.Configuration[keyValue[0].Trim()] = keyValue[1].Trim();
                 }
             }
+            builder.Logging.AddConsole();
+
             builder.Services
                     .AddAuthentication(options =>
                     {
@@ -55,6 +62,31 @@ namespace GoKartUnite
                     {
                         googleOptions.ClientId = configuration["ClientId"];
                         googleOptions.ClientSecret = configuration["ClientSecret"];
+                        googleOptions.Events.OnCreatingTicket = ctx =>
+                        {
+                            var dbContext = ctx.HttpContext.RequestServices.GetRequiredService<GoKartUniteContext>();
+                            var email = ctx.Principal.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+                            var NameIdentifier = ctx.Principal.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                            var karter = dbContext.Karter.Include(k => k.UserRoles).FirstOrDefault(k => k.Email == email);
+                            var claims = new List<Claim>();
+                            if (karter != null)
+                            {
+                                if (karter.UserRoles == null)
+                                {
+                                    ctx.Principal.AddIdentity(new ClaimsIdentity(claims));
+                                    return Task.CompletedTask;
+                                }
+                                foreach (UserRoles role in karter.UserRoles)
+                                {
+                                    Role singleRole = dbContext.Role.FirstOrDefault(r => r.Id == role.Id);
+                                    claims.Add(new Claim(ClaimTypes.Role, singleRole.Name));
+                                }
+                            }
+
+                            ctx.Principal.AddIdentity(new ClaimsIdentity(claims));
+                            return Task.CompletedTask;
+
+                        };
                     });
             // Add services to the container.
             builder.Services.AddControllersWithViews();

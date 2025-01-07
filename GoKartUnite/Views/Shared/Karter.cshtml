@@ -9,12 +9,15 @@
     <td>@Model.Name</td>
     <td>@Model.YearsExperience</td>
     <td>@(Model.LocalTrack == null ? "MISSING" : Model.LocalTrack.Title)</td>
-    <td><a asp-action="Create" asp-route-id="@Model.Id">Edit</a></td>
-    <td>
 
-        <form asp-action="Delete" asp-route-id="@Model.Id" method="post" style="display:inline;">
-        @Html.AntiForgeryToken()
-        <input type="submit" value="Delete" class="btn btn-danger" />
-    </form>
-    </td>
+    @if(User.IsInRole("User")){
+                <td><a asp-action="Create" asp-route-id="@Model.Id">Edit</a></td>
+        <td>
+            @Html.AntiForgeryToken()
+            <form asp-action="Delete" asp-route-id="@Model.Id" method="post" style="display:inline;">
+            <input type="submit" value="Delete" class="btn btn-danger" />
+        </form>
+        </td>
+    }
+
 </tr>

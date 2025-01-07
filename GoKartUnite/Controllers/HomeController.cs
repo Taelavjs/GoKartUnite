@@ -36,13 +36,13 @@ namespace GoKartUnite.Controllers
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet("/login")]
-        [AllowAnonymous] // Allow unauthenticated users to access this endpoint
+        [AllowAnonymous]
         public async Task<IActionResult> Login()
         {
             // Trigger Google login
             var authenticationProperties = new AuthenticationProperties
             {
-                RedirectUri = Url.Action("Create", "KarterHome") 
+                RedirectUri = Url.Action("Create", "KarterHome")
             };
 
             return Challenge(authenticationProperties, GoogleDefaults.AuthenticationScheme);
