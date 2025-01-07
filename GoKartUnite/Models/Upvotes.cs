@@ -6,7 +6,7 @@
         public int VoterId { get; set; }
         public int PostId { get; set; }
 
-        public Karter? Karter { get; set; }
-        public BlogPost? Post { get; set; }
+        public virtual Karter? Karter { get; set; }
+        public virtual BlogPost? Post { get; set; }
     }
 }

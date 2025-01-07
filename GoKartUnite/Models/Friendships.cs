@@ -8,12 +8,12 @@ namespace GoKartUnite.Models
         public int KarterFirstId { get; set; }
 
         [ForeignKey(nameof(KarterFirstId))]
-        public Karter KarterFirst { get; set; }
+        public virtual Karter KarterFirst { get; set; }
 
         public int KarterSecondId { get; set; }
 
         [ForeignKey(nameof(KarterSecondId))]
-        public Karter KarterSecond { get; set; }
+        public virtual Karter KarterSecond { get; set; }
 
         public DateOnly? DateCreated { get; set; } = DateOnly.FromDateTime(DateTime.Now); // Made public for EF mapping
 

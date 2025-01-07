@@ -12,8 +12,8 @@ namespace GoKartUnite.Models
         public required Locations Location { get; set; }
 
         // Relationships
-        public ICollection<Karter>? Karters { get; set; }
-        public ICollection<BlogPost>? BlogPosts { get; set; }
+        public virtual ICollection<Karter>? Karters { get; set; }
+        public virtual ICollection<BlogPost>? BlogPosts { get; set; }
     }
 
     public enum Locations

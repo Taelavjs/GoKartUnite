@@ -9,11 +9,11 @@ namespace GoKartUnite.Models
         public int KarterId { get; set; }
 
         [ForeignKey(nameof(KarterId))]
-        public Karter karter { get; set; }
+        public virtual Karter karter { get; set; }
 
         public int TrackId { get; set; }
         [ForeignKey(nameof(TrackId))]
-        public Track track { get; set; }
+        public virtual Track track { get; set; }
 
         public DateTime FollowedAt { get; set; } = DateTime.Now;
 

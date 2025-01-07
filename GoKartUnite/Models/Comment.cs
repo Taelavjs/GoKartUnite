@@ -10,7 +10,7 @@
         public int AuthorId { get; set; }
 
         public int BlogPostId { get; set; }
-        public Karter? Author { get; set; }
-        public BlogPost? BlogPost { get; set; }
+        public virtual Karter? Author { get; set; }
+        public virtual BlogPost? BlogPost { get; set; }
     }
 }
