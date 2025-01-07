@@ -16,17 +16,17 @@ namespace GoKartUnite.CustomAttributes
                 .RequestServices
                 .GetService(typeof(GoKartUniteContext)) as GoKartUniteContext;
 
-            var userGoogleId = context.HttpContext.User.Claims
+            var NameIdentifier = context.HttpContext.User.Claims
                 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
 
-            if (userGoogleId == null || userGoogleId.Value == String.Empty)
+            if (NameIdentifier == null || NameIdentifier.Value == String.Empty)
             {
                 context.Result = new RedirectResult("/login");
                 return;
             }
 
             var userExists = dbContext.Karter
-                .Any(u => u.GoogleId == userGoogleId.Value);
+                .Any(u => u.NameIdentifier == NameIdentifier.Value);
 
             if (!userExists)
             {

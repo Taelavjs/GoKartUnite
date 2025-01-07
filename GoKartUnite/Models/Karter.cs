@@ -16,7 +16,7 @@ namespace GoKartUnite.Models
     {
         public int Id { get; set; }
         public string? Email { get; set; }
-        public string? GoogleId { get; set; }
+        public string? NameIdentifier { get; set; }
 
 
 

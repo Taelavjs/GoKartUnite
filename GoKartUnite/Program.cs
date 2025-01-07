@@ -58,7 +58,6 @@ namespace GoKartUnite
                     });
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-            builder.Services.AddSingleton<IHandleFriendsList, HandleFriendsList>();
             var app = builder.Build();
             var webSocketOptions = new WebSocketOptions
             {
@@ -75,6 +74,7 @@ namespace GoKartUnite
             // WEBSOCKETS +_+_+_+_+_+_+_+_+_+_+_+_+_+_
 
             // +_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+
+            app.UseAuthentication();
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

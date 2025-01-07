@@ -100,7 +100,7 @@ namespace GoKartUnite.Controllers
             karter.Name = kv.Name;
             karter.TrackId = kv.TrackId;
             karter.YearsExperience = kv.YearsExperience;
-            karter.GoogleId = NameIdentifier;
+            karter.NameIdentifier = NameIdentifier;
 
 
             await _karters.createUser(karter,

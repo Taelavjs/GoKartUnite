@@ -108,7 +108,7 @@ namespace GoKartUnite.Handlers
 
             if (prevKarterRecord == null)
             {
-                if (await _context.Karter.FirstOrDefaultAsync(k => k.GoogleId == karter.GoogleId) != null)
+                if (await _context.Karter.FirstOrDefaultAsync(k => k.NameIdentifier == karter.NameIdentifier) != null)
                 {
                     return;
                 }
@@ -131,10 +131,10 @@ namespace GoKartUnite.Handlers
 
             if (withTrack)
             {
-                var karterInDbD = await _context.Karter.Include(k => k.Track).FirstOrDefaultAsync(k => k.GoogleId == GoogleId);
+                var karterInDbD = await _context.Karter.Include(k => k.Track).FirstOrDefaultAsync(k => k.NameIdentifier == GoogleId);
                 return karterInDbD;
             }
-            var karterInDb = await _context.Karter.FirstOrDefaultAsync(k => k.GoogleId == GoogleId);
+            var karterInDb = await _context.Karter.FirstOrDefaultAsync(k => k.NameIdentifier == GoogleId);
             return karterInDb;
         }
 
