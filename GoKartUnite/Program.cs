@@ -33,6 +33,7 @@ namespace GoKartUnite
             builder.Services.AddTransient<BlogHandler>();
             builder.Services.AddTransient<FollowerHandler>();
             builder.Services.AddTransient<NotificationHandler>();
+            builder.Services.AddTransient<RoleHandler>();
             builder.Services.AddControllers().AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             );
@@ -121,8 +122,8 @@ namespace GoKartUnite
             using (var scope = app.Services.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<GoKartUniteContext>();
-                dummyDbData(context);
-                dummyDbComments(context);
+                //dummyDbData(context);
+                //dummyDbComments(context);
             }
             app.Run();
         }
@@ -134,7 +135,7 @@ namespace GoKartUnite
             {
                 BlogPost post = new BlogPost
                 {
-                    AuthorId = 4032,
+                    AuthorId = 4033,
                     Title = "New Tracks",
                     Descripttion = "This is for NewBuckmore",
                     TaggedTrackId = 1014
@@ -143,7 +144,7 @@ namespace GoKartUnite
                 context.BlogPosts.Add(post);
                 BlogPost post2 = new BlogPost
                 {
-                    AuthorId = 4032,
+                    AuthorId = 4033,
                     Title = "New Tracks",
                     Descripttion = "This is for Alt",
                     TaggedTrackId = 1016
@@ -164,7 +165,7 @@ namespace GoKartUnite
                 Comment comment = new Comment
                 {
                     Text = "This is testData",
-                    AuthorId = 4032,
+                    AuthorId = 4033,
                     BlogPostId = 3026
                 };
 

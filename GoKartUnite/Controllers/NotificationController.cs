@@ -2,6 +2,8 @@
 using GoKartUnite.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using GoKartUnite.CustomAttributes;
 
 namespace GoKartUnite.Controllers
 {
@@ -15,6 +17,10 @@ namespace GoKartUnite.Controllers
             _notifs = notifs;
         }
 
+
+        [HttpGet]
+        [Authorize]
+        [AccountConfirmed]
         public async Task<int> getNotifCount()
         {
             string GoogleId = User.Claims

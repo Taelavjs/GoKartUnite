@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using System.Web.Mvc.Filters;
 using System.Web.Mvc;
 using GoKartUnite.CustomAttributes;
+using Authroize = Microsoft.AspNetCore.Authorization;
+using AllowAnonymousAttribute = Microsoft.AspNetCore.Authorization.AllowAnonymousAttribute;
+using HttpGetAttribute = Microsoft.AspNetCore.Mvc.HttpGetAttribute;
 
 namespace GoKartUnite.Controllers
 {
@@ -18,7 +21,7 @@ namespace GoKartUnite.Controllers
         {
             _logger = logger;
         }
-
+        [AllowAnonymous]
         public IActionResult Index()
         {
             return View();
@@ -35,7 +38,7 @@ namespace GoKartUnite.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        [Microsoft.AspNetCore.Mvc.HttpGet("/login")]
+        [HttpGet("/login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login()
         {
@@ -48,8 +51,8 @@ namespace GoKartUnite.Controllers
             return Challenge(authenticationProperties, GoogleDefaults.AuthenticationScheme);
         }
 
-        [Microsoft.AspNetCore.Mvc.HttpGet("/logout")]
-        [Microsoft.AspNetCore.Authorization.Authorize]
+        [HttpGet("/logout")]
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

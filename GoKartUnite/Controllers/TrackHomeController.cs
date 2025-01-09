@@ -10,6 +10,7 @@ using NuGet.DependencyResolver;
 using NuGet.Protocol.Core.Types;
 using System.Reflection.Metadata;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GoKartUnite.Controllers
 {
@@ -31,13 +32,14 @@ namespace GoKartUnite.Controllers
 
         [HttpGet]
         [AccountConfirmed]
-        [Microsoft.AspNetCore.Authorization.Authorize]
+        [Authorize]
         public async Task<ActionResult> Index()
         {
             return View();
         }
 
-        [Microsoft.AspNetCore.Authorization.Authorize]
+        [HttpGet]
+        [Authorize]
         [AccountConfirmed]
         public async Task<ActionResult> Create()
         {
@@ -45,7 +47,7 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpPost]
-        [Microsoft.AspNetCore.Authorization.Authorize]
+        [Authorize(Roles = "Track, Admin")]
         [AccountConfirmed]
         public async Task<IActionResult> Create(Track track)
         {
@@ -59,7 +61,7 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpGet]
-        [Microsoft.AspNetCore.Authorization.Authorize]
+        [Authorize(Roles = "Track, Admin")]
         [AccountConfirmed]
         public async Task<IActionResult> Create(int? id)
         {
@@ -77,7 +79,7 @@ namespace GoKartUnite.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Microsoft.AspNetCore.Authorization.Authorize]
+        [Authorize(Roles = "Track, Admin")]
         [AccountConfirmed]
         public async Task<IActionResult> Edit(int id)
         {
@@ -87,7 +89,7 @@ namespace GoKartUnite.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Microsoft.AspNetCore.Authorization.Authorize]
+        [Authorize(Roles = "Admin")]
         [AccountConfirmed]
         public async Task<ActionResult> Delete(int id)
         {
@@ -102,7 +104,7 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpGet]
-        [Microsoft.AspNetCore.Authorization.Authorize]
+        [Authorize]
         [AccountConfirmed]
         public async Task<IActionResult> Details(int? id)
         {
@@ -113,7 +115,7 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpGet]
-        [Microsoft.AspNetCore.Authorization.Authorize]
+        [Authorize]
         [AccountConfirmed]
         public async Task<IActionResult> SearchTracks(string trackSearched, List<Locations> location)
         {
@@ -136,7 +138,7 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpGet]
-        [Microsoft.AspNetCore.Authorization.Authorize]
+        [Authorize]
         [AccountConfirmed]
         public async Task<IActionResult> FilteredIndex(string track = "")
         {
@@ -145,7 +147,7 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpGet]
-        [Microsoft.AspNetCore.Authorization.Authorize]
+        [Authorize]
         [AccountConfirmed]
         public async Task<IActionResult> FilteredKarterIndex(string track = "")
         {

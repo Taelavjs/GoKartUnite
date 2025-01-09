@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using System.Diagnostics;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
@@ -27,6 +28,9 @@ namespace GoKartUnite.Controllers
             _followerHandler = followerHandler;
             _tracks = tracks;
         }
+        [HttpGet]
+        [Authorize]
+        [AccountConfirmed]
         public async Task<IActionResult> Index(int page = 1, string? track = null)
         {
             ViewBag.TotalPages = await _blog.getTotalPageCount();
@@ -60,7 +64,7 @@ namespace GoKartUnite.Controllers
 
 
         [HttpGet]
-        [Microsoft.AspNetCore.Authorization.Authorize]
+        [Authorize]
         [AccountConfirmed]
         public async Task<IActionResult> Create()
         {
@@ -69,9 +73,9 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Microsoft.AspNetCore.Authorization.Authorize]
+        [Authorize]
         [AccountConfirmed]
+        [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(BlogPostView post)
         {
             if (!ModelState.IsValid)
@@ -105,10 +109,9 @@ namespace GoKartUnite.Controllers
             }
             return RedirectToAction("Index");
         }
-
-        [Microsoft.AspNetCore.Authorization.Authorize]
-        [AccountConfirmed]
         [HttpPost]
+        [Authorize]
+        [AccountConfirmed]
         public async Task UpvoteBlog(int id)
         {
             string GoogleId = User.Claims
@@ -132,7 +135,8 @@ namespace GoKartUnite.Controllers
 
 
         [HttpGet]
-
+        [Authorize]
+        [AccountConfirmed]
         public async Task<ActionResult<IEnumerable<Comment>>> GetCommentsForBlog(int blogId, int lastCommentId)
         {
             List<Comment> comments = await _blog.GetAllCommentsForPost(blogId, lastCommentId);
@@ -140,6 +144,8 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpGet]
+        [Authorize]
+        [AccountConfirmed]
         public ActionResult CreateComment(int blogId)
         {
             CommentView cv = new CommentView();
@@ -148,7 +154,9 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpPost]
-
+        [Authorize]
+        [AccountConfirmed]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateComment(CommentView cv)
         {
             string GoogleId = User.Claims

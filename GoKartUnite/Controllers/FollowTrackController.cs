@@ -3,6 +3,8 @@ using GoKartUnite.Handlers;
 using GoKartUnite.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using GoKartUnite.CustomAttributes;
 
 namespace GoKartUnite.Controllers
 {
@@ -19,6 +21,10 @@ namespace GoKartUnite.Controllers
             _tracks = tracks;
             _blogs = blogs;
         }
+
+        [HttpGet]
+        [Authorize]
+        [AccountConfirmed]
         public async Task<IActionResult> Index(string track, string fullUrl)
         {
             string GoogleId = User.Claims

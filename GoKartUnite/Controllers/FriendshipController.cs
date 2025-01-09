@@ -2,6 +2,7 @@
 using GoKartUnite.Handlers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GoKartUnite.Controllers
 {
