@@ -42,10 +42,42 @@ namespace GoKartUnite.Handlers
             await deleteUser(await getUser(id));
         }
 
-        public async Task<bool> sendFriendRequest(string friendsName, string GoogleId)
+        public async Task<bool> sendFriendRequestByName(string friendsName, string GoogleId)
         {
             var karter2 = await getUserByGoogleId(GoogleId);
             var karter = await getUser(friendsName);
+            if (karter == null || karter2 == null)
+            {
+                return false;
+            }
+
+            if (karter.Id > karter2.Id)
+            {
+                (karter, karter2) = (karter2, karter);
+            }
+
+            var ifExists = await _context.Friendships.FindAsync(karter.Id, karter2.Id); // uupdate when all handlers created
+            if (ifExists != null || karter.Id == karter2.Id)
+            {
+                //var modelErrText = karter.Id == karter2.Id ? "Cannot send a friend request to yourself" : "You are already friends <3";
+                //ModelState.AddModelError(string.Empty, modelErrText);
+                return false;
+            }
+
+            var friendship = new Friendships(karter.Id, karter2.Id);
+            _context.Attach(karter);
+            _context.Attach(karter2);
+
+            await _context.Friendships.AddAsync(friendship);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> sendFriendRequestById(int friendId, string GoogleId)
+        {
+            var karter2 = await getUserByGoogleId(GoogleId);
+            var karter = await getUser(friendId);
             if (karter == null || karter2 == null)
             {
                 return false;
@@ -166,5 +198,6 @@ namespace GoKartUnite.Handlers
             kv.LocalTrack = karter.Track;
             return kv;
         }
+
     }
 }

@@ -3,7 +3,7 @@
 	ViewData["Title"] = "Index";
 }
 
-@model Karter
+@model GoKartUnite.ViewModel.KarterIndex
 <h1>GoKartersHome</h1>
 <div class="container">
 	<!-- Profile Section -->
@@ -11,10 +11,10 @@
 	<div class="profile-header">
 		<div class="profile-image"></div>
 		<div class="profile-details">
-		<div class="profile-name">@Model.Name</div>
+		<div class="profile-name">@Model.karter.Name</div>
 		<div class="profile-info">
-			<div><label>Local Track:</label> @(Model.Track == null ? "None" : Model.Track.Title)</div>
-			<div><label>Email:</label> @Model.Email</div>
+			<div><label>Local Track:</label> @(Model.karter.Track == null ? "None" : Model.karter.Track.Title)</div>
+			<div><label>Email:</label> @Model.karter.Email</div>
 		</div>
 		</div>
 	</div>

@@ -19,11 +19,13 @@ namespace GoKartUnite.Controllers
         private readonly KarterHandler _karters;
         private readonly TrackHandler _tracks;
         private readonly RoleHandler _roles;
-        public KarterHomeController(KarterHandler karters, TrackHandler tracks, RoleHandler roles)
+        private readonly RelationshipHandler _friendships;
+        public KarterHomeController(RelationshipHandler friendships, KarterHandler karters, TrackHandler tracks, RoleHandler roles)
         {
             _karters = karters;
             _tracks = tracks;
             _roles = roles;
+            _friendships = friendships;
         }
         [HttpGet]
         [Authorize]
@@ -36,9 +38,15 @@ namespace GoKartUnite.Controllers
                 return View("Details", new List<Karter> { karters });
             }
 
+            Karter k = await _karters.getUserByGoogleId(User.Claims
+    .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
 
-            return View(await _karters.getUserByGoogleId(User.Claims
-    .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true));
+            KarterIndex store = new KarterIndex
+            {
+                karter = k,
+                karterFriends = await _friendships.getAllFriends(k.Id)
+            };
+            return View(store);
         }
 
 
@@ -134,22 +142,33 @@ namespace GoKartUnite.Controllers
         [Authorize]
         [AccountConfirmed]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SendFriendRequest(string friendsName)
+        public async Task<IActionResult> SendFriendRequestByName(string friendId)
         {
             string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
 
-            if (!await _karters.sendFriendRequest(friendsName, googleId))
+            if (!await _karters.sendFriendRequestByName(friendId, googleId))
             {
                 return View("Index");
             }
 
 
             return View("Index");
-
-
         }
+        [HttpPost]
+        [Authorize]
+        [AccountConfirmed]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendFriendRequestById(int friendId)
+        {
+            string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+
+            if (!await _karters.sendFriendRequestById(friendId, googleId))
+            {
+                return View("Index");
+            }
 
 
-
+            return View("Index");
+        }
     }
 }

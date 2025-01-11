@@ -17,6 +17,9 @@ namespace GoKartUnite.Models
 
         public DateOnly? DateCreated { get; set; } = DateOnly.FromDateTime(DateTime.Now); // Made public for EF mapping
 
+        public int requestedByInt { get; set; }
+
+        public bool accepted { get; set; } = false;
         public Friendships(int karterFirstId, int karterSecondId)
         {
             if (karterFirstId > karterSecondId)
