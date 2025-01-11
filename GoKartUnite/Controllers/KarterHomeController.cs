@@ -44,8 +44,25 @@ namespace GoKartUnite.Controllers
             KarterIndex store = new KarterIndex
             {
                 karter = k,
-                karterFriends = await _friendships.getAllFriends(k.Id)
+                karterFriends = await _karters.karterModelToView(await _friendships.getAllFriends(k.Id)),
+                karterFriendRequests = await _karters.karterModelToView(await _friendships.getAllFriendRequests(k.Id)),
+                sentFriendRequests = await _karters.karterModelToView(await _friendships.getAllSentRequests(k.Id))
             };
+
+            foreach (var kar in store.karterFriendRequests)
+            {
+                kar.FriendStatus = FriendshipStatus.Requested;
+            }
+
+            foreach (var kar in store.karterFriends)
+            {
+                kar.FriendStatus = FriendshipStatus.Friend;
+            }
+
+            foreach (var kar in store.sentFriendRequests)
+            {
+                kar.FriendStatus = FriendshipStatus.Received;
+            }
             return View(store);
         }
 
@@ -55,10 +72,15 @@ namespace GoKartUnite.Controllers
         [AccountConfirmed]
         public async Task<IActionResult> Details(int? id)
         {
-            Console.WriteLine(User.Claims);
+            string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+
+            Karter k = await _karters.getUserByGoogleId(googleId);
 
             List<Karter> karters = await _karters.getAllUsers(true);
-            return View(await _karters.karterModelToView(karters));
+            List<KarterView> karterViews = await _karters.karterModelToView(karters);
+
+            karterViews = await _friendships.AddStatusToKarters(karterViews, k.Id);
+            return View(karterViews);
         }
 
 
@@ -67,10 +89,14 @@ namespace GoKartUnite.Controllers
         [AccountConfirmed]
         public async Task<IActionResult> DetailsByTrack(string? track)
         {
-            Console.WriteLine(User.Claims);
+            string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
 
+            Karter k = await _karters.getUserByGoogleId(googleId);
             List<Karter> karters = await _karters.getAllUsers(false, track);
-            return View("Details", await _karters.karterModelToView(karters));
+            List<KarterView> karterViews = await _karters.karterModelToView(karters);
+
+            karterViews = await _friendships.AddStatusToKarters(karterViews, k.Id);
+            return View("Details", karterViews);
         }
 
         [HttpGet]
@@ -169,6 +195,53 @@ namespace GoKartUnite.Controllers
 
 
             return View("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> HandleFriendRequest(int friendId, string action)
+        {
+            if (action == "Accept")
+            {
+                await AcceptFriendRequest(friendId);
+            }
+            else if (action == "Add")
+            {
+                await SendFriendRequestById(friendId);
+            }
+            else if (action == "Remove")
+            {
+                await RemoveFriendRequest(friendId);
+            }
+            else if (action == "Cancel")
+            {
+                await RemoveFriendRequest(friendId);
+            }
+
+            return RedirectToAction("Index");
+        }
+        [HttpPost]
+        [Authorize]
+        [AccountConfirmed]
+        [ValidateAntiForgeryToken]
+        private async Task AcceptFriendRequest(int friendId)
+        {
+            string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+
+            Karter k = await _karters.getUserByGoogleId(googleId);
+
+            await _friendships.AcceptFriendRequest(k.Id, friendId);
+        }
+        [HttpPost]
+        [Authorize]
+        [AccountConfirmed]
+        [ValidateAntiForgeryToken]
+        public async Task RemoveFriendRequest(int friendId)
+        {
+            string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+
+            Karter k = await _karters.getUserByGoogleId(googleId);
+
+            await _friendships.RemoveFriendShip(k.Id, friendId);
         }
     }
 }

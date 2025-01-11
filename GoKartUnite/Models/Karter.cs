@@ -35,4 +35,12 @@ namespace GoKartUnite.Models
 
 
     }
+
+    public enum FriendshipStatus
+    {
+        User,
+        Requested,
+        Received,
+        Friend
+    }
 }

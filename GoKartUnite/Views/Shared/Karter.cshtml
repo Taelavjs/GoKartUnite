@@ -10,9 +10,23 @@
     <td>@Model.YearsExperience</td>
     <td>@(Model.LocalTrack == null ? "MISSING" : Model.LocalTrack.Title)</td>
     <td>
-        <form asp-controller="KarterHome" asp-action="SendFriendRequestById" asp-route-friendId="@Model.Id" method="post" style="display:inline;">
-        @Html.AntiForgeryToken()
-            <input type="submit" value="Add Friend" class="btn btn-danger" />
+        <form asp-controller="KarterHome" asp-action="HandleFriendRequest" asp-route-friendId="@Model.Id" method="post" style="display:inline;">
+            @Html.AntiForgeryToken()
+            @switch (Model.FriendStatus)
+            {
+                case FriendshipStatus.Requested:
+                    <button type="submit" name="action" value="Accept" class="btn btn-success">Accept Friend</button>
+                    break;
+                case FriendshipStatus.Friend:
+                    <button type="submit" name="action" value="Remove" class="btn btn-danger">Remove Friend</button>
+                    break;
+                case FriendshipStatus.Received:
+                    <button type="submit" name="action" value="Cancel" class="btn btn-danger">Cancel Request</button>
+                    break;
+                default:
+                    <button type="submit" name="action" value="Add" class="btn btn-danger">Add Friend</button>
+                    break;
+            }
         </form>
     </td>
     @if(User.IsInRole("User")){

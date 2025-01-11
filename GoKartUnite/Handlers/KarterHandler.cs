@@ -77,6 +77,7 @@ namespace GoKartUnite.Handlers
         public async Task<bool> sendFriendRequestById(int friendId, string GoogleId)
         {
             var karter2 = await getUserByGoogleId(GoogleId);
+            int sentBy = karter2.Id;
             var karter = await getUser(friendId);
             if (karter == null || karter2 == null)
             {
@@ -99,6 +100,7 @@ namespace GoKartUnite.Handlers
             var friendship = new Friendships(karter.Id, karter2.Id);
             _context.Attach(karter);
             _context.Attach(karter2);
+            friendship.requestedByInt = sentBy;
 
             await _context.Friendships.AddAsync(friendship);
             await _context.SaveChangesAsync();

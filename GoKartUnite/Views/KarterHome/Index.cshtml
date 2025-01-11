@@ -28,82 +28,57 @@
 		<thead>
 			<tr>
 			<th></th>
+			<th></th>
 			<th>Friends</th>
+			<th></th>
 			<th></th>
 			</tr>
 		</thead>
 		<tbody>
-			<tr>
-			<td>Img</td>
-			<td>Tae Boo</td>
-			<td>X</td>
-			</tr>
-			<tr>
-			<td>Img</td>
-			<td>Tae Boo</td>
-			<td>X</td>
-			</tr>
+			@foreach(var friend in Model.karterFriends){
+				@await Html.PartialAsync("karter", friend)
+			}
 		</tbody>
 		</table>
 	</div>
 
-	<!-- Local Karters Table -->
 	<div class="table-container">
 		<table>
 		<thead>
 			<tr>
 			<th></th>
-			<th>Local Karters</th>
+			<th></th>
+			<th>Incoming Requests</th>
+			<th></th>
 			<th></th>
 			</tr>
 		</thead>
 		<tbody>
+			@foreach (var friend in Model.karterFriendRequests)
+			{
+				@await Html.PartialAsync("karter", friend)
+			}
+		</tbody>
+		</table>
+	</div>
+	</div>
+
+	<div class="table-container">
+		<table>
+		<thead>
 			<tr>
-			<td>Img</td>
-			<td>Tae Boo</td>
-			<td>X</td>
+			<th></th>
+			<th></th>
+			<th>Outgoing Requests</th>
+			<th></th>
+			<th></th>
 			</tr>
-			<tr>
-			<td>Img</td>
-			<td>Tae Boo</td>
-			<td>X</td>
-			</tr>              <tr>
-			<td>Img</td>
-			<td>Tae Boo</td>
-			<td>X</td>
-			</tr>
-			<tr>
-			<td>Img</td>
-			<td>Tae Boo</td>
-			<td>X</td>
-			</tr>              <tr>
-			<td>Img</td>
-			<td>Tae Boo</td>
-			<td>X</td>
-			</tr>
-			<tr>
-			<td>Img</td>
-			<td>Tae Boo</td>
-			<td>X</td>
-			</tr>              <tr>
-			<td>Img</td>
-			<td>Tae Boo</td>
-			<td>X</td>
-			</tr>
-			<tr>
-			<td>Img</td>
-			<td>Tae Boo</td>
-			<td>X</td>
-			</tr>              <tr>
-			<td>Img</td>
-			<td>Tae Boo</td>
-			<td>X</td>
-			</tr>
-			<tr>
-			<td>Img</td>
-			<td>Tae Boo</td>
-			<td>X</td>
-			</tr>
+		</thead>
+		<tbody>
+				@foreach (var friend in Model.sentFriendRequests)
+				{
+					@await Html.PartialAsync("karter", friend)
+				}
 		</tbody>
 		</table>
 	</div>
