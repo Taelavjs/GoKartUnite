@@ -1,8 +1,24 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-
+@model IEnumerable<GoKartUnite.ViewModel.BlogPostView>
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Go Kart Unite</h1>
+</div>
+<div class="container">
+    @if (User.Identity.IsAuthenticated)
+    {   
+         @foreach (var post in Model) 
+         { 
+                 <div class="post" data-postid="@post.Id" data-lastcommentid=0> <!-- Add lastCommentId here --> 
+
+                 @await Html.PartialAsync("Blog", post); 
+                 <button data-postid="@post.Id" class="commentBtn">Comments</button> 
+                 <div class="comment-section-@post.Id comment"> 
+
+                 </div> 
+             <button class="create-comment-btn btn btn-primary" data-postid="@post.Id">Create Comment</button> 
+             </div> 
+         } 
+    }
 </div>

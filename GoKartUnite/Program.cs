@@ -122,7 +122,7 @@ namespace GoKartUnite
             using (var scope = app.Services.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<GoKartUniteContext>();
-                //dummyDbData(context);
+                dummyDbData(context);
                 //dummyDbComments(context);
             }
             app.Run();
@@ -130,12 +130,12 @@ namespace GoKartUnite
 
         private static void dummyDbData(GoKartUniteContext context)
         {
-            if (context.BlogPosts.Count() > 400) return;
-            for (int i = 0; i < 100; i++)
+            if (context.BlogPosts.Count() > 10000) return;
+            for (int i = 0; i < 15; i++)
             {
                 BlogPost post = new BlogPost
                 {
-                    AuthorId = 4033,
+                    AuthorId = 4041,
                     Title = "New Tracks",
                     Descripttion = "This is for NewBuckmore",
                     TaggedTrackId = 1014

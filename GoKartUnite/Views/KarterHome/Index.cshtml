@@ -11,7 +11,7 @@
 	<div class="profile-header">
 		<div class="profile-image"></div>
 		<div class="profile-details">
-		<div class="profile-name">@Model.karter.Name</div>
+		<div class="profile-name">@Model.karter.Name <a asp-action="EditUserDetails" class="btn btn-primary">Edit</a></div>
 		<div class="profile-info">
 			<div><label>Local Track:</label> @(Model.karter.Track == null ? "None" : Model.karter.Track.Title)</div>
 			<div><label>Email:</label> @Model.karter.Email</div>

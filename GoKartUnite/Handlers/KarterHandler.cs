@@ -201,5 +201,16 @@ namespace GoKartUnite.Handlers
             return kv;
         }
 
+        public async Task UpdateUser(string nameIdentifier, KarterView kv)
+        {
+            Karter k = await getUserByGoogleId(nameIdentifier);
+            k.Name = kv.Name;
+            k.TrackId = kv.TrackId;
+            k.YearsExperience = kv.YearsExperience;
+
+            _context.Karter.Update(k);
+            _context.SaveChanges();
+        }
+
     }
 }

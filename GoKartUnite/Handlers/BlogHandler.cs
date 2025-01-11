@@ -39,6 +39,17 @@ namespace GoKartUnite.Handlers
                 .ToListAsync();
         }
 
+        public async Task<List<BlogPost>> GetAllPostsFromUser(int Id)
+        {
+            List<BlogPost> posts = await _context.BlogPosts
+                .Include(k => k.Upvotes)
+                .Include(k => k.TaggedTrack)
+                .Where(k => k.AuthorId == Id)
+                .ToListAsync();
+
+            return posts;
+        }
+
         public async Task<int> addPost(BlogPostView post, Karter author, Track taggedT)
         {
             BlogPost dbPost = new BlogPost();
@@ -82,6 +93,7 @@ namespace GoKartUnite.Handlers
                 post.Author = Author.Name;
                 post.Upvotes = bp.Upvotes.Count;
                 post.TaggedTrack = bp.TaggedTrack?.Title;
+                post.authorId = bp.AuthorId;
                 retPosts.Add(post);
             }
 

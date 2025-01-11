@@ -49,6 +49,8 @@ namespace GoKartUnite.Controllers
                 sentFriendRequests = await _karters.karterModelToView(await _friendships.getAllSentRequests(k.Id))
             };
 
+            // Adds Status to KarterView Lists
+
             foreach (var kar in store.karterFriendRequests)
             {
                 kar.FriendStatus = FriendshipStatus.Requested;
@@ -99,25 +101,54 @@ namespace GoKartUnite.Controllers
             return View("Details", karterViews);
         }
 
+        // ======================================
+        // CREATE METHODS
+        // ======================================
         [HttpGet]
         [Authorize]
-        public async Task<ActionResult> Create(int? id)
+        [AccountConfirmed]
+        public async Task<ActionResult> Create(int id)
         {
             ViewBag.TrackTitles = await _tracks.getAllTracks();
 
-            if (id != null)
-            {
-                var karterInDb = await _karters.getUser(id.Value);
-                ViewData["Title"] = "Editing Karter Details";
 
-                return View(await _karters.karterModelToView(karterInDb));
-            }
             ViewData["Title"] = "Creating Karter Profile";
 
             return View();
         }
+        [HttpGet]
+        [Authorize]
+        [AccountConfirmed]
+        public async Task<ActionResult> EditUserDetails()
+        {
+            string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+
+            Karter k = await _karters.getUserByGoogleId(googleId);
+            ViewData["Title"] = "Editing Karter Details";
+            ViewData["ButtonValue"] = "UpdateUser";
+            ViewBag.TrackTitles = await _tracks.getAllTracks();
+
+            return View("Create", await _karters.karterModelToView(k));
+        }
+        [HttpPost]
+        [Authorize]
+        [AccountConfirmed]
+        public async Task<ActionResult> UpdateUser(KarterView kv)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.TrackTitles = await _tracks.getAllTracks();
+                return View("Create");
+            }
+            string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+
+            await _karters.UpdateUser(googleId, kv);
+            return RedirectToAction("Index");
+        }
 
 
+        // Create accoount method for new users - Triggered with successful
+        // Login with google but no user account found
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
@@ -128,6 +159,7 @@ namespace GoKartUnite.Controllers
                 ViewBag.tracks = await _tracks.getAllTracks();
                 return View("Create");
             }
+            ViewData["ButtonValue"] = "Create";
 
             string NameIdentifier = User.Claims
     .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
@@ -148,6 +180,11 @@ namespace GoKartUnite.Controllers
             return RedirectToAction("Details");
         }
 
+
+        // ======================================
+        // CREATE METHODS
+        // ======================================
+
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [AccountConfirmed]
@@ -163,6 +200,10 @@ namespace GoKartUnite.Controllers
 
             return RedirectToAction("Details");
         }
+
+        // ======================================
+        // FRIEND REQUEST METHODS
+        // ======================================
 
         [HttpPost]
         [Authorize]
@@ -197,7 +238,11 @@ namespace GoKartUnite.Controllers
             return View("Index");
         }
 
+        // Handles different button presses via partial karter view
         [HttpPost]
+        [Authorize]
+        [AccountConfirmed]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> HandleFriendRequest(int friendId, string action)
         {
             if (action == "Accept")
@@ -244,4 +289,8 @@ namespace GoKartUnite.Controllers
             await _friendships.RemoveFriendShip(k.Id, friendId);
         }
     }
+
+    // ======================================
+    // FRIEND REQUEST METHODS
+    // ======================================
 }

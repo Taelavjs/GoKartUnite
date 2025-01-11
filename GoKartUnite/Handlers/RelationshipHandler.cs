@@ -45,8 +45,8 @@ namespace GoKartUnite.Handlers
         public async Task<List<Karter>> getAllFriendRequests(int id)
         {
             List<Friendships> friends = _context.Friendships
-                .Include(k => k.KarterFirst)
-                .Include(k => k.KarterSecond)
+                .Include(k => k.KarterFirst.Track)
+                .Include(k => k.KarterSecond.Track)
                 .Where(k => (k.KarterFirstId == id || k.KarterSecondId == id) && id != k.requestedByInt && !k.accepted)
                 .ToList();
             List<Karter> result = new List<Karter>();
@@ -67,8 +67,8 @@ namespace GoKartUnite.Handlers
         public async Task<List<Karter>> getAllSentRequests(int id)
         {
             List<Friendships> friends = _context.Friendships
-                .Include(k => k.KarterFirst)
-                .Include(k => k.KarterSecond)
+                .Include(k => k.KarterFirst.Track)
+                .Include(k => k.KarterSecond.Track)
                 .Where(k => (k.KarterFirstId == id || k.KarterSecondId == id) && id == k.requestedByInt && !k.accepted)
                 .ToList();
             List<Karter> result = new List<Karter>();

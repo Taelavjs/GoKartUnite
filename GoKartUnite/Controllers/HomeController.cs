@@ -10,21 +10,47 @@ using GoKartUnite.CustomAttributes;
 using Authroize = Microsoft.AspNetCore.Authorization;
 using AllowAnonymousAttribute = Microsoft.AspNetCore.Authorization.AllowAnonymousAttribute;
 using HttpGetAttribute = Microsoft.AspNetCore.Mvc.HttpGetAttribute;
+using GoKartUnite.Handlers;
+using System.Security.Claims;
 
 namespace GoKartUnite.Controllers
 {
     public class HomeController : Microsoft.AspNetCore.Mvc.Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly RelationshipHandler _friends;
+        private readonly BlogHandler _blog;
+        private readonly KarterHandler _karters;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, KarterHandler karters, RelationshipHandler friends, BlogHandler blog)
         {
             _logger = logger;
+            _friends = friends;
+            _blog = blog;
+            _karters = karters;
         }
         [AllowAnonymous]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            if (User.Identity == null || User.Identity.IsAuthenticated == false)
+            {
+                return View();
+            }
+            Karter k = await _karters.getUserByGoogleId(User.Claims
+.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
+            List<Karter> friends = await _friends.getAllFriends(k.Id);
+            List<BlogPost> blogPosts = new List<BlogPost>();
+
+            foreach (var friend in friends)
+            {
+                blogPosts.AddRange(await _blog.GetAllPostsFromUser(friend.Id));
+            }
+            blogPosts = blogPosts.OrderBy(x => x.DateTimePosted).ToList();
+
+
+
+            return View(await _blog.getModelToView(blogPosts));
+
         }
 
         public IActionResult Privacy()
