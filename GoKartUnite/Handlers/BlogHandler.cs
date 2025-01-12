@@ -39,15 +39,17 @@ namespace GoKartUnite.Handlers
                 .ToListAsync();
         }
 
-        public async Task<List<BlogPost>> GetAllPostsFromUser(int Id)
+        public async Task<List<BlogPost>> GetAllPostsFromUser(int Id, int pageNo = 0)
         {
-            List<BlogPost> posts = await _context.BlogPosts
+            IQueryable<BlogPost> postsQuery = _context.BlogPosts
                 .Include(k => k.Upvotes)
                 .Include(k => k.TaggedTrack)
                 .Where(k => k.AuthorId == Id)
-                .ToListAsync();
+                .Skip(pageNo * 10)
+                .Take(10);
 
-            return posts;
+
+            return postsQuery.ToList();
         }
 
         public async Task<int> addPost(BlogPostView post, Karter author, Track taggedT)

@@ -1,0 +1,43 @@
+﻿@model dynamic
+
+@{
+    int page = Model.Page;
+    int totalPages = Model.TotalPages;
+
+    var query = ViewContext.HttpContext.Request.Query
+        .Where(q => q.Key != "page")
+        .Select(q => $"{q.Key}={q.Value}")
+        .ToList();
+    var queryString = query.Any() ? "&" + string.Join("&", query) : "";
+}
+
+<ul class="pagination">
+    <!-- Previous and Start -->
+    <li class="page-item @(page == 1 ? "disabled" : "")">
+        <a class="page-link" href="?page=@(page - 1)@queryString">Previous</a>
+    </li>
+    <li class="page-item @(page == 1 ? "disabled" : "")">
+        <a class="page-link" href="?page=1@queryString">Start</a>
+    </li>
+
+    <!-- Page Number Links -->
+    @{
+        int leftCounter = Math.Max(page - 2, 1);
+        int rightCounter = Math.Min(page + 2, totalPages);
+    }
+
+    @for (int i = leftCounter; i <= rightCounter; i++)
+    {
+            <li class="page-item @(i == page ? "active" : "")">
+                <a class="page-link" href="?page=@i@queryString">@i</a>
+            </li>
+    }
+
+    <!-- Next and End -->
+    <li class="page-item @(page == totalPages ? "disabled" : "")">
+        <a class="page-link" href="?page=@(page + 1)@queryString">Next</a>
+    </li>
+    <li class="page-item @(page == totalPages ? "disabled" : "")">
+        <a class="page-link" href="?page=@(totalPages)@queryString">End</a>
+    </li>
+</ul>

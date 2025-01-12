@@ -1,0 +1,22 @@
+﻿<script>
+    $(".container").on("click", ".create-comment-btn", function (e) {
+        e.preventDefault();
+        console.log("Create Comment button clicked");
+        var postId = $(this).data("postid");
+        var lastCommentId = $(this).closest('.post').data('lastcommentid');
+        console.log("Post ID:", postId);
+
+        $.ajax({
+            url: '@Url.Action("CreateComment", "BlogHome")',
+            type: "GET",
+            data: { blogId: postId },
+            success: function (data) {
+                $('.modal-body').html(data);
+                $('#ModalTextInput').modal('show');
+            },
+            error: function (err) {
+                console.error("Error:", err);
+            }
+        });
+    });
+</script>

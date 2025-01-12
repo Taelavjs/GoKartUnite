@@ -2,23 +2,24 @@
     ViewData["Title"] = "Home Page";
 }
 @model IEnumerable<GoKartUnite.ViewModel.BlogPostView>
+
 <div class="text-center">
     <h1 class="display-4">Go Kart Unite</h1>
 </div>
-<div class="container">
+
+<div class="container infiniteScrollDiv">
     @if (User.Identity.IsAuthenticated)
-    {   
-         @foreach (var post in Model) 
-         { 
-                 <div class="post" data-postid="@post.Id" data-lastcommentid=0> <!-- Add lastCommentId here --> 
-
-                 @await Html.PartialAsync("Blog", post); 
-                 <button data-postid="@post.Id" class="commentBtn">Comments</button> 
-                 <div class="comment-section-@post.Id comment"> 
-
-                 </div> 
-             <button class="create-comment-btn btn btn-primary" data-postid="@post.Id">Create Comment</button> 
-             </div> 
-         } 
+    {
+        @await Html.PartialAsync("~/Views/BlogHome/_Posts.cshtml", Model)
     }
 </div>
+
+@await Html.PartialAsync("~/Views/BlogHome/_Modal.cshtml", Model)
+
+
+@section Scripts {
+    <script src="~/js/UpvoteBlogPost.js" asp-append-version="true"></script>
+    <script src="~/js/_InfiniteScroll.js" asp-append-version="true"></script>
+    @await Html.PartialAsync("~/Views/BlogHome/_Scripts.cshtml")
+
+}

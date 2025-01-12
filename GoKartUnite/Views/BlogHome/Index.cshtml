@@ -1,112 +1,16 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@model GoKartUnite.ViewModel.BlogPage
-
+﻿@model GoKartUnite.ViewModel.BlogPage
 <link rel="stylesheet" href="~/css/Blog.css" asp-append-version="true" />
 
 <div class="container">
-    <H1>Blog</H1>
-    @{
-        foreach (var post in Model.notifiedPosts)
-        {
-            @await Html.PartialAsync("Blog", post);
-            <button data-postid="@post.Id" class="commentBtn">Comments</button>
-        }
-        <hr style="width:50%;text-align:left;margin-left:0">
-    }
-    @foreach (var post in Model.posts)
-    {
-        <div class="post" data-postid="@post.Id" data-lastcommentid=0> <!-- Add lastCommentId here -->
-
-        @await Html.PartialAsync("Blog", post);
-        <button data-postid="@post.Id" class="commentBtn">Comments</button>
-        <div class="comment-section-@post.Id comment">
-
-        </div>
-    <button class="create-comment-btn btn btn-primary" data-postid="@post.Id">Create Comment</button>
-    </div>
-    }
+    <h1>Blog</h1>
+    @await Html.PartialAsync("_Posts", Model.notifiedPosts)
+    @await Html.PartialAsync("_Posts", Model.posts)
 </div>
-@{
-    var query = ViewContext.HttpContext.Request.Query
-        .Where(q => q.Key != "page")
-        .Select(q => $"{q.Key}={q.Value}")
-        .ToList();
-    var queryString = query.Any() ? "&" + string.Join("&", query) : "";
-}
 
+@await Html.PartialAsync("_Pagination", new { Page = ViewBag.Page, TotalPages = ViewBag.TotalPages, QueryString = ViewContext.HttpContext.Request.Query })
+@await Html.PartialAsync("_Modal")
 
-<ul class="pagination">
-    <li class="page-item @(ViewBag.Page == 1 ? "disabled" : "")">
-        <a class="page-link" href="?page=@(ViewBag.Page - 1)@queryString">Previous</a>
-        <a class="page-link" href="?page=1@queryString">Start</a>
-    </li>
-
-    @{
-        int leftCounter = Math.Max(ViewBag.Page - 2, 1);
-        int rightCounter = Math.Min(ViewBag.Page + 2, ViewBag.TotalPages);
-    }
-
-    @for (int i = leftCounter; i <= rightCounter; i++)
-    {
-            <li class="page-item @(i == ViewBag.Page ? "active" : "")">
-                <a class="page-link" href="?page=@i@queryString">@i</a>
-            </li>
-    }
-
-    <li class="page-item @(ViewBag.Page == ViewBag.TotalPages ? "disabled" : "")">
-        <a class="page-link" href="?page=@(ViewBag.Page + 1)@queryString">Next</a>
-        <a class="page-link" href="?page=@(ViewBag.TotalPages)@queryString">End</a>
-    </li>
-</ul>
-
-<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true"></span>
-                </button>
-            </div>
-            <div class="modal-body">
-
-            </div>
-
-        </div>
-    </div>
-</div>
 @section Scripts {
-        <script>
-            $(".container").on("click", ".create-comment-btn", function (e) {
-                e.preventDefault();
-
-                // Log to confirm button click
-                console.log("Create Comment button clicked");
-
-                // Get the post ID
-                var postId = $(this).data("postid");
-                    var lastCommentId = $(this).closest('.post').data('lastcommentid');
-
-                // Log the post ID for debugging
-                console.log("Post ID:", postId);
-
-                // Perform the AJAX request
-                $.ajax({
-                    url: '@Url.Action("CreateComment", "BlogHome")',
-                    type: "GET", 
-                    data: { blogId: postId }, 
-                    success: function (data) {
-                        $('.modal-body').html(data);
-                        $('#exampleModalLong').modal('show');
-                    },
-                    error: function (err) {
-                        console.error("Error:", err);
-                    }
-                });
-            });
-        </script>
-}
-
+    @await Html.PartialAsync("_Scripts")
     <script src="~/js/UpvoteBlogPost.js" asp-append-version="true"></script>
+}
