@@ -19,5 +19,14 @@ namespace GoKartUnite.Models
 
         public virtual Track? TaggedTrack { get; set; }
         public int? TaggedTrackId { get; set; }
+        public BlogType PostType { get; set; } = BlogType.Post;
+    }
+
+    public enum BlogType
+    {
+        Post,
+        TrackNews,
+        TrackOffer,
+        AdminUpdate
     }
 }

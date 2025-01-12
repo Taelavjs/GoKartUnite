@@ -14,5 +14,6 @@ namespace GoKartUnite.ViewModel
         public int? authorId { get; set; }
         public int Upvotes { get; set; } = 0;
         public string TaggedTrack { get; set; } = string.Empty;
+        public BlogType blogType { get; set; } = BlogType.Post;
     }
 }

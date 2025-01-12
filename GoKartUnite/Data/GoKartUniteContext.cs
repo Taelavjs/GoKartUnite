@@ -63,5 +63,6 @@ namespace GoKartUnite.Data
         public DbSet<GoKartUnite.Models.Comment> Comments { get; set; } = default!;
         public DbSet<GoKartUnite.Models.UserRoles> UserRoles { get; set; } = default!;
         public DbSet<GoKartUnite.Models.Role> Role { get; set; } = default!;
+        public DbSet<GoKartUnite.Models.TrackAdmins> TrackAdmin { get; set; } = default!;
     }
 }

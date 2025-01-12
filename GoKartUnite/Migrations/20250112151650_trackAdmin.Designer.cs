@@ -4,6 +4,7 @@ using GoKartUnite.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GoKartUnite.Migrations
 {
     [DbContext(typeof(GoKartUniteContext))]
-    partial class GoKartUniteContextModelSnapshot : ModelSnapshot
+    [Migration("20250112151650_trackAdmin")]
+    partial class trackAdmin
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -71,9 +74,6 @@ namespace GoKartUnite.Migrations
                     b.Property<string>("Descripttion")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PostType")
-                        .HasColumnType("int");
 
                     b.Property<int?>("TaggedTrackId")
                         .HasColumnType("int");
@@ -240,27 +240,6 @@ namespace GoKartUnite.Migrations
                     b.ToTable("Track");
                 });
 
-            modelBuilder.Entity("GoKartUnite.Models.TrackAdmins", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("KarterId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TrackId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TrackId");
-
-                    b.ToTable("TrackAdmin");
-                });
-
             modelBuilder.Entity("GoKartUnite.Models.Upvotes", b =>
                 {
                     b.Property<int>("Id")
@@ -412,17 +391,6 @@ namespace GoKartUnite.Migrations
                         .HasForeignKey("TrackId");
 
                     b.Navigation("Track");
-                });
-
-            modelBuilder.Entity("GoKartUnite.Models.TrackAdmins", b =>
-                {
-                    b.HasOne("GoKartUnite.Models.Track", "ManagedTrack")
-                        .WithMany()
-                        .HasForeignKey("TrackId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ManagedTrack");
                 });
 
             modelBuilder.Entity("GoKartUnite.Models.Upvotes", b =>
