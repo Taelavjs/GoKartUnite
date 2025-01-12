@@ -108,7 +108,7 @@ namespace GoKartUnite.Handlers
             return true;
         }
 
-        public async Task<List<Karter>> getAllUsers(bool fetchTracks, string? track = null)
+        public async Task<List<Karter>> getAllUsers(bool fetchTracks, string? track = null, int pageNo = 0)
         {
             if (fetchTracks)
             {
@@ -122,7 +122,7 @@ namespace GoKartUnite.Handlers
 
             }
 
-            return await _context.Karter.Include(k => k.Track).ToListAsync();
+            return await _context.Karter.Include(k => k.Track).Skip(pageNo * 10).Take(10).ToListAsync();
         }
 
         public async Task<List<Karter>> getAllUsersByTrackId(int id)

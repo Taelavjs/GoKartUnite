@@ -1,0 +1,22 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@using GoKartUnite.ViewModel
+
+@model Karter
+
+<tr>
+    <td>@Model.Id</td>
+    <td>@Model.Name</td>
+    <td>@Model.Email</td>
+    <td>@Model.YearsExperience</td>
+    <td>@(Model.Track == null ? "MISSING" : Model.Track.Title)</td>
+    <td><a asp-action="Create" asp-route-id="@Model.Id">Edit</a></td>
+        <td>
+            <form asp-action="Delete" asp-route-id="@Model.Id" method="post" style="display:inline;">
+                @Html.AntiForgeryToken()
+                <input type="submit" value="Delete" class="btn btn-danger" />
+            </form>
+        </td>
+
+</tr>
