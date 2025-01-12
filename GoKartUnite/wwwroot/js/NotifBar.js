@@ -8,7 +8,7 @@ console.log('ID:', baseUrl);
 
 
 fetch(baseUrl, {
-    method: "POST"
+    method: "GET"
 })
     .then(response => {
         if (!response.ok) {

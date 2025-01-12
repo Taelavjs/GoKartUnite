@@ -79,7 +79,7 @@ namespace GoKartUnite
                                 }
                                 foreach (UserRoles role in karter.UserRoles)
                                 {
-                                    Role singleRole = dbContext.Role.FirstOrDefault(r => r.Id == role.Id);
+                                    Role singleRole = dbContext.Role.FirstOrDefault(r => r.Id == role.RoleId);
                                     claims.Add(new Claim(ClaimTypes.Role, singleRole.Name));
                                 }
                             }

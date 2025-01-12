@@ -38,14 +38,6 @@ namespace GoKartUnite.Controllers
             return View();
         }
 
-        [HttpGet]
-        [Authorize]
-        [AccountConfirmed]
-        public async Task<ActionResult> Create()
-        {
-            return View();
-        }
-
         [HttpPost]
         [Authorize(Roles = "Track, Admin")]
         [AccountConfirmed]
@@ -61,7 +53,7 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Track, Admin")]
+        [Authorize(Roles = "Admin")]
         [AccountConfirmed]
         public async Task<IActionResult> Create(int? id)
         {

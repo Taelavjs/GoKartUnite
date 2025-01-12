@@ -29,7 +29,7 @@
             }
         </form>
     </td>
-    @if(User.IsInRole("User")){
+    @if(User.IsInRole("Admin")){
                 <td><a asp-action="Create" asp-route-id="@Model.Id">Edit</a></td>
         <td>
             <form asp-action="Delete" asp-route-id="@Model.Id" method="post" style="display:inline;">
