@@ -1,0 +1,54 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+
+@model GoKartUnite.ViewModel.TrackProfile
+
+<h1>@ViewData["Title"]</h1>
+<div class="content">
+    <div class="trackProfile">
+        <div class="trackProfileRow">
+            <div><h2>@Model.trackView.Title</h2></div>
+        </div>
+        <div class="trackProfileRow">
+            <div>@Model.trackView.location</div>
+        </div>
+        <div class="trackProfileRow">
+            <div>
+                @Model.trackView.Description
+            </div>
+        </div>
+        <div class="trackProfileRow">
+            <div>Local Karters : @Model.trackView.karters</div>
+            <div>Track Upvotes : @Model.trackView.blogPosts</div>
+        </div>
+        <div class="trackProfileRow recentPosts">
+            <div><h3>Recent Posts</h3></div>
+            <div>
+                Track Posts? : 
+                <div class="btn btn-rect" id="button-12">
+                    <input type="checkbox" class="checkbox" />
+                    <div class="knob">
+                        <span></span>
+                    </div>
+                        <div class="btn-bg"></div>
+                    </div>
+                </div>
+
+            </div>
+        <div class="trackProfileCol">
+            @await Html.PartialAsync("~/Views/BlogHome/_Posts.cshtml", Model.posts)
+
+        </div>
+                    
+    </div>
+
+</div>
+@await Html.PartialAsync("~/Views/BlogHome/_Modal.cshtml")
+
+@section Scripts {
+    <script src="~/js/UpvoteBlogPost.js" asp-append-version="true"></script>
+    @await Html.PartialAsync("~/Views/BlogHome/_Scripts.cshtml")
+
+}

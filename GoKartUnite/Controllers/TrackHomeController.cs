@@ -20,12 +20,14 @@ namespace GoKartUnite.Controllers
         private readonly TrackHandler _tracks;
         private readonly KarterHandler _karters;
         private readonly FollowerHandler _follows;
-        public TrackHomeController(GoKartUniteContext context, TrackHandler tracks, FollowerHandler follows, KarterHandler karters)
+        private readonly BlogHandler _blog;
+        public TrackHomeController(BlogHandler blog, GoKartUniteContext context, TrackHandler tracks, FollowerHandler follows, KarterHandler karters)
         {
             _context = context;
             _tracks = tracks;
             _karters = karters;
             _follows = follows;
+            _blog = blog;
         }
 
         // GET: TrackHomeController
@@ -145,6 +147,30 @@ namespace GoKartUnite.Controllers
         {
 
             return RedirectToAction("DetailsByTrack", "KarterHome", new { track });
+        }
+
+        [HttpGet]
+        [Authorize]
+        [AccountConfirmed]
+        public async Task<IActionResult> Profile(string track)
+        {
+            Track toReply = await _tracks.getSingleTrackByTitle(track);
+            if (toReply == null) return RedirectToAction("index");
+            ViewData["Title"] = toReply.Title;
+
+            TrackView trackView = await _tracks.modelToView(toReply);
+
+            List<BlogPost> posts = await _blog.getPostsForTrack(track, 10);
+
+            List<BlogPostView> postViews = await _blog.getModelToView(posts);
+
+            TrackProfile trackProfile = new TrackProfile
+            {
+                trackView = trackView,
+                posts = postViews
+            };
+            return View(trackProfile);
+
         }
 
     }

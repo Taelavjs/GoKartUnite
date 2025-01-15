@@ -13,7 +13,9 @@ document.addEventListener("DOMContentLoaded", function () {
             const newUpvotes = parseInt(postUpvotes) + 1;
             button.setAttribute('data-upvoteCount', newUpvotes);
             button.parentNode.textContent = newUpvotes.toString();
-            fetch(`BlogHome/UpvoteBlog?id=${postId}`, {
+            const baseUrl = `${window.location.origin}/BlogHome/UpvoteBlog?id=${postId}`;
+            console.log(baseUrl);
+            fetch(baseUrl, {
                 method: "POST"
             }).catch(err => console.log(err));
         });
@@ -28,8 +30,11 @@ document.addEventListener("DOMContentLoaded", function () {
             var lastCommentId = $(this).closest('.post').data('lastcommentid');
 
             const postId = button.getAttribute('data-postid');
-            fetch(`BlogHome/GetCommentsForBlog?blogId=${postId}&lastCommentId=${lastCommentId}`, {
+            const baseUrl = `${window.location.origin}/BlogHome/GetCommentsForBlog?blogId=${postId}&lastCommentId=${lastCommentId}`;
+
+            fetch(baseUrl, {
                 method: "GET",
+
                 headers: {
                     'Content-Type': 'application/json',
                 },

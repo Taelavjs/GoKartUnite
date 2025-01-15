@@ -180,5 +180,16 @@ namespace GoKartUnite.Handlers
             await _context.Comments.AddAsync(comment);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<List<BlogPost>> getPostsForTrack(string trackTitle, int count = 0)
+        {
+            List<BlogPost> posts = _context.BlogPosts
+                .Where(t => t.TaggedTrack != null && t.TaggedTrack.Title == trackTitle)
+                .Take(count)
+                .Include(t => t.Upvotes)
+                .ToList();
+
+            return posts;
+        }
     }
 }
