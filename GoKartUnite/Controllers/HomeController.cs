@@ -14,6 +14,7 @@ using GoKartUnite.Handlers;
 using System.Security.Claims;
 using GoKartUnite.ViewModel;
 using HttpPostAttribute = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace GoKartUnite.Controllers
 {
@@ -58,6 +59,7 @@ namespace GoKartUnite.Controllers
         [HttpPost]
         [Authorize]
         [AccountConfirmed]
+        [EnableRateLimiting("slidingPolicy")]
         public async Task<IActionResult> InfiniteScroll(int pagesScrolled = 0)
         {
             Karter k = await _karters.getUserByGoogleId(User.Claims

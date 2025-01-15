@@ -14,7 +14,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using System.Security.Claims;
 using System.Diagnostics;
-
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 
 
 namespace GoKartUnite
@@ -37,6 +38,42 @@ namespace GoKartUnite
             builder.Services.AddControllers().AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             );
+            builder.Services.AddRateLimiter(_ => _
+                .AddFixedWindowLimiter(policyName: "fixed", options =>
+                {
+                    options.PermitLimit = 4;
+                    options.Window = TimeSpan.FromSeconds(12);
+                    options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                    options.QueueLimit = 2;
+                }));
+
+            builder.Services.AddRateLimiter(options =>
+            {
+                options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+                    RateLimitPartition.GetSlidingWindowLimiter(
+                        partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "Unknown",
+                        factory: _ => new SlidingWindowRateLimiterOptions
+                        {
+                            PermitLimit = 8,
+                            Window = TimeSpan.FromSeconds(2),
+                            SegmentsPerWindow = 4,
+                            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                            QueueLimit = 2
+                        }));
+
+                options.RejectionStatusCode = 429;
+            });
+
+            builder.Services.AddRateLimiter(_ => _
+            .AddSlidingWindowLimiter(policyName: "slidingPolicy", options =>
+            {
+                options.PermitLimit = 4;
+                options.Window = TimeSpan.FromSeconds(4);
+                options.SegmentsPerWindow = 4;
+                options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                options.QueueLimit = 2;
+            }));
+
             var services = builder.Services;
             var configuration = builder.Configuration;
             var secretFilePath = Path.Combine(Directory.GetCurrentDirectory(), "secrets.txt");
@@ -92,6 +129,7 @@ namespace GoKartUnite
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             var app = builder.Build();
+
             var webSocketOptions = new WebSocketOptions
             {
                 KeepAliveInterval = TimeSpan.FromMinutes(2)
@@ -113,7 +151,7 @@ namespace GoKartUnite
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseRateLimiter();
             app.UseAuthorization();
             app.MapControllerRoute(
                 name: "default",
