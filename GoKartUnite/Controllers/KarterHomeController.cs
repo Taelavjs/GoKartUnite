@@ -106,12 +106,11 @@ namespace GoKartUnite.Controllers
         // ======================================
         [HttpGet]
         [Authorize]
-        [AccountConfirmed]
         public async Task<ActionResult> Create(int id)
         {
             ViewBag.TrackTitles = await _tracks.getAllTracks();
 
-
+            ViewData["ButtonValue"] = "Create";
             ViewData["Title"] = "Creating Karter Profile";
 
             return View();
@@ -159,7 +158,6 @@ namespace GoKartUnite.Controllers
                 ViewBag.tracks = await _tracks.getAllTracks();
                 return View("Create");
             }
-            ViewData["ButtonValue"] = "Create";
 
             string NameIdentifier = User.Claims
     .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;

@@ -49,8 +49,6 @@ namespace GoKartUnite.Controllers
 
 
             List<BlogPost> allPosts = await _blog.GetAllPosts(page, getTaggedTrack: true, trackFilter: track);
-
-            if (allPosts.Count == 0) return View(await _blog.getModelToView(await _blog.GetAllPosts()));
             List<BlogPost> notifiedPosts = await _notification.GetAllUsersUnseenPosts(k.Id);
             await _notification.setAllBlogNotifsViewed(k.Id);
             BlogPage blogPage = new BlogPage

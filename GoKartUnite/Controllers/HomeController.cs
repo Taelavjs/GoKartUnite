@@ -47,7 +47,7 @@ namespace GoKartUnite.Controllers
             {
                 blogPosts.AddRange(await _blog.GetAllPostsFromUser(friend.Id));
             }
-            blogPosts = blogPosts.OrderBy(x => x.DateTimePosted).ToList();
+            blogPosts = blogPosts.OrderByDescending(x => x.DateTimePosted).ToList();
 
 
 
@@ -69,7 +69,7 @@ namespace GoKartUnite.Controllers
             {
                 blogPosts.AddRange(await _blog.GetAllPostsFromUser(friend.Id, pagesScrolled));
             }
-            blogPosts = blogPosts.OrderBy(x => x.DateTimePosted).ToList();
+            blogPosts = blogPosts.OrderByDescending(x => x.DateTimePosted).ToList();
             return PartialView("~/Views/BlogHome/_Posts.cshtml", await _blog.getModelToView(blogPosts));
         }
 

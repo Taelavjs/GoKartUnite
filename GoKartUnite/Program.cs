@@ -136,7 +136,7 @@ namespace GoKartUnite
                 BlogPost post = new BlogPost
                 {
                     AuthorId = 4041,
-                    Title = "New Tracks",
+                    Title = "NewestPost",
                     Descripttion = "This is for NewBuckmore",
                     TaggedTrackId = 1014
                 };
@@ -145,7 +145,7 @@ namespace GoKartUnite
                 BlogPost post2 = new BlogPost
                 {
                     AuthorId = 4033,
-                    Title = "New Tracks",
+                    Title = "NewestPost",
                     Descripttion = "This is for Alt",
                     TaggedTrackId = 1016
                 };

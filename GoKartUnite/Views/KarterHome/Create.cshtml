@@ -4,13 +4,13 @@
 @{
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1>@ViewData["ButtonValue"]</h1>
 
 <h4>Karter</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="@(ViewData["ButtonValue"] == "Create" ? "Create" : "UpdateUser")">
+        <form asp-asp-controller="KarterHomeController" asp-action="@(ViewData["ButtonValue"] == "Create" ? "Create" : "UpdateUser")">
 
             @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>

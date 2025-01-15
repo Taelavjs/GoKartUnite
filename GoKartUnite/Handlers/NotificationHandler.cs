@@ -51,7 +51,12 @@ namespace GoKartUnite.Handlers
 
         public async Task<List<BlogPost>> GetAllUsersUnseenPosts(int userId)
         {
-            return await _context.BlogNotifications.Include(t => t.LinkedPost).Where(t => t.userId == userId && t.isViewed == false).Select(t => t.LinkedPost).ToListAsync();
+            return await _context.BlogNotifications
+                .Include(t => t.LinkedPost)
+                .Where(t => t.userId == userId && t.isViewed == false)
+                .Select(t => t.LinkedPost)
+                .OrderByDescending(k => k.DateTimePosted)
+                .ToListAsync() ?? new List<BlogPost>();
         }
 
     }

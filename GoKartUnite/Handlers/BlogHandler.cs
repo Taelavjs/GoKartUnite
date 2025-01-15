@@ -42,11 +42,12 @@ namespace GoKartUnite.Handlers
         public async Task<List<BlogPost>> GetAllPostsFromUser(int Id, int pageNo = 0)
         {
             IQueryable<BlogPost> postsQuery = _context.BlogPosts
-                .Include(k => k.Upvotes)
-                .Include(k => k.TaggedTrack)
                 .Where(k => k.AuthorId == Id)
+                .OrderByDescending(i => i.DateTimePosted)
                 .Skip(pageNo * 10)
-                .Take(10);
+                .Take(10)
+                .Include(k => k.Upvotes)
+                .Include(k => k.TaggedTrack);
 
 
             return postsQuery.ToList();
