@@ -5,16 +5,33 @@
     ViewData["Title"] = "Details";
 }
 @using GoKartUnite.ViewModel
+@using GoKartUnite.Models
+
 
 @model IEnumerable<KarterView>
-    <div class="table-section">
+<div class="table-section">
+
+    @{
+        SortKartersBy nameSort = ViewBag.CurrentSort == SortKartersBy.Alphabetically ? SortKartersBy.ReverseAlphabetically : SortKartersBy.Alphabetically;
+        SortKartersBy yearsSort = ViewBag.CurrentSort == SortKartersBy.YearsExperience ? SortKartersBy.ReverseYearsExperience : SortKartersBy.YearsExperience;
+
+
+        }
 
 <div class="table-container">
     <table >
 
         <thead>
-            <th scope="col">Name</th>
-            <th scope="col">Years Experience</th>
+            <th scope="col">Name
+                <a class="page-link" href="?sortby=@(nameSort)&page=@(ViewBag.Page)@ViewContext.HttpContext.Request.Query">
+                    Name
+                </a>
+            </th>
+            <th scope="col">
+                <a class="page-link" href="?sortby=@(yearsSort)&page=@(ViewBag.Page)@ViewContext.HttpContext.Request.Query">
+                    Years Experience
+                </a>
+            </th>
             <th scope="col">Local Track</th>
             @if(User.IsInRole("Admin")){
                 <th scope="col">Options</th>

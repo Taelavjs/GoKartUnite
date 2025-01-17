@@ -108,22 +108,38 @@ namespace GoKartUnite.Handlers
             return true;
         }
 
-        public async Task<List<Karter>> getAllUsers(bool fetchTracks, string? track = null, int pageNo = 0, int usersPerPage = 3)
+        public async Task<List<Karter>> getAllUsers(bool fetchTracks, string? track = null, int pageNo = 0, int usersPerPage = 3, SortKartersBy sort = SortKartersBy.Alphabetically)
         {
-
+            var query = _context.Karter.AsQueryable();
             if (fetchTracks)
             {
-                return await _context.Karter.Include(k => k.Track).ToListAsync();
-
+                query = query.Include(k => k.Track);
             }
 
-            if (!track.IsNullOrEmpty())
+            if (!string.IsNullOrEmpty(track))
             {
-                return await _context.Karter.Include(k => k.Track).Where(k => k.Track != null && k.Track.Title == track).Skip(pageNo * usersPerPage).Take(usersPerPage).ToListAsync();
-
+                query = query.Where(k => k.Track != null && k.Track.Title == track);
             }
 
-            return await _context.Karter.Include(k => k.Track).Skip(pageNo * usersPerPage).Take(usersPerPage).ToListAsync();
+            switch (sort)
+            {
+                case SortKartersBy.Alphabetically:
+                    query = query.OrderBy(k => k.Name);
+                    break;
+                case SortKartersBy.ReverseAlphabetically:
+                    query = query.OrderByDescending(k => k.Name);
+                    break;
+                case SortKartersBy.YearsExperience:
+                    query = query.OrderBy(k => k.YearsExperience);
+                    break;
+                case SortKartersBy.ReverseYearsExperience:
+                    query = query.OrderByDescending(k => k.YearsExperience);
+                    break;
+            }
+
+            query = query.Skip(pageNo * usersPerPage).Take(usersPerPage);
+            return await query.ToListAsync();
+
         }
 
         public async Task<int> GetNumberOfUserPages(string track, int usersPerPage = 3)

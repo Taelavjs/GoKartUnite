@@ -43,4 +43,12 @@ namespace GoKartUnite.Models
         Received,
         Friend
     }
+
+    public enum SortKartersBy
+    {
+        Alphabetically,
+        ReverseAlphabetically,
+        YearsExperience,
+        ReverseYearsExperience
+    }
 }

@@ -89,19 +89,21 @@ namespace GoKartUnite.Controllers
         [HttpGet]
         [Authorize]
         [AccountConfirmed]
-        public async Task<IActionResult> DetailsByTrack(string? track, int page = 0)
+        public async Task<IActionResult> DetailsByTrack(string? track, int page = 0, SortKartersBy sortby = SortKartersBy.Alphabetically)
         {
             string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
             Karter k = await _karters.getUserByGoogleId(googleId);
             ViewBag.TotalPages = await _karters.GetNumberOfUserPages(track);
             page = Math.Max(0, Math.Min(page, ViewBag.TotalPages));
-            List<Karter> karters = await _karters.getAllUsers(false, track, page <= 0 ? 0 : page - 1);
+            List<Karter> karters = await _karters.getAllUsers(false, track, page <= 0 ? 0 : page - 1, sort: sortby);
             List<KarterView> karterViews = await _karters.karterModelToView(karters);
 
             karterViews = await _friendships.AddStatusToKarters(karterViews, k.Id);
 
 
             ViewBag.page = page;
+
+            ViewBag.CurrentSort = sortby;
             return View("Details", karterViews);
         }
 
