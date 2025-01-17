@@ -33,8 +33,9 @@ namespace GoKartUnite.Controllers
         [AccountConfirmed]
         public async Task<IActionResult> Index(int page = 1, string? track = null)
         {
-            ViewBag.TotalPages = await _blog.getTotalPageCount();
 
+            ViewBag.TotalPages = await _blog.getTotalPageCount();
+            page = Math.Max(0, Math.Min(page, ViewBag.TotalPages));
             string GoogleId = User.Claims
                 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
 

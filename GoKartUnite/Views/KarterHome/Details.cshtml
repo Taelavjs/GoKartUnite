@@ -29,3 +29,5 @@
         </tbody>
     </table>
 </div></div>
+
+@await Html.PartialAsync("~/Views/BlogHome/_Pagination.cshtml", new { Page = ViewBag.Page, TotalPages = ViewBag.TotalPages, QueryString = ViewContext.HttpContext.Request.Query })

@@ -108,8 +108,9 @@ namespace GoKartUnite.Handlers
             return true;
         }
 
-        public async Task<List<Karter>> getAllUsers(bool fetchTracks, string? track = null, int pageNo = 0)
+        public async Task<List<Karter>> getAllUsers(bool fetchTracks, string? track = null, int pageNo = 0, int usersPerPage = 3)
         {
+
             if (fetchTracks)
             {
                 return await _context.Karter.Include(k => k.Track).ToListAsync();
@@ -118,11 +119,16 @@ namespace GoKartUnite.Handlers
 
             if (!track.IsNullOrEmpty())
             {
-                return await _context.Karter.Include(k => k.Track).Where(k => k.Track != null && k.Track.Title == track).ToListAsync();
+                return await _context.Karter.Include(k => k.Track).Where(k => k.Track != null && k.Track.Title == track).Skip(pageNo * usersPerPage).Take(usersPerPage).ToListAsync();
 
             }
 
-            return await _context.Karter.Include(k => k.Track).Skip(pageNo * 10).Take(10).ToListAsync();
+            return await _context.Karter.Include(k => k.Track).Skip(pageNo * usersPerPage).Take(usersPerPage).ToListAsync();
+        }
+
+        public async Task<int> GetNumberOfUserPages(string track, int usersPerPage = 3)
+        {
+            return _context.Karter.Include(k => k.Track).Count() / usersPerPage;
         }
 
         public async Task<List<Karter>> getAllUsersByTrackId(int id)
