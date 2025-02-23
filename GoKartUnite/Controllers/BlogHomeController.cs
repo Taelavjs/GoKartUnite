@@ -2,6 +2,7 @@
 using GoKartUnite.Handlers;
 using GoKartUnite.Models;
 using GoKartUnite.ViewModel;
+using GoKartUnite.DataFilterOptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using System.Diagnostics;
@@ -9,6 +10,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using GoKartUnite.DataFilterOptions;
+using System.Drawing.Printing;
 
 namespace GoKartUnite.Controllers
 {
@@ -50,8 +53,14 @@ namespace GoKartUnite.Controllers
             page = Math.Max(page, 1);
             ViewBag.page = page;
 
+            BlogFilterOptions blogFilter = new BlogFilterOptions
+            {
+                PageSize = 10,
+                PageNo = page,
+                TrackNameFilter = track
+            };
 
-            List<BlogPost> allPosts = await _blog.GetAllPosts(page, getTaggedTrack: true, trackFilter: track);
+            List<BlogPost> allPosts = await _blog.GetAllPosts(blogFilter);
             List<BlogPost> notifiedPosts = await _notification.GetAllUsersUnseenPosts(k.Id);
             await _notification.setAllBlogNotifsViewed(k.Id);
             BlogPage blogPage = new BlogPage

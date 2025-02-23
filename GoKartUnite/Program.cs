@@ -160,7 +160,7 @@ namespace GoKartUnite
             using (var scope = app.Services.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<GoKartUniteContext>();
-                dummyDbData(context);
+                //dummyDbData(context);
                 //dummyDbComments(context);
             }
             app.Run();

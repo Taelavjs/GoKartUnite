@@ -1,12 +1,15 @@
 ﻿using GoKartUnite.Data;
+using GoKartUnite.DataFilterOptions;
 using GoKartUnite.Models;
 using GoKartUnite.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.IdentityModel.Tokens;
 using System.Drawing.Printing;
 using System.Web.Mvc;
 using X.PagedList;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GoKartUnite.Handlers
 {
@@ -18,40 +21,56 @@ namespace GoKartUnite.Handlers
             _context = context;
         }
 
-        public async Task<List<BlogPost>> GetAllPosts(int page = 1, int pageSize = 10, bool getTaggedTrack = false, string? trackFilter = null)
+        public async Task<List<BlogPost>> GetAllPosts(BlogFilterOptions filterOptions)
         {
             IQueryable<BlogPost> query = _context.BlogPosts.Include(k => k.Upvotes).AsQueryable();
 
-            if (getTaggedTrack)
+            if (!string.IsNullOrEmpty(filterOptions.TrackNameFilter))
+            {
+                query = query.Include(k => k.TaggedTrack)
+                             .Where(k => k.TaggedTrack != null && k.TaggedTrack.Title == filterOptions.TrackNameFilter);
+            }
+
+            if (filterOptions.IncludeTrack)
             {
                 query = query.Include(k => k.TaggedTrack);
+            }
 
-                if (!string.IsNullOrEmpty(trackFilter))
-                {
-                    query = query.Where(k => k.TaggedTrack != null && k.TaggedTrack.Title == trackFilter);
-                }
+            if (filterOptions.IncludeUpvotes)
+            {
+                query = query.Include(k => k.Upvotes);
+            }
+
+            if (filterOptions.UserIdFilter != null)
+            {
+                query = query.Where(x => x.AuthorId == filterOptions.UserIdFilter);
+            }
+
+            if (filterOptions.SortByAscending)
+            {
+                query = query.OrderBy(i => i.DateTimePosted);
+            }
+            else
+            {
+                query = query.OrderByDescending(i => i.DateTimePosted);
+            }
+
+            if (filterOptions.PreDateFilter != null)
+            {
+                query = query.Where(x => x.DateTimePosted < filterOptions.PreDateFilter);
+            }
+
+            if (filterOptions.AfterDateFilter != null)
+            {
+                query = query.Where(x => x.DateTimePosted > filterOptions.AfterDateFilter);
             }
 
             return await query
-                .OrderByDescending(i => i.DateTimePosted)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+                .Skip((filterOptions.PageNo - 1) * filterOptions.PageSize)
+                .Take(filterOptions.PageSize)
                 .ToListAsync();
         }
 
-        public async Task<List<BlogPost>> GetAllPostsFromUser(int Id, int pageNo = 0)
-        {
-            IQueryable<BlogPost> postsQuery = _context.BlogPosts
-                .Where(k => k.AuthorId == Id)
-                .OrderByDescending(i => i.DateTimePosted)
-                .Skip(pageNo * 10)
-                .Take(10)
-                .Include(k => k.Upvotes)
-                .Include(k => k.TaggedTrack);
-
-
-            return postsQuery.ToList();
-        }
 
         public async Task<int> addPost(BlogPostView post, Karter author, Track taggedT)
         {
@@ -130,16 +149,6 @@ namespace GoKartUnite.Handlers
             int totalCount = await _context.BlogPosts.CountAsync();
             int totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
             return totalPages;
-        }
-
-
-        public async Task<List<BlogPost>> AllBlogsAtTrackAfterDate(string trackTitle, DateTime date)
-        {
-            return await _context.BlogPosts.Include(X => X.TaggedTrack)
-                            .Where(x => x.TaggedTrack != null && x.DateTimePosted > date && x.TaggedTrack.Title == trackTitle)
-                            .OrderByDescending(x => x.DateTimePosted)
-                            .ToListAsync();
-
         }
 
         public async Task<List<Comment>> GetAllCommentsForPost(int blogPostId, int lastIdSent)

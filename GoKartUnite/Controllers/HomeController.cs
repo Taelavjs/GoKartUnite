@@ -15,6 +15,8 @@ using System.Security.Claims;
 using GoKartUnite.ViewModel;
 using HttpPostAttribute = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
 using Microsoft.AspNetCore.RateLimiting;
+using GoKartUnite.DataFilterOptions;
+using Microsoft.Extensions.Configuration.UserSecrets;
 
 namespace GoKartUnite.Controllers
 {
@@ -46,7 +48,13 @@ namespace GoKartUnite.Controllers
 
             foreach (var friend in friends)
             {
-                blogPosts.AddRange(await _blog.GetAllPostsFromUser(friend.Id));
+                BlogFilterOptions filter = new BlogFilterOptions
+                {
+                    UserIdFilter = friend.Id,
+                    IncludeUpvotes = true
+
+                };
+                blogPosts.AddRange(await _blog.GetAllPosts(filter));
             }
             blogPosts = blogPosts.OrderByDescending(x => x.DateTimePosted).ToList();
 
@@ -69,7 +77,13 @@ namespace GoKartUnite.Controllers
 
             foreach (var friend in friends)
             {
-                blogPosts.AddRange(await _blog.GetAllPostsFromUser(friend.Id, pagesScrolled));
+                BlogFilterOptions filter = new BlogFilterOptions
+                {
+                    UserIdFilter = friend.Id,
+                    PageNo = pagesScrolled,
+                    IncludeUpvotes = true
+                };
+                blogPosts.AddRange(await _blog.GetAllPosts(filter));
             }
             blogPosts = blogPosts.OrderByDescending(x => x.DateTimePosted).ToList();
             return PartialView("~/Views/BlogHome/_Posts.cshtml", await _blog.getModelToView(blogPosts));
