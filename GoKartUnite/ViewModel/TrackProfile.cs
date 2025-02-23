@@ -4,5 +4,7 @@
     {
         public TrackView trackView { get; set; }
         public List<BlogPostView> posts { get; set; } = new List<BlogPostView>();
+
+        public bool isAdminAtTrack { get; set; } = false;
     }
 }

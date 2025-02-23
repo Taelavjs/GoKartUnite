@@ -21,8 +21,11 @@ namespace GoKartUnite.Controllers
         private readonly KarterHandler _karters;
         private readonly FollowerHandler _follows;
         private readonly BlogHandler _blog;
-        public TrackHomeController(BlogHandler blog, GoKartUniteContext context, TrackHandler tracks, FollowerHandler follows, KarterHandler karters)
+        private readonly RoleHandler _role;
+
+        public TrackHomeController(RoleHandler role, BlogHandler blog, GoKartUniteContext context, TrackHandler tracks, FollowerHandler follows, KarterHandler karters)
         {
+            _role = role;
             _context = context;
             _tracks = tracks;
             _karters = karters;
@@ -163,11 +166,17 @@ namespace GoKartUnite.Controllers
             List<BlogPost> posts = await _blog.getPostsForTrack(track, 10);
 
             List<BlogPostView> postViews = await _blog.getModelToView(posts);
+            string userClaimsId = User.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+
+            Karter userId = await _karters.getUserByGoogleId(userClaimsId);
+            bool isAdminAtTrack = await _role.isAdminAtTrack(track, userId.Id);
 
             TrackProfile trackProfile = new TrackProfile
             {
                 trackView = trackView,
-                posts = postViews
+                posts = postViews,
+                isAdminAtTrack = isAdminAtTrack
             };
             return View(trackProfile);
 

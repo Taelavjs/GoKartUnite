@@ -150,6 +150,11 @@ namespace GoKartUnite.Handlers
             return t.Id;
         }
 
+        public async Task<Track> getTrackById(int id)
+        {
+            Track t = await _context.Track.Where(t => t.Id == id).SingleAsync();
+            return t;
+        }
 
     }
 }

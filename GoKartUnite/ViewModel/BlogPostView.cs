@@ -15,5 +15,29 @@ namespace GoKartUnite.ViewModel
         public int Upvotes { get; set; } = 0;
         public string TaggedTrack { get; set; } = string.Empty;
         public BlogType blogType { get; set; } = BlogType.Post;
+
+        [FutureDateAttribute]
+        public DateTime? ReleaseDateTime { get; set; }
+    }
+
+
+    public class FutureDateAttribute : ValidationAttribute
+    {
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        {
+            if (value is DateTime dateTime)
+            {
+                if (dateTime > DateTime.Now)
+                {
+                    return ValidationResult.Success;
+                }
+                else
+                {
+                    return new ValidationResult("The date must be in the future.");
+                }
+            }
+
+            return ValidationResult.Success;
+        }
     }
 }

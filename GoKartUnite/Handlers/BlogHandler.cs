@@ -185,6 +185,7 @@ namespace GoKartUnite.Handlers
         {
             List<BlogPost> posts = _context.BlogPosts
                 .Where(t => t.TaggedTrack != null && t.TaggedTrack.Title == trackTitle)
+                .OrderByDescending(x => x.DateTimePosted)
                 .Take(count)
                 .Include(t => t.Upvotes)
                 .ToList();

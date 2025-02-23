@@ -37,6 +37,12 @@
                 </div>
 
             </div>
+            <div>
+            @if (@Model.isAdminAtTrack)
+            {
+                    <a asp-action="CreateAdminPost" asp-controller="BlogHome" asp-route-trackTitle=@Model.trackView.Title>Create Admin Post</a>
+            }
+            </div>
         <div class="trackProfileCol">
             @await Html.PartialAsync("~/Views/BlogHome/_Posts.cshtml", Model.posts)
 

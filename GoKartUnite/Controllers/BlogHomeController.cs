@@ -19,14 +19,16 @@ namespace GoKartUnite.Controllers
 
         private readonly TrackHandler _tracks;
         private readonly NotificationHandler _notification;
+        private readonly RoleHandler _roles;
         private readonly FollowerHandler _followerHandler;
-        public BlogHomeController(TrackHandler tracks, FollowerHandler followerHandler, BlogHandler blog, KarterHandler karter, NotificationHandler notification)
+        public BlogHomeController(RoleHandler roles, TrackHandler tracks, FollowerHandler followerHandler, BlogHandler blog, KarterHandler karter, NotificationHandler notification)
         {
             _blog = blog;
             _karter = karter;
             _notification = notification;
             _followerHandler = followerHandler;
             _tracks = tracks;
+            _roles = roles;
         }
         [HttpGet]
         [Authorize]
@@ -108,6 +110,38 @@ namespace GoKartUnite.Controllers
             }
             return RedirectToAction("Index");
         }
+
+        [HttpGet]
+        [Authorize]
+        [AccountConfirmed]
+        public async Task<IActionResult> CreateAdminPost(string trackTitle)
+        {
+            ViewBag.TrackTitle = trackTitle;
+            return View();
+        }
+
+        [HttpPost]
+        [Authorize]
+        [AccountConfirmed]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateAdminPost(BlogPostView post)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+
+            string GoogleId = User.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            Karter k = await _karter.getUserByGoogleId(GoogleId);
+            int trackAdminIds = await _roles.getTrackUserTrackId(k.Id);
+            Track taggedT = await _tracks.getTrackById(trackAdminIds);
+            post.blogType = BlogType.TrackNews;
+            int postId = await _blog.addPost(post, k, taggedT);
+
+            return RedirectToAction("Index", "BlogHome");
+        }
+
         [HttpPost]
         [Authorize]
         [AccountConfirmed]
@@ -176,5 +210,8 @@ namespace GoKartUnite.Controllers
 
             return Redirect(previousUrl);
         }
+
+
+
     }
 }
