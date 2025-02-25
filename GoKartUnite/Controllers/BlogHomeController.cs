@@ -12,19 +12,20 @@ using Microsoft.AspNetCore.Authorization;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using GoKartUnite.DataFilterOptions;
 using System.Drawing.Printing;
+using GoKartUnite.Interfaces;
 
 namespace GoKartUnite.Controllers
 {
     public class BlogHomeController : Controller
     {
-        private readonly BlogHandler _blog;
-        private readonly KarterHandler _karter;
+        private readonly IBlogHandler _blog;
+        private readonly IKarterHandler _karter;
 
-        private readonly TrackHandler _tracks;
-        private readonly NotificationHandler _notification;
-        private readonly RoleHandler _roles;
-        private readonly FollowerHandler _followerHandler;
-        public BlogHomeController(RoleHandler roles, TrackHandler tracks, FollowerHandler followerHandler, BlogHandler blog, KarterHandler karter, NotificationHandler notification)
+        private readonly ITrackHandler _tracks;
+        private readonly INotificationHandler _notification;
+        private readonly IRoleHandler _roles;
+        private readonly IFollowerHandler _followerHandler;
+        public BlogHomeController(IRoleHandler roles, ITrackHandler tracks, IFollowerHandler followerHandler, IBlogHandler blog, IKarterHandler karter, INotificationHandler notification)
         {
             _blog = blog;
             _karter = karter;
@@ -39,14 +40,14 @@ namespace GoKartUnite.Controllers
         public async Task<IActionResult> Index(int page = 1, string? track = null)
         {
 
-            ViewBag.TotalPages = await _blog.getTotalPageCount();
+            ViewBag.TotalPages = await _blog.GetTotalPageCount();
             page = Math.Max(0, Math.Min(page, ViewBag.TotalPages));
             string GoogleId = User.Claims
                 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
 
-            Karter k = await _karter.getUserByGoogleId(GoogleId);
+            Karter k = await _karter.GetUserByGoogleId(GoogleId);
             List<BlogNotifications> notifications = await _notification.GetUserBlogNotifications(k.Id);
-            await _notification.setAllBlogNotifsViewed(k.Id);
+            await _notification.SetAllBlogNotifsViewed(k.Id);
             ViewBag.Notifcount = notifications.Count;
             ViewBag.NotifiedTracks = await _notification.GetAllUsersUnseenPosts(k.Id);
             page = Math.Min(page, ViewBag.TotalPages);
@@ -62,11 +63,11 @@ namespace GoKartUnite.Controllers
 
             List<BlogPost> allPosts = await _blog.GetAllPosts(blogFilter);
             List<BlogPost> notifiedPosts = await _notification.GetAllUsersUnseenPosts(k.Id);
-            await _notification.setAllBlogNotifsViewed(k.Id);
+            await _notification.SetAllBlogNotifsViewed(k.Id);
             BlogPage blogPage = new BlogPage
             {
-                posts = await _blog.getModelToView(allPosts),
-                notifiedPosts = await _blog.getModelToView(notifiedPosts)
+                posts = await _blog.GetModelToView(allPosts),
+                notifiedPosts = await _blog.GetModelToView(notifiedPosts)
             };
 
             return View(blogPage);
@@ -96,18 +97,18 @@ namespace GoKartUnite.Controllers
             string GoogleId = User.Claims
                 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
 
-            Karter k = await _karter.getUserByGoogleId(GoogleId);
+            Karter k = await _karter.GetUserByGoogleId(GoogleId);
             int postId;
             if (post.TaggedTrack != "")
             {
-                Track taggedT = await _tracks.getSingleTrackByTitle(post.TaggedTrack);
-                postId = await _blog.addPost(post, k, taggedT);
+                Track taggedT = await _tracks.GetSingleTrackByTitle(post.TaggedTrack);
+                postId = await _blog.AddPost(post, k, taggedT);
             }
             else
             {
-                postId = await _blog.addPost(post, k);
+                postId = await _blog.AddPost(post, k);
             }
-            int track = await _tracks.getTrackIdByTitle(post.TaggedTrack);
+            int track = await _tracks.GetTrackIdByTitle(post.TaggedTrack);
 
             List<int> kartersWhoNeedNotif = await _followerHandler.AllUserIdsWhoFollowTrack(track);
             if (post.TaggedTrack != "")
@@ -142,11 +143,11 @@ namespace GoKartUnite.Controllers
 
             string GoogleId = User.Claims
                 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            Karter k = await _karter.getUserByGoogleId(GoogleId);
-            int trackAdminIds = await _roles.getTrackUserTrackId(k.Id);
-            Track taggedT = await _tracks.getTrackById(trackAdminIds);
+            Karter k = await _karter.GetUserByGoogleId(GoogleId);
+            int trackAdminIds = await _roles.GetTrackUserTrackId(k.Id);
+            Track taggedT = await _tracks.GetTrackById(trackAdminIds);
             post.blogType = BlogType.TrackNews;
-            int postId = await _blog.addPost(post, k, taggedT);
+            int postId = await _blog.AddPost(post, k, taggedT);
 
             return RedirectToAction("Index", "BlogHome");
         }
@@ -158,8 +159,8 @@ namespace GoKartUnite.Controllers
         {
             string GoogleId = User.Claims
     .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            BlogPost post = await _blog.getPost(id, inclUpvotes: true);
-            Karter karter = await _karter.getUserByGoogleId(GoogleId);
+            BlogPost post = await _blog.GetPost(id, inclUpvotes: true);
+            Karter karter = await _karter.GetUserByGoogleId(GoogleId);
 
             bool alreadyUpvoted = post.Upvotes
                 .Any(upvote => upvote.VoterId == karter.Id);
@@ -172,7 +173,7 @@ namespace GoKartUnite.Controllers
             var upvote = new Upvotes();
             upvote.PostId = id;
             upvote.VoterId = karter.Id;
-            await _blog.upvotePost(id, upvote);
+            await _blog.UpvotePost(id, upvote);
         }
 
 
@@ -204,7 +205,7 @@ namespace GoKartUnite.Controllers
             string GoogleId = User.Claims
                 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
 
-            Karter k = await _karter.getUserByGoogleId(GoogleId);
+            Karter k = await _karter.GetUserByGoogleId(GoogleId);
 
             Comment comment = new Comment
             {

@@ -5,10 +5,11 @@ using System.Web.Mvc;
 using System.Security.Claims;
 using GoKartUnite.ViewModel;
 using Microsoft.IdentityModel.Tokens;
+using GoKartUnite.Interfaces;
 
 namespace GoKartUnite.Handlers
 {
-    public class KarterHandler
+    public class KarterHandler : IKarterHandler
     {
         private readonly GoKartUniteContext _context;
         public KarterHandler(GoKartUniteContext context)
@@ -16,19 +17,19 @@ namespace GoKartUnite.Handlers
             _context = context;
         }
 
-        public async Task<Karter> getUser(int id)
+        public async Task<Karter> GetUser(int id)
         {
             var karterInDb = await _context.Karter.SingleOrDefaultAsync(x => x.Id == id);
             return karterInDb;
         }
 
-        public async Task<Karter> getUser(string name)
+        public async Task<Karter> GetUser(string name)
         {
             var karterInDb = await _context.Karter.SingleOrDefaultAsync(k => k.Name.ToLower() == name);
             return karterInDb;
         }
 
-        public async Task deleteUser(Karter karter)
+        public async Task DeleteUser(Karter karter)
         {
             var friendshipsToRemove = await _context.Friendships
                 .Where(f => f.KarterFirstId == karter.Id || f.KarterSecondId == karter.Id).ToListAsync();
@@ -37,15 +38,15 @@ namespace GoKartUnite.Handlers
             await _context.SaveChangesAsync();
         }
 
-        public async Task deleteUser(int id)
+        public async Task DeleteUser(int id)
         {
-            await deleteUser(await getUser(id));
+            await DeleteUser(await GetUser(id));
         }
 
-        public async Task<bool> sendFriendRequestByName(string friendsName, string GoogleId)
+        public async Task<bool> SendFriendRequestByName(string friendsName, string GoogleId)
         {
-            var karter2 = await getUserByGoogleId(GoogleId);
-            var karter = await getUser(friendsName);
+            var karter2 = await GetUserByGoogleId(GoogleId);
+            var karter = await GetUser(friendsName);
             if (karter == null || karter2 == null)
             {
                 return false;
@@ -74,11 +75,11 @@ namespace GoKartUnite.Handlers
             return true;
         }
 
-        public async Task<bool> sendFriendRequestById(int friendId, string GoogleId)
+        public async Task<bool> SendFriendRequestById(int friendId, string GoogleId)
         {
-            var karter2 = await getUserByGoogleId(GoogleId);
+            var karter2 = await GetUserByGoogleId(GoogleId);
             int sentBy = karter2.Id;
-            var karter = await getUser(friendId);
+            var karter = await GetUser(friendId);
             if (karter == null || karter2 == null)
             {
                 return false;
@@ -108,7 +109,7 @@ namespace GoKartUnite.Handlers
             return true;
         }
 
-        public async Task<List<Karter>> getAllUsers(bool fetchTracks, string? track = null, int pageNo = 0, int usersPerPage = 3, SortKartersBy sort = SortKartersBy.Alphabetically)
+        public async Task<List<Karter>> GetAllUsers(bool fetchTracks, string? track = null, int pageNo = 0, int usersPerPage = 3, SortKartersBy sort = SortKartersBy.Alphabetically)
         {
             var query = _context.Karter.AsQueryable();
             if (fetchTracks)
@@ -147,7 +148,7 @@ namespace GoKartUnite.Handlers
             return _context.Karter.Include(k => k.Track).Count() / usersPerPage;
         }
 
-        public async Task<List<Karter>> getAllUsersByTrackId(int id)
+        public async Task<List<Karter>> GetAllUsersByTrackId(int id)
         {
             var karters = await _context.Karter
                 .Where(k => k.TrackId == id)
@@ -156,11 +157,11 @@ namespace GoKartUnite.Handlers
             return karters;
         }
 
-        public async Task createUser(Karter karter, string email)
+        public async Task CreateUser(Karter karter, string email)
         {
             karter.Track = await _context.Track.SingleOrDefaultAsync(t => t.Id == karter.TrackId);
             karter.Email = email;
-            var prevKarterRecord = await getUser(karter.Id);
+            var prevKarterRecord = await GetUser(karter.Id);
 
             if (prevKarterRecord == null)
             {
@@ -182,7 +183,7 @@ namespace GoKartUnite.Handlers
 
         }
 
-        public async Task<Karter> getUserByGoogleId(string GoogleId, bool withTrack = false)
+        public async Task<Karter> GetUserByGoogleId(string GoogleId, bool withTrack = false)
         {
 
             if (withTrack)
@@ -194,7 +195,7 @@ namespace GoKartUnite.Handlers
             return karterInDb;
         }
 
-        public async Task<List<KarterView>> karterModelToView(List<Karter> karters)
+        public async Task<List<KarterView>> KarterModelToView(List<Karter> karters)
         {
             List<KarterView> kvs = new List<KarterView>();
             foreach (var karter in karters)
@@ -213,7 +214,7 @@ namespace GoKartUnite.Handlers
             return kvs;
         }
 
-        public async Task<KarterView> karterModelToView(Karter karter)
+        public async Task<KarterView> KarterModelToView(Karter karter)
         {
 
             KarterView kv = new KarterView();
@@ -225,7 +226,7 @@ namespace GoKartUnite.Handlers
 
         public async Task UpdateUser(string nameIdentifier, KarterView kv)
         {
-            Karter k = await getUserByGoogleId(nameIdentifier);
+            Karter k = await GetUserByGoogleId(nameIdentifier);
             k.Name = kv.Name;
             k.TrackId = kv.TrackId;
             k.YearsExperience = kv.YearsExperience;

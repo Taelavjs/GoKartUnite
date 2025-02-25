@@ -1,4 +1,5 @@
 ﻿using GoKartUnite.Data;
+using GoKartUnite.Interfaces;
 using GoKartUnite.Models;
 using GoKartUnite.ViewModel;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +7,7 @@ using NuGet.Protocol.Plugins;
 
 namespace GoKartUnite.Handlers
 {
-    public class RelationshipHandler
+    public class RelationshipHandler : IRelationshipHandler
     {
         private readonly GoKartUniteContext _context;
         public RelationshipHandler(GoKartUniteContext context)
@@ -14,13 +15,13 @@ namespace GoKartUnite.Handlers
             _context = context;
         }
 
-        public async Task<int> getFriendsCount(int id)
+        public async Task<int> GetFriendsCount(int id)
         {
             int numFriends = await _context.Friendships.CountAsync(k => k.KarterFirstId == id || k.KarterSecondId == id);
             return numFriends;
         }
 
-        public async Task<List<Karter>> getAllFriends(int id)
+        public async Task<List<Karter>> GetAllFriends(int id)
         {
             List<Friendships> friends = _context.Friendships
                 .Include(k => k.KarterFirst)
@@ -42,7 +43,7 @@ namespace GoKartUnite.Handlers
             return result;
         }
 
-        public async Task<List<Karter>> getAllFriendRequests(int id)
+        public async Task<List<Karter>> GetAllFriendRequests(int id)
         {
             List<Friendships> friends = _context.Friendships
                 .Include(k => k.KarterFirst.Track)
@@ -64,7 +65,7 @@ namespace GoKartUnite.Handlers
             return result;
         }
 
-        public async Task<List<Karter>> getAllSentRequests(int id)
+        public async Task<List<Karter>> GetAllSentRequests(int id)
         {
             List<Friendships> friends = _context.Friendships
                 .Include(k => k.KarterFirst.Track)
@@ -121,7 +122,7 @@ namespace GoKartUnite.Handlers
 
         }
 
-        public async Task<Friendships> getFriendshipByIds(int id1, int id2)
+        public async Task<Friendships> GetFriendshipByIds(int id1, int id2)
         {
             Friendships? friendReq = await _context.Friendships
                 .SingleOrDefaultAsync(k =>
@@ -136,7 +137,7 @@ namespace GoKartUnite.Handlers
         {
             foreach (var karter in karters)
             {
-                Friendships f = await getFriendshipByIds(karter.Id, userId);
+                Friendships f = await GetFriendshipByIds(karter.Id, userId);
                 if (f == null)
                 {
                     karter.FriendStatus = FriendshipStatus.User;

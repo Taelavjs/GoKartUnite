@@ -4,14 +4,15 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using GoKartUnite.CustomAttributes;
+using GoKartUnite.Interfaces;
 
 namespace GoKartUnite.Controllers
 {
     public class NotificationController : Controller
     {
-        private readonly KarterHandler _karters;
-        private readonly NotificationHandler _notifs;
-        public NotificationController(KarterHandler karters, NotificationHandler notifs)
+        private readonly IKarterHandler _karters;
+        private readonly INotificationHandler _notifs;
+        public NotificationController(IKarterHandler karters, INotificationHandler notifs)
         {
             _karters = karters;
             _notifs = notifs;
@@ -26,7 +27,7 @@ namespace GoKartUnite.Controllers
             string GoogleId = User.Claims
                 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
 
-            Karter k = await _karters.getUserByGoogleId(GoogleId);
+            Karter k = await _karters.GetUserByGoogleId(GoogleId);
             List<BlogNotifications> notifications = await _notifs.GetUserBlogNotifications(k.Id);
             return notifications.Count;
         }

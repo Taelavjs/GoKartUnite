@@ -1,4 +1,5 @@
 ﻿using GoKartUnite.Data;
+using GoKartUnite.Interfaces;
 using GoKartUnite.Models;
 using GoKartUnite.ViewModel;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +9,7 @@ using System.Web.Mvc;
 
 namespace GoKartUnite.Handlers
 {
-    public class TrackHandler
+    public class TrackHandler : ITrackHandler
     {
         private readonly GoKartUniteContext _context;
         public TrackHandler(GoKartUniteContext context)
@@ -16,7 +17,7 @@ namespace GoKartUnite.Handlers
             _context = context;
         }
 
-        public async Task<Track?> getTrack(int id, bool? getKarters)
+        public async Task<Track?> GetTrack(int id, bool? getKarters)
         {
             if (getKarters == true)
             {
@@ -27,9 +28,9 @@ namespace GoKartUnite.Handlers
             return await _context.Track.SingleOrDefaultAsync(t => t.Id == id);
         }
 
-        public async Task<bool> addTrack(Track track)
+        public async Task<bool> AddTrack(Track track)
         {
-            var prevTrackRecord = await getTrack(track.Id, false);
+            var prevTrackRecord = await GetTrack(track.Id, false);
 
             if (prevTrackRecord == null)
             {
@@ -46,16 +47,16 @@ namespace GoKartUnite.Handlers
             return true;
         }
 
-        public async Task updateTrack(int id)
+        public async Task UpdateTrack(int id)
         {
-            var track = await getTrack(id, false);
+            var track = await GetTrack(id, false);
             _context.Track.Remove(track);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> deleteTrack(int id)
+        public async Task<bool> DeleteTrack(int id)
         {
-            var track = await getTrack(id, true);
+            var track = await GetTrack(id, true);
 
             if (track == null)
             {
@@ -72,7 +73,7 @@ namespace GoKartUnite.Handlers
             return true;
         }
 
-        public async Task<List<Track>> getAllTracks()
+        public async Task<List<Track>> GetAllTracks()
         {
             return await _context.Track.ToListAsync();
         }
@@ -82,7 +83,7 @@ namespace GoKartUnite.Handlers
             return await _context.Track.Select(track => track.Title).ToListAsync();
         }
 
-        public async Task<List<Track>> getTracksByTitle(string title, List<Locations>? location = null)
+        public async Task<List<Track>> GetTracksByTitle(string title, List<Locations>? location = null)
         {
             if (title == "" || title == null) return new List<Track>();
             if (location == null)
@@ -107,14 +108,12 @@ namespace GoKartUnite.Handlers
             return tracks;
         }
 
-
-        public async Task<Track> getSingleTrackByTitle(string title)
+        public async Task<Track> GetSingleTrackByTitle(string title)
         {
             return await _context.Track.SingleOrDefaultAsync(t => t.Title == title);
         }
 
-
-        public async Task<List<TrackView>> modelToView(List<Track> tracks)
+        public async Task<List<TrackView>> ModelToView(List<Track> tracks)
         {
             List<TrackView> trackRet = new List<TrackView>();
             foreach (Track track in tracks)
@@ -134,7 +133,7 @@ namespace GoKartUnite.Handlers
             return trackRet;
         }
 
-        public async Task<TrackView> modelToView(Track track)
+        public async Task<TrackView> ModelToView(Track track)
         {
             TrackView trackView = new TrackView();
             trackView.Title = track.Title;
@@ -144,13 +143,13 @@ namespace GoKartUnite.Handlers
             return trackView;
         }
 
-        public async Task<int> getTrackIdByTitle(string g)
+        public async Task<int> GetTrackIdByTitle(string g)
         {
             Track t = await _context.Track.Where(t => t.Title == g).SingleAsync();
             return t.Id;
         }
 
-        public async Task<Track> getTrackById(int id)
+        public async Task<Track> GetTrackById(int id)
         {
             Track t = await _context.Track.Where(t => t.Id == id).SingleAsync();
             return t;

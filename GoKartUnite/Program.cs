@@ -16,6 +16,7 @@ using System.Security.Claims;
 using System.Diagnostics;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
+using GoKartUnite.Interfaces;
 
 
 namespace GoKartUnite
@@ -28,13 +29,13 @@ namespace GoKartUnite
             builder.Services.AddDbContext<GoKartUniteContext>(options =>
                             options.UseSqlServer(builder.Configuration.GetConnectionString("GoKartUniteContext") ?? throw new InvalidOperationException("Connection string 'GoKartUniteContext' not found.")));
             builder.Services.AddSignalR();
-            builder.Services.AddTransient<RelationshipHandler>();
-            builder.Services.AddTransient<KarterHandler>();
-            builder.Services.AddTransient<TrackHandler>();
-            builder.Services.AddTransient<BlogHandler>();
-            builder.Services.AddTransient<FollowerHandler>();
-            builder.Services.AddTransient<NotificationHandler>();
-            builder.Services.AddTransient<RoleHandler>();
+            builder.Services.AddScoped<IRelationshipHandler, RelationshipHandler>();
+            builder.Services.AddScoped<IKarterHandler, KarterHandler>();
+            builder.Services.AddScoped<ITrackHandler, TrackHandler>();
+            builder.Services.AddScoped<IBlogHandler, BlogHandler>();
+            builder.Services.AddScoped<IFollowerHandler, FollowerHandler>();
+            builder.Services.AddScoped<INotificationHandler, NotificationHandler>();
+            builder.Services.AddScoped<IRoleHandler, RoleHandler>();
             builder.Services.AddControllers().AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             );

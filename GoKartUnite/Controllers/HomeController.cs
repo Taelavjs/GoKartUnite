@@ -17,17 +17,18 @@ using HttpPostAttribute = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
 using Microsoft.AspNetCore.RateLimiting;
 using GoKartUnite.DataFilterOptions;
 using Microsoft.Extensions.Configuration.UserSecrets;
+using GoKartUnite.Interfaces;
 
 namespace GoKartUnite.Controllers
 {
     public class HomeController : Microsoft.AspNetCore.Mvc.Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly RelationshipHandler _friends;
-        private readonly BlogHandler _blog;
-        private readonly KarterHandler _karters;
+        private readonly IRelationshipHandler _friends;
+        private readonly IBlogHandler _blog;
+        private readonly IKarterHandler _karters;
 
-        public HomeController(ILogger<HomeController> logger, KarterHandler karters, RelationshipHandler friends, BlogHandler blog)
+        public HomeController(ILogger<HomeController> logger, IKarterHandler karters, IRelationshipHandler friends, IBlogHandler blog)
         {
             _logger = logger;
             _friends = friends;
@@ -41,9 +42,9 @@ namespace GoKartUnite.Controllers
             {
                 return View();
             }
-            Karter k = await _karters.getUserByGoogleId(User.Claims
+            Karter k = await _karters.GetUserByGoogleId(User.Claims
 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
-            List<Karter> friends = await _friends.getAllFriends(k.Id);
+            List<Karter> friends = await _friends.GetAllFriends(k.Id);
             List<BlogPost> blogPosts = new List<BlogPost>();
 
             foreach (var friend in friends)
@@ -60,7 +61,7 @@ namespace GoKartUnite.Controllers
 
 
 
-            return View(await _blog.getModelToView(blogPosts));
+            return View(await _blog.GetModelToView(blogPosts));
 
         }
 
@@ -70,9 +71,9 @@ namespace GoKartUnite.Controllers
         [EnableRateLimiting("slidingPolicy")]
         public async Task<IActionResult> InfiniteScroll(int pagesScrolled = 0)
         {
-            Karter k = await _karters.getUserByGoogleId(User.Claims
+            Karter k = await _karters.GetUserByGoogleId(User.Claims
 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
-            List<Karter> friends = await _friends.getAllFriends(k.Id);
+            List<Karter> friends = await _friends.GetAllFriends(k.Id);
             List<BlogPost> blogPosts = new List<BlogPost>();
 
             foreach (var friend in friends)
@@ -86,7 +87,7 @@ namespace GoKartUnite.Controllers
                 blogPosts.AddRange(await _blog.GetAllPosts(filter));
             }
             blogPosts = blogPosts.OrderByDescending(x => x.DateTimePosted).ToList();
-            return PartialView("~/Views/BlogHome/_Posts.cshtml", await _blog.getModelToView(blogPosts));
+            return PartialView("~/Views/BlogHome/_Posts.cshtml", await _blog.GetModelToView(blogPosts));
         }
 
         public IActionResult Privacy()

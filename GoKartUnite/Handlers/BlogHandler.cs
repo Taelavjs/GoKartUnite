@@ -1,5 +1,6 @@
 ﻿using GoKartUnite.Data;
 using GoKartUnite.DataFilterOptions;
+using GoKartUnite.Interfaces;
 using GoKartUnite.Models;
 using GoKartUnite.ViewModel;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +14,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GoKartUnite.Handlers
 {
-    public class BlogHandler
+    public class BlogHandler : IBlogHandler
     {
         private readonly GoKartUniteContext _context;
         public BlogHandler(GoKartUniteContext context)
@@ -72,7 +73,7 @@ namespace GoKartUnite.Handlers
         }
 
 
-        public async Task<int> addPost(BlogPostView post, Karter author, Track taggedT)
+        public async Task<int> AddPost(BlogPostView post, Karter author, Track taggedT)
         {
             BlogPost dbPost = new BlogPost();
 
@@ -89,7 +90,7 @@ namespace GoKartUnite.Handlers
             return dbPost.Id;
         }
 
-        public async Task<int> addPost(BlogPostView post, Karter author)
+        public async Task<int> AddPost(BlogPostView post, Karter author)
         {
             BlogPost dbPost = new BlogPost();
 
@@ -102,7 +103,7 @@ namespace GoKartUnite.Handlers
             await _context.SaveChangesAsync();
             return dbPost.Id;
         }
-        public async Task<List<BlogPostView>> getModelToView(List<BlogPost> posts)
+        public async Task<List<BlogPostView>> GetModelToView(List<BlogPost> posts)
         {
             List<BlogPostView> retPosts = new List<BlogPostView>();
             foreach (BlogPost bp in posts)
@@ -122,7 +123,7 @@ namespace GoKartUnite.Handlers
             return retPosts;
         }
 
-        public async Task<BlogPost> getPost(int Id, bool inclUpvotes = false, bool inclComments = false)
+        public async Task<BlogPost> GetPost(int Id, bool inclUpvotes = false, bool inclComments = false)
         {
             IQueryable<BlogPost> query = _context.BlogPosts.AsQueryable();
             if (inclUpvotes)
@@ -136,15 +137,15 @@ namespace GoKartUnite.Handlers
             return await query.SingleOrDefaultAsync(k => k.Id == Id);
         }
 
-        public async Task upvotePost(int Id, Upvotes upvoteToAdd)
+        public async Task UpvotePost(int Id, Upvotes upvoteToAdd)
         {
-            BlogPost post = await getPost(Id);
+            BlogPost post = await GetPost(Id);
             post.Upvotes.Add(upvoteToAdd);
 
             await _context.SaveChangesAsync();
         }
 
-        public async Task<int> getTotalPageCount(int pageSize = 10)
+        public async Task<int> GetTotalPageCount(int pageSize = 10)
         {
             int totalCount = await _context.BlogPosts.CountAsync();
             int totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
@@ -153,7 +154,7 @@ namespace GoKartUnite.Handlers
 
         public async Task<List<Comment>> GetAllCommentsForPost(int blogPostId, int lastIdSent)
         {
-            BlogPost post = await getPost(blogPostId, false, true);
+            BlogPost post = await GetPost(blogPostId, false, true);
 
             if (lastIdSent == 0)
             {
@@ -190,7 +191,7 @@ namespace GoKartUnite.Handlers
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<BlogPost>> getPostsForTrack(string trackTitle, int count = 0)
+        public async Task<List<BlogPost>> GetPostsForTrack(string trackTitle, int count = 0)
         {
             List<BlogPost> posts = _context.BlogPosts
                 .Where(t => t.TaggedTrack != null && t.TaggedTrack.Title == trackTitle)

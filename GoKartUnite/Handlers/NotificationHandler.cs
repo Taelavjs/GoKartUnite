@@ -1,10 +1,11 @@
 ﻿using GoKartUnite.Data;
+using GoKartUnite.Interfaces;
 using GoKartUnite.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace GoKartUnite.Handlers
 {
-    public class NotificationHandler
+    public class NotificationHandler : INotificationHandler
     {
         private readonly GoKartUniteContext _context;
         public NotificationHandler(GoKartUniteContext context)
@@ -37,7 +38,7 @@ namespace GoKartUnite.Handlers
 
         }
 
-        public async Task setAllBlogNotifsViewed(int userId)
+        public async Task SetAllBlogNotifsViewed(int userId)
         {
             List<BlogNotifications> allBlogNotifs = await GetUserBlogNotifications(userId);
 

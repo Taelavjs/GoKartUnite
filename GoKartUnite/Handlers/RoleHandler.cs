@@ -1,10 +1,11 @@
 ﻿using GoKartUnite.Data;
+using GoKartUnite.Interfaces;
 using GoKartUnite.Models;
 using System.Security.Claims;
 
 namespace GoKartUnite.Handlers
 {
-    public class RoleHandler
+    public class RoleHandler : IRoleHandler
     {
         private readonly GoKartUniteContext _context;
         public RoleHandler(GoKartUniteContext context)
@@ -33,13 +34,13 @@ namespace GoKartUnite.Handlers
             _context.UserRoles.Remove(deleteRole);
         }
 
-        public async Task<int> getTrackUserTrackId(int userId)
+        public async Task<int> GetTrackUserTrackId(int userId)
         {
             return _context.TrackAdmin
                 .Single(t => t.KarterId == userId).TrackId;
         }
 
-        public async Task<bool> isAdminAtTrack(string track, int userId)
+        public async Task<bool> IsAdminAtTrack(string track, int userId)
         {
             TrackAdmins admin = _context.TrackAdmin.SingleOrDefault(t => t.KarterId == userId);
             if (admin == null || admin.ManagedTrack == null) return false;

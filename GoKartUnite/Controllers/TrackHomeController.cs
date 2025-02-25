@@ -11,19 +11,20 @@ using NuGet.Protocol.Core.Types;
 using System.Reflection.Metadata;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using GoKartUnite.Interfaces;
 
 namespace GoKartUnite.Controllers
 {
     public class TrackHomeController : Controller
     {
         private readonly GoKartUniteContext _context;
-        private readonly TrackHandler _tracks;
-        private readonly KarterHandler _karters;
-        private readonly FollowerHandler _follows;
-        private readonly BlogHandler _blog;
-        private readonly RoleHandler _role;
+        private readonly ITrackHandler _tracks;
+        private readonly IKarterHandler _karters;
+        private readonly IFollowerHandler _follows;
+        private readonly IBlogHandler _blog;
+        private readonly IRoleHandler _role;
 
-        public TrackHomeController(RoleHandler role, BlogHandler blog, GoKartUniteContext context, TrackHandler tracks, FollowerHandler follows, KarterHandler karters)
+        public TrackHomeController(IRoleHandler role, IBlogHandler blog, GoKartUniteContext context, ITrackHandler tracks, IFollowerHandler follows, IKarterHandler karters)
         {
             _role = role;
             _context = context;
@@ -53,7 +54,7 @@ namespace GoKartUnite.Controllers
                 ViewBag.Locations = Locations.GetNames(typeof(Locations));
                 return View("Create");
             }
-            _ = await _tracks.addTrack(track);
+            _ = await _tracks.AddTrack(track);
             return RedirectToAction("Details");
         }
 
@@ -65,7 +66,7 @@ namespace GoKartUnite.Controllers
             ViewBag.Locations = Locations.GetNames(typeof(Locations));
             if (id != null)
             {
-                var trackInDb = await _tracks.getTrack(id.Value, false);
+                var trackInDb = await _tracks.GetTrack(id.Value, false);
                 ViewData["Title"] = "Editing Track Details";
                 return View(trackInDb);
             }
@@ -80,7 +81,7 @@ namespace GoKartUnite.Controllers
         [AccountConfirmed]
         public async Task<IActionResult> Edit(int id)
         {
-            _tracks.updateTrack(id);
+            _tracks.UpdateTrack(id);
             return View("Details");
         }
 
@@ -91,7 +92,7 @@ namespace GoKartUnite.Controllers
         public async Task<ActionResult> Delete(int id)
         {
             // Find the track with its related karters
-            bool res = await _tracks.deleteTrack(id);
+            bool res = await _tracks.DeleteTrack(id);
 
             if (res)
             {
@@ -105,10 +106,10 @@ namespace GoKartUnite.Controllers
         [AccountConfirmed]
         public async Task<IActionResult> Details(int? id)
         {
-            var tracksRender = _tracks.modelToView(await _tracks.getAllTracks());
+            var tracksRender = _tracks.ModelToView(await _tracks.GetAllTracks());
             if (id == null) return View(await tracksRender);
 
-            return View("KartersLocalTrack", await _karters.getAllUsersByTrackId(id.Value));
+            return View("KartersLocalTrack", await _karters.GetAllUsersByTrackId(id.Value));
         }
 
         [HttpGet]
@@ -118,12 +119,12 @@ namespace GoKartUnite.Controllers
         {
             string GoogleId = User.Claims
     .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            Karter usr = await _karters.getUserByGoogleId(GoogleId);
+            Karter usr = await _karters.GetUserByGoogleId(GoogleId);
 
-            List<TrackView> tracks = await _tracks.modelToView(await _tracks.getTracksByTitle(trackSearched, location));
+            List<TrackView> tracks = await _tracks.ModelToView(await _tracks.GetTracksByTitle(trackSearched, location));
             foreach (TrackView track in tracks)
             {
-                if (await _follows.doesUserFollow(usr.Id, await _tracks.getTrackIdByTitle(track.Title)))
+                if (await _follows.DoesUserFollow(usr.Id, await _tracks.GetTrackIdByTitle(track.Title)))
                 {
                     track.isFollowed = true;
                 }
@@ -157,20 +158,20 @@ namespace GoKartUnite.Controllers
         [AccountConfirmed]
         public async Task<IActionResult> Profile(string track)
         {
-            Track toReply = await _tracks.getSingleTrackByTitle(track);
+            Track toReply = await _tracks.GetSingleTrackByTitle(track);
             if (toReply == null) return RedirectToAction("index");
             ViewData["Title"] = toReply.Title;
 
-            TrackView trackView = await _tracks.modelToView(toReply);
+            TrackView trackView = await _tracks.ModelToView(toReply);
 
-            List<BlogPost> posts = await _blog.getPostsForTrack(track, 10);
+            List<BlogPost> posts = await _blog.GetPostsForTrack(track, 10);
 
-            List<BlogPostView> postViews = await _blog.getModelToView(posts);
+            List<BlogPostView> postViews = await _blog.GetModelToView(posts);
             string userClaimsId = User.Claims
                 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
 
-            Karter userId = await _karters.getUserByGoogleId(userClaimsId);
-            bool isAdminAtTrack = await _role.isAdminAtTrack(track, userId.Id);
+            Karter userId = await _karters.GetUserByGoogleId(userClaimsId);
+            bool isAdminAtTrack = await _role.IsAdminAtTrack(track, userId.Id);
 
             TrackProfile trackProfile = new TrackProfile
             {
