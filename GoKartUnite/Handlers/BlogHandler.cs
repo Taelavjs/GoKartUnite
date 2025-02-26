@@ -17,8 +17,10 @@ namespace GoKartUnite.Handlers
     public class BlogHandler : IBlogHandler
     {
         private readonly GoKartUniteContext _context;
-        public BlogHandler(GoKartUniteContext context)
+        private readonly IKarterHandler _karter;
+        public BlogHandler(GoKartUniteContext context, IKarterHandler karter)
         {
+            _karter = karter;
             _context = context;
         }
 
@@ -75,6 +77,11 @@ namespace GoKartUnite.Handlers
 
         public async Task<int> AddPost(BlogPostView post, Karter author, Track taggedT)
         {
+            if (await _karter.GetUser(author.Id) == null)
+            {
+                return -1;
+            }
+
             BlogPost dbPost = new BlogPost();
 
             dbPost.Author = author;
@@ -92,6 +99,10 @@ namespace GoKartUnite.Handlers
 
         public async Task<int> AddPost(BlogPostView post, Karter author)
         {
+            if (await _karter.GetUser(author.Id) == null)
+            {
+                return -1;
+            }
             BlogPost dbPost = new BlogPost();
 
             dbPost.Author = author;
@@ -105,6 +116,8 @@ namespace GoKartUnite.Handlers
         }
         public async Task<List<BlogPostView>> GetModelToView(List<BlogPost> posts)
         {
+            if (posts == null || posts.Count == 0) return new List<BlogPostView>();
+
             List<BlogPostView> retPosts = new List<BlogPostView>();
             foreach (BlogPost bp in posts)
             {
@@ -112,8 +125,7 @@ namespace GoKartUnite.Handlers
                 post.Id = bp.Id;
                 post.Title = bp.Title;
                 post.Descripttion = bp.Descripttion;
-                Karter Author = await _context.Karter.SingleOrDefaultAsync(k => k.Id == bp.AuthorId);
-                post.Author = Author.Name;
+                post.Author = bp.Author.Name;
                 post.Upvotes = bp.Upvotes.Count;
                 post.TaggedTrack = bp.TaggedTrack?.Title;
                 post.authorId = bp.AuthorId;
@@ -183,7 +195,6 @@ namespace GoKartUnite.Handlers
 
             return viewComments;
         }
-
 
         public async Task CreateComment(Comment comment)
         {
