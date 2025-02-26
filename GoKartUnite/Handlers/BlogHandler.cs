@@ -83,7 +83,7 @@ namespace GoKartUnite.Handlers
 
         public async Task<int> AddPost(BlogPostView post)
         {
-            if (post.Author == null)
+            if (post.Author == null || post.Author.Id < 0)
             {
                 return -1;
             }

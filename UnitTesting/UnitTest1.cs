@@ -292,15 +292,16 @@ namespace UnitTesting
             {
                 Title = "My First Blog Post",
                 Descripttion = "This is a sample blog post description.",
-                Author = tempKarterName,
+                Author = karter,
                 authorId = 123,
                 Upvotes = 10,
-                TaggedTrack = tempTrackName,
+                TaggedTrackTitle = trackNameExample,
+                TaggedTrack = track,
                 blogType = BlogType.Post,
                 ReleaseDateTime = DateTime.Now.AddDays(1)
             };
 
-            int result = await _blogHandler.AddPost(blogPostsView, karter, track);
+            int result = await _blogHandler.AddPost(blogPostsView);
             Assert.True(result > -1);
             Assert.True(_context.BlogPosts.Count() == 1, "More than 1 Record Created");
             BlogPost post = _context.BlogPosts.Include(x => x.Author).Include(x => x.TaggedTrack).Single(x => x.Id >= -1);
@@ -335,14 +336,14 @@ namespace UnitTesting
             {
                 Title = "My First Blog Post",
                 Descripttion = "This is a sample blog post description.",
-                Author = tempKarterName,
-                authorId = 123,
+                Author = karter,
+                authorId = karter.Id,
                 Upvotes = 10,
                 blogType = BlogType.Post,
                 ReleaseDateTime = DateTime.Now.AddDays(1)
             };
 
-            int result = await _blogHandler.AddPost(blogPostsView, karter);
+            int result = await _blogHandler.AddPost(blogPostsView);
 
             Assert.True(result > -1);
             Assert.True(_context.BlogPosts.Count() == 1, "More than 1 Record Created");
@@ -379,14 +380,14 @@ namespace UnitTesting
             {
                 Title = "My First Blog Post",
                 Descripttion = "This is a sample blog post description.",
-                Author = tempKarterName,
-                authorId = -1, // Invalid
+                Author = karter,
+                authorId = karter.Id, // Invalid
                 Upvotes = 10,
                 blogType = BlogType.Post,
                 ReleaseDateTime = DateTime.Now.AddDays(1)
             };
 
-            int result = await _blogHandler.AddPost(blogPostsView, karter);
+            int result = await _blogHandler.AddPost(blogPostsView);
 
 
             Assert.True(_context.BlogPosts.Count() == 0, "1 invalid Record Created");
