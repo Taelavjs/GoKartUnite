@@ -44,6 +44,12 @@ namespace GoKartUnite.Handlers
                 query = query.Include(k => k.Upvotes);
             }
 
+            if (filterOptions.IncludeAuthor)
+            {
+                query = query.Include(k => k.Author);
+            }
+
+
             if (filterOptions.UserIdFilter != null)
             {
                 query = query.Where(x => x.AuthorId == filterOptions.UserIdFilter);
@@ -75,20 +81,20 @@ namespace GoKartUnite.Handlers
         }
 
 
-        public async Task<int> AddPost(BlogPostView post, Karter author, Track taggedT)
+        public async Task<int> AddPost(BlogPostView post)
         {
-            if (await _karter.GetUser(author.Id) == null)
+            if (post.Author == null)
             {
                 return -1;
             }
 
             BlogPost dbPost = new BlogPost();
 
-            dbPost.Author = author;
+            dbPost.Author = post.Author;
             dbPost.Title = post.Title;
-            dbPost.AuthorId = author.Id;
+            dbPost.AuthorId = post.Author.Id;
             dbPost.Descripttion = post.Descripttion;
-            dbPost.TaggedTrack = taggedT;
+            dbPost.TaggedTrack = post.TaggedTrack ?? null;
 
 
             await _context.BlogPosts.AddAsync(dbPost);
@@ -97,23 +103,23 @@ namespace GoKartUnite.Handlers
             return dbPost.Id;
         }
 
-        public async Task<int> AddPost(BlogPostView post, Karter author)
-        {
-            if (await _karter.GetUser(author.Id) == null)
-            {
-                return -1;
-            }
-            BlogPost dbPost = new BlogPost();
+        //public async Task<int> AddPost(BlogPostView post, Karter author)
+        //{
+        //    if (await _karter.GetUser(author.Id) == null)
+        //    {
+        //        return -1;
+        //    }
+        //    BlogPost dbPost = new BlogPost();
 
-            dbPost.Author = author;
-            dbPost.Title = post.Title;
-            dbPost.AuthorId = author.Id;
-            dbPost.Descripttion = post.Descripttion;
-            await _context.BlogPosts.AddAsync(dbPost);
+        //    dbPost.Author = author;
+        //    dbPost.Title = post.Title;
+        //    dbPost.AuthorId = author.Id;
+        //    dbPost.Descripttion = post.Descripttion;
+        //    await _context.BlogPosts.AddAsync(dbPost);
 
-            await _context.SaveChangesAsync();
-            return dbPost.Id;
-        }
+        //    await _context.SaveChangesAsync();
+        //    return dbPost.Id;
+        //}
         public async Task<List<BlogPostView>> GetModelToView(List<BlogPost> posts)
         {
             if (posts == null || posts.Count == 0) return new List<BlogPostView>();
@@ -125,9 +131,9 @@ namespace GoKartUnite.Handlers
                 post.Id = bp.Id;
                 post.Title = bp.Title;
                 post.Descripttion = bp.Descripttion;
-                post.Author = bp.Author.Name;
+                post.Author = bp.Author;
                 post.Upvotes = bp.Upvotes.Count;
-                post.TaggedTrack = bp.TaggedTrack?.Title;
+                post.TaggedTrack = bp.TaggedTrack;
                 post.authorId = bp.AuthorId;
                 retPosts.Add(post);
             }

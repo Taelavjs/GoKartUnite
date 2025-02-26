@@ -11,5 +11,6 @@
         public bool IncludeUpvotes { get; set; } = false;
         public DateTime? AfterDateFilter { get; set; }
         public DateTime? PreDateFilter { get; set; }
+        public bool IncludeAuthor { get; set; } = false;
     }
 }

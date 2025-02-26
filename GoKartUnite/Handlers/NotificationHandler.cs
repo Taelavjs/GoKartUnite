@@ -54,6 +54,7 @@ namespace GoKartUnite.Handlers
         {
             return await _context.BlogNotifications
                 .Include(t => t.LinkedPost)
+                .Include(t => t.Author)
                 .Where(t => t.userId == userId && t.isViewed == false)
                 .Select(t => t.LinkedPost)
                 .OrderByDescending(k => k.DateTimePosted)

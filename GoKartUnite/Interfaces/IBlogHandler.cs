@@ -8,9 +8,7 @@ namespace GoKartUnite.Interfaces
     {
         Task<List<BlogPost>> GetAllPosts(BlogFilterOptions filterOptions);
 
-        Task<int> AddPost(BlogPostView post, Karter author, Track taggedT);
-
-        Task<int> AddPost(BlogPostView post, Karter author);
+        Task<int> AddPost(BlogPostView post);
 
         Task<List<BlogPostView>> GetModelToView(List<BlogPost> posts);
 

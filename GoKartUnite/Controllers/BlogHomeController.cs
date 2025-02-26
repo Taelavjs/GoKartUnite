@@ -47,7 +47,6 @@ namespace GoKartUnite.Controllers
 
             Karter k = await _karter.GetUserByGoogleId(GoogleId);
             List<BlogNotifications> notifications = await _notification.GetUserBlogNotifications(k.Id);
-            await _notification.SetAllBlogNotifsViewed(k.Id);
             ViewBag.Notifcount = notifications.Count;
             ViewBag.NotifiedTracks = await _notification.GetAllUsersUnseenPosts(k.Id);
             page = Math.Min(page, ViewBag.TotalPages);
@@ -58,7 +57,8 @@ namespace GoKartUnite.Controllers
             {
                 PageSize = 10,
                 PageNo = page,
-                TrackNameFilter = track
+                TrackNameFilter = track,
+                IncludeAuthor = true
             };
 
             List<BlogPost> allPosts = await _blog.GetAllPosts(blogFilter);
@@ -79,7 +79,7 @@ namespace GoKartUnite.Controllers
         [AccountConfirmed]
         public async Task<IActionResult> Create()
         {
-            ViewBag.TrackTitles = await _tracks.GetAllTrackTitles();
+            ViewBag.AllTracks = await _tracks.ModelToView(await _tracks.GetAllTracks());
             return View();
         }
 
@@ -99,19 +99,24 @@ namespace GoKartUnite.Controllers
 
             Karter k = await _karter.GetUserByGoogleId(GoogleId);
             int postId;
-            if (post.TaggedTrack != "")
+            if (post.TaggedTrackTitle != string.Empty)
             {
-                Track taggedT = await _tracks.GetSingleTrackByTitle(post.TaggedTrack);
-                postId = await _blog.AddPost(post, k, taggedT);
+                Track taggedT = await _tracks.GetSingleTrackByTitle(post.TaggedTrackTitle);
+                post.authorId = k.Id;
+                post.Author = k;
+                post.TaggedTrack = taggedT;
+                postId = await _blog.AddPost(post);
             }
             else
             {
-                postId = await _blog.AddPost(post, k);
+                post.authorId = k.Id;
+                post.Author = k;
+                postId = await _blog.AddPost(post);
+                return RedirectToAction("Index");
             }
-            int track = await _tracks.GetTrackIdByTitle(post.TaggedTrack);
 
-            List<int> kartersWhoNeedNotif = await _followerHandler.AllUserIdsWhoFollowTrack(track);
-            if (post.TaggedTrack != "")
+            List<int> kartersWhoNeedNotif = await _followerHandler.AllUserIdsWhoFollowTrack(post.TaggedTrack.Id);
+            if (post.TaggedTrackTitle != string.Empty)
             {
                 foreach (int kar in kartersWhoNeedNotif)
                 {
@@ -147,7 +152,10 @@ namespace GoKartUnite.Controllers
             int trackAdminIds = await _roles.GetTrackUserTrackId(k.Id);
             Track taggedT = await _tracks.GetTrackById(trackAdminIds);
             post.blogType = BlogType.TrackNews;
-            int postId = await _blog.AddPost(post, k, taggedT);
+
+            post.TaggedTrackTitle = taggedT.Title;
+            post.TaggedTrack = taggedT;
+            int postId = await _blog.AddPost(post);
 
             return RedirectToAction("Index", "BlogHome");
         }

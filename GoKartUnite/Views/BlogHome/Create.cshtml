@@ -4,7 +4,7 @@
 @{
 }
 
-@model GoKartUnite.Models.BlogPost
+@model GoKartUnite.ViewModel.BlogPostView
 
 <h1>@ViewData["Title"]</h1>
 
@@ -28,12 +28,12 @@
             </div>
             <div class="form-group">
 
-                <label asp-for="TaggedTrack">Select Track</label>
-                <select asp-for="TaggedTrack" class="form-control">
+                <label asp-for="TaggedTrackTitle">Select Track</label>
+                <select asp-for="TaggedTrackTitle" class="form-control">
                     <option value="">-- Select a Track --</option>
-                    @foreach (var item in ViewBag.TrackTitles)
+                    @foreach (var item in ViewBag.AllTracks)
                     {
-                        <option value="@item">@item</option>
+                            <option value="@item.Title">@item.Title</option>
                     }
                 </select>
             </div>

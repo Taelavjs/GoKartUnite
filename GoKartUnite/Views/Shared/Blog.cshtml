@@ -7,9 +7,9 @@
 
         <div class="blog-post">
             <div class="blog-post-title">@Model.Title</div>
-            <div class="blog-post-author">By: @Model.Author</div>
+            <div class="blog-post-author">By: @Model.Author?.Name</div>
             <div class="blog-post-description">@Model.Descripttion</div>
-    @if (!string.IsNullOrWhiteSpace(@Model.TaggedTrack))
+    @if (!string.IsNullOrWhiteSpace(@Model.TaggedTrack?.Title))
     {
                 <div class="blog-post-description">@Model.TaggedTrack</div>
     }
