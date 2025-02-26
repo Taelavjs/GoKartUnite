@@ -15,7 +15,10 @@ namespace GoKartUnite.Handlers
 
         public async Task AddRoleToUser(int userId, string roleName)
         {
-            int roleId = _context.Role.FirstOrDefault(r => r.Name == roleName)?.Id ?? 0;
+            if (!_context.Karter.Any(x => x.Id == userId)) return;
+
+            int roleId = _context.Role.FirstOrDefault(r => r.Name == roleName)?.Id ?? -1;
+            if (roleId == -1) return;
 
             UserRoles role = new UserRoles
             {
@@ -24,14 +27,17 @@ namespace GoKartUnite.Handlers
             };
 
             _context.UserRoles.Add(role);
+            _context.SaveChanges();
         }
 
         public async Task RemoveUserRole(int userId, string roleToRemove)
         {
             int roleId = _context.Role.FirstOrDefault(r => r.Name == roleToRemove)?.Id ?? 0;
 
-            UserRoles deleteRole = _context.UserRoles.FirstOrDefault(r => r.KarterId == userId && roleId == r.RoleId);
+            UserRoles deleteRole = _context.UserRoles.FirstOrDefault(r => r.KarterId == userId && roleId == r.RoleId) ?? null;
+            if (deleteRole == null) return;
             _context.UserRoles.Remove(deleteRole);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<int> GetTrackUserTrackId(int userId)

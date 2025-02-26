@@ -156,7 +156,7 @@ namespace GoKartUnite.Handlers
 
         public async Task<List<Comment>> GetAllCommentsForPost(int blogPostId, int lastIdSent)
         {
-            BlogPost post = await GetPost(blogPostId, new BlogPostFilterOptions { IncludeComments = false, IncludeUpvotes = true });
+            BlogPost post = await GetPost(blogPostId, new BlogPostFilterOptions { IncludeComments = true, IncludeUpvotes = true });
             if (post == null) return new List<Comment>();
             if (lastIdSent == 0)
             {
