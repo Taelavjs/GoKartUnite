@@ -12,7 +12,7 @@ namespace GoKartUnite.Interfaces
 
         Task<List<BlogPostView>> GetModelToView(List<BlogPost> posts);
 
-        Task<BlogPost> GetPost(int Id, bool inclUpvotes = false, bool inclComments = false);
+        Task<BlogPost> GetPost(int Id, BlogPostFilterOptions? options = null);
 
         Task UpvotePost(int Id, Upvotes upvoteToAdd);
 

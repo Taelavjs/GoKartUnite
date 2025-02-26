@@ -167,7 +167,7 @@ namespace GoKartUnite.Controllers
         {
             string GoogleId = User.Claims
     .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            BlogPost post = await _blog.GetPost(id, inclUpvotes: true);
+            BlogPost post = await _blog.GetPost(id, new BlogPostFilterOptions { IncludeUpvotes = true });
             Karter karter = await _karter.GetUserByGoogleId(GoogleId);
 
             bool alreadyUpvoted = post.Upvotes

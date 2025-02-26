@@ -102,24 +102,6 @@ namespace GoKartUnite.Handlers
             await _context.SaveChangesAsync();
             return dbPost.Id;
         }
-
-        //public async Task<int> AddPost(BlogPostView post, Karter author)
-        //{
-        //    if (await _karter.GetUser(author.Id) == null)
-        //    {
-        //        return -1;
-        //    }
-        //    BlogPost dbPost = new BlogPost();
-
-        //    dbPost.Author = author;
-        //    dbPost.Title = post.Title;
-        //    dbPost.AuthorId = author.Id;
-        //    dbPost.Descripttion = post.Descripttion;
-        //    await _context.BlogPosts.AddAsync(dbPost);
-
-        //    await _context.SaveChangesAsync();
-        //    return dbPost.Id;
-        //}
         public async Task<List<BlogPostView>> GetModelToView(List<BlogPost> posts)
         {
             if (posts == null || posts.Count == 0) return new List<BlogPostView>();
@@ -141,16 +123,18 @@ namespace GoKartUnite.Handlers
             return retPosts;
         }
 
-        public async Task<BlogPost> GetPost(int Id, bool inclUpvotes = false, bool inclComments = false)
+        public async Task<BlogPost> GetPost(int Id, BlogPostFilterOptions? options = null)
         {
+            if (options == null) options = new BlogPostFilterOptions();
+
             IQueryable<BlogPost> query = _context.BlogPosts.AsQueryable();
-            if (inclUpvotes)
-            {
-                query = query.Include(k => k.Upvotes);
-            }
-            if (inclComments)
+            if (options.IncludeComments)
             {
                 query = query.Include(k => k.Comments);
+            }
+            if (options.IncludeUpvotes)
+            {
+                query = query.Include(k => k.Upvotes);
             }
             return await query.SingleOrDefaultAsync(k => k.Id == Id);
         }
@@ -172,8 +156,8 @@ namespace GoKartUnite.Handlers
 
         public async Task<List<Comment>> GetAllCommentsForPost(int blogPostId, int lastIdSent)
         {
-            BlogPost post = await GetPost(blogPostId, false, true);
-
+            BlogPost post = await GetPost(blogPostId, new BlogPostFilterOptions { IncludeComments = false, IncludeUpvotes = true });
+            if (post == null) return new List<Comment>();
             if (lastIdSent == 0)
             {
                 return post.Comments.Take(10).ToList();

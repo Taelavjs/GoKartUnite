@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace UnitTesting
 {
@@ -434,6 +435,233 @@ namespace UnitTesting
             Assert.True(blogPostsViews.Count == 0, "Invalid Return");
             Assert.True(blogPostsNull.Count == 0, "Invalid Return when passed NULL");
 
+        }
+
+        [Fact]
+        public async Task GetPost_ValidReturnOfPost()
+        {
+            CreateDatabase_WithXNumberOfRows(10);
+
+            BlogPostFilterOptions filterOnlyComments = new BlogPostFilterOptions
+            {
+                IncludeUpvotes = false,
+                IncludeComments = true,
+            };
+            BlogPostFilterOptions filterOnlyUpvotes = new BlogPostFilterOptions
+            {
+                IncludeUpvotes = true,
+                IncludeComments = false,
+            };
+            BlogPostFilterOptions filterIncludeBoth = new BlogPostFilterOptions
+            {
+                IncludeUpvotes = true,
+                IncludeComments = true,
+            };
+
+            BlogPost post = await _blogHandler.GetPost(1);
+            BlogPost postWithComments = await _blogHandler.GetPost(2, filterOnlyComments);
+            BlogPost postWithUpvotes = await _blogHandler.GetPost(3, filterOnlyComments);
+            BlogPost postWithBoth = await _blogHandler.GetPost(4, filterIncludeBoth);
+
+
+            Assert.True(post != null);
+            Assert.True(post.Id == 1);
+
+            Assert.True(postWithComments.Id == 2);
+            Assert.True(postWithComments.Comments != null);
+            Assert.True(postWithComments.Comments.Count >= 0);
+
+
+            Assert.True(postWithUpvotes.Id == 3);
+            Assert.True(postWithUpvotes.Upvotes != null);
+            Assert.True(postWithUpvotes.Upvotes.Count >= 0);
+
+
+            Assert.True(postWithBoth.Id == 4);
+            Assert.True(postWithBoth.Comments != null);
+            Assert.True(postWithBoth.Comments.Count >= 0);
+            Assert.True(postWithBoth.Upvotes != null);
+            Assert.True(postWithBoth.Upvotes.Count >= 0);
+
+        }
+
+        [Fact]
+        public async Task GetPost_InvalidId()
+        {
+            CreateDatabase_WithXNumberOfRows(2);
+
+            BlogPostFilterOptions filterOnlyComments = new BlogPostFilterOptions
+            {
+                IncludeUpvotes = false,
+                IncludeComments = true,
+            };
+            BlogPostFilterOptions filterOnlyUpvotes = new BlogPostFilterOptions
+            {
+                IncludeUpvotes = true,
+                IncludeComments = false,
+            };
+            BlogPostFilterOptions filterIncludeBoth = new BlogPostFilterOptions
+            {
+                IncludeUpvotes = true,
+                IncludeComments = true,
+            };
+
+            BlogPost post = await _blogHandler.GetPost(1);
+            BlogPost postWithComments = await _blogHandler.GetPost(2, filterOnlyComments);
+            BlogPost postWithUpvotes = await _blogHandler.GetPost(3, filterOnlyComments);
+            BlogPost postWithBoth = await _blogHandler.GetPost(4, filterIncludeBoth);
+
+
+            Assert.True(post != null);
+            Assert.True(post.Id == 1);
+
+            Assert.True(postWithComments.Id == 2);
+            Assert.True(postWithComments.Comments != null);
+            Assert.True(postWithComments.Comments.Count >= 0);
+
+
+            Assert.True(postWithUpvotes == null);
+            Assert.True(postWithBoth == null);
+
+        }
+
+        [Fact]
+        public async Task GetAllCommentsForPost_ValidPostWithComments()
+        {
+
+            _context.Database.EnsureDeleted();
+            _context.Database.EnsureCreated();
+
+            int numComments = 20;
+
+            var comments = Enumerable.Range(1, numComments).Select(i => new Comment
+            {
+                Text = "WOOOT"
+            }).ToList();
+
+            var trackNameExample = "Example Track";
+            var location = Locations.EAST;
+            var blogPosts = Enumerable.Range(1, 2)
+                .Select(i => new BlogPost
+                {
+                    DateTimePosted = DateTime.Now.AddDays(-i),
+                    Comments = comments,
+                    TaggedTrack = new Track
+                    {
+                        Title = trackNameExample + "i",
+                        Location = location
+                    }
+                })
+                .ToList();
+
+            _context.BlogPosts.AddRange(blogPosts);
+            _context.SaveChanges();
+
+            List<BlogPost> posts = _context.BlogPosts.ToList();
+
+            foreach (var post in posts)
+            {
+                Assert.True(post.Comments != null, "Comment Value Are Null");
+                Assert.True(post.Comments.Count > 0);
+                Assert.True(post.Comments.Count <= numComments);
+
+                List<Comment> commentsFetched = await _blogHandler.GetAllCommentsForPost(post.Id, 3);
+
+                Assert.True(commentsFetched.Count == 10);
+                Assert.True(commentsFetched[0].Id == 3);
+            }
+        }
+
+        [Fact]
+        public async Task GetAllCommentsForPost_ValidPostWithNoComments()
+        {
+
+            _context.Database.EnsureDeleted();
+            _context.Database.EnsureCreated();
+
+            int numComments = 0;
+
+            var comments = Enumerable.Range(1, numComments).Select(i => new Comment
+            {
+                Text = "WOOOT"
+            }).ToList();
+
+            var trackNameExample = "Example Track";
+            var location = Locations.EAST;
+            var blogPosts = Enumerable.Range(1, 2)
+                .Select(i => new BlogPost
+                {
+                    DateTimePosted = DateTime.Now.AddDays(-i),
+                    Comments = comments,
+                    TaggedTrack = new Track
+                    {
+                        Title = trackNameExample + "i",
+                        Location = location
+                    }
+                })
+                .ToList();
+
+            _context.BlogPosts.AddRange(blogPosts);
+            _context.SaveChanges();
+
+            List<BlogPost> posts = _context.BlogPosts.ToList();
+
+            foreach (var post in posts)
+            {
+                Assert.True(post.Comments != null, "Comment Value Are Null");
+                Assert.True(post.Comments.Count >= 0);
+                Assert.True(post.Comments.Count <= numComments);
+
+                List<Comment> commentsFetched = await _blogHandler.GetAllCommentsForPost(post.Id, 3);
+
+                Assert.True(commentsFetched.Count == 0);
+            }
+        }
+
+        [Fact]
+        public async Task GetAllCommentsForPost_InvalidPostId()
+        {
+
+            _context.Database.EnsureDeleted();
+            _context.Database.EnsureCreated();
+
+            int numComments = 20;
+
+            var comments = Enumerable.Range(1, numComments).Select(i => new Comment
+            {
+                Text = "WOOOT"
+            }).ToList();
+
+            var trackNameExample = "Example Track";
+            var location = Locations.EAST;
+            var blogPosts = Enumerable.Range(1, 2)
+                .Select(i => new BlogPost
+                {
+                    DateTimePosted = DateTime.Now.AddDays(-i),
+                    Comments = comments,
+                    TaggedTrack = new Track
+                    {
+                        Title = trackNameExample + "i",
+                        Location = location
+                    }
+                })
+                .ToList();
+
+            _context.BlogPosts.AddRange(blogPosts);
+            _context.SaveChanges();
+
+            List<BlogPost> posts = _context.BlogPosts.ToList();
+
+            foreach (var post in posts)
+            {
+                Assert.True(post.Comments != null, "Comment Value Are Null");
+                Assert.True(post.Comments.Count > 0);
+                Assert.True(post.Comments.Count <= numComments);
+
+                List<Comment> commentsFetched = await _blogHandler.GetAllCommentsForPost(100, 3);
+
+                Assert.True(commentsFetched.Count == 0);
+            }
         }
     }
 }
