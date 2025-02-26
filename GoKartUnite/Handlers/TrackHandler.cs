@@ -34,6 +34,10 @@ namespace GoKartUnite.Handlers
 
             if (prevTrackRecord == null)
             {
+                if (await _context.Track.AnyAsync(x => x.Title.ToLower() == track.Title.ToLower()))
+                {
+                    return false;
+                }
                 _context.Track.Add(track);
             }
             else
@@ -47,12 +51,12 @@ namespace GoKartUnite.Handlers
             return true;
         }
 
-        public async Task UpdateTrack(int id)
-        {
-            var track = await GetTrack(id, false);
-            _context.Track.Remove(track);
-            await _context.SaveChangesAsync();
-        }
+        //public async Task UpdateTrack(int id)
+        //{
+        //    var track = await GetTrack(id, false);
+        //    _context.Track.Remove(track);
+        //    await _context.SaveChangesAsync();
+        //}
 
         public async Task<bool> DeleteTrack(int id)
         {

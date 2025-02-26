@@ -93,7 +93,7 @@ namespace GoKartUnite.Handlers
             dbPost.Author = post.Author;
             dbPost.Title = post.Title;
             dbPost.AuthorId = post.Author.Id;
-            dbPost.Descripttion = post.Descripttion;
+            dbPost.Description = post.Descripttion;
             dbPost.TaggedTrack = post.TaggedTrack ?? null;
 
 
@@ -112,7 +112,7 @@ namespace GoKartUnite.Handlers
                 BlogPostView post = new BlogPostView();
                 post.Id = bp.Id;
                 post.Title = bp.Title;
-                post.Descripttion = bp.Descripttion;
+                post.Descripttion = bp.Description;
                 post.Author = bp.Author;
                 post.Upvotes = bp.Upvotes.Count;
                 post.TaggedTrack = bp.TaggedTrack;

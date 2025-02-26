@@ -7,7 +7,7 @@ namespace GoKartUnite.Interfaces
     {
         Task<Track?> GetTrack(int id, bool? getKarters);
         Task<bool> AddTrack(Track track);
-        Task UpdateTrack(int id);
+        //Task UpdateTrack(int id);
         Task<bool> DeleteTrack(int id);
         Task<List<Track>> GetAllTracks();
         Task<List<string>> GetAllTrackTitles();

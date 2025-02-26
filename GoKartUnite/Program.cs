@@ -176,7 +176,7 @@ namespace GoKartUnite
                 {
                     AuthorId = 4041,
                     Title = "NewestPost",
-                    Descripttion = "This is for NewBuckmore",
+                    Description = "This is for NewBuckmore",
                     TaggedTrackId = 1014
                 };
 
@@ -185,7 +185,7 @@ namespace GoKartUnite
                 {
                     AuthorId = 4033,
                     Title = "NewestPost",
-                    Descripttion = "This is for Alt",
+                    Description = "This is for Alt",
                     TaggedTrackId = 1016
                 };
 

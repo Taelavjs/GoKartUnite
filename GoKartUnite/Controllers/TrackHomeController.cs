@@ -75,15 +75,15 @@ namespace GoKartUnite.Controllers
         }
 
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Track, Admin")]
-        [AccountConfirmed]
-        public async Task<IActionResult> Edit(int id)
-        {
-            _tracks.UpdateTrack(id);
-            return View("Details");
-        }
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //[Authorize(Roles = "Track, Admin")]
+        //[AccountConfirmed]
+        //public async Task<IActionResult> Edit(int id)
+        //{
+        //    _tracks.UpdateTrack(id);
+        //    return View("Details");
+        //}
 
         [HttpPost]
         [ValidateAntiForgeryToken]

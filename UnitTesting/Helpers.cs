@@ -19,5 +19,9 @@ namespace UnitTesting
 
             };
         }
+        public static Track GenerateValidTrack(string initialName, int iter = 0, Locations location = Locations.NORTHEAST)
+        {
+            return new Track { Title = initialName + iter, Location = location };
+        }
     }
 }
