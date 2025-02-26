@@ -663,6 +663,95 @@ namespace UnitTesting
                 Assert.True(commentsFetched.Count == 0);
             }
         }
+
+        [Fact]
+        public async Task GetPostsForTrack_ValidInputs()
+        {
+            _context.Database.EnsureDeleted();
+            _context.Database.EnsureCreated();
+
+            var trackNameExample = "Example Track";
+            var location = Locations.EAST;
+            var blogPosts = Enumerable.Range(1, 30)
+                .Select(i => new BlogPost
+                {
+                    DateTimePosted = DateTime.Now.AddDays(-i),
+                    TaggedTrack = new Track
+                    {
+                        Title = trackNameExample + i % 2,
+                        Location = location
+                    }
+                })
+                .ToList();
+
+            _context.BlogPosts.AddRange(blogPosts);
+            _context.SaveChanges();
+
+            List<BlogPost> posts = await _blogHandler.GetPostsForTrack(trackNameExample + "1", 10);
+
+            Assert.Equal(10, posts.Count);
+            foreach (var post in posts)
+            {
+                Assert.True(post.TaggedTrack.Title == trackNameExample + "1");
+            }
+        }
+
+
+        [Fact]
+        public async Task GetPostsForTrack_InValidTrackName()
+        {
+            _context.Database.EnsureDeleted();
+            _context.Database.EnsureCreated();
+
+            var trackNameExample = "Example Track";
+            var location = Locations.EAST;
+            var blogPosts = Enumerable.Range(1, 10)
+                .Select(i => new BlogPost
+                {
+                    DateTimePosted = DateTime.Now.AddDays(-i),
+                    TaggedTrack = new Track
+                    {
+                        Title = trackNameExample + i % 2,
+                        Location = location
+                    }
+                })
+                .ToList();
+
+            _context.BlogPosts.AddRange(blogPosts);
+            _context.SaveChanges();
+
+            List<BlogPost> posts = await _blogHandler.GetPostsForTrack("InvalidName", 10);
+
+            Assert.Equal(0, posts.Count);
+        }
+
+        [Fact]
+        public async Task GetPostsForTrack_InValidCountReques()
+        {
+            _context.Database.EnsureDeleted();
+            _context.Database.EnsureCreated();
+
+            var trackNameExample = "Example Track";
+            var location = Locations.EAST;
+            var blogPosts = Enumerable.Range(1, 10)
+                .Select(i => new BlogPost
+                {
+                    DateTimePosted = DateTime.Now.AddDays(-i),
+                    TaggedTrack = new Track
+                    {
+                        Title = trackNameExample + i % 2,
+                        Location = location
+                    }
+                })
+                .ToList();
+
+            _context.BlogPosts.AddRange(blogPosts);
+            _context.SaveChanges();
+
+            List<BlogPost> posts = await _blogHandler.GetPostsForTrack(trackNameExample + "1", -2);
+
+            Assert.Equal(0, posts.Count);
+        }
     }
 }
 
