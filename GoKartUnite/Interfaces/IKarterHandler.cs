@@ -13,7 +13,7 @@ namespace GoKartUnite.Interfaces
         Task<bool> SendFriendRequest(Karter sentBy, Karter requestedTo);
         Task<List<Karter>> GetAllUsers(KarterGetAllUsersFilter? options = null);
         Task<int> GetNumberOfUserPages(string track, int usersPerPage = 3);
-        Task<List<Karter>> GetAllUsersByTrackId(int id);
+        Task<List<Karter>> GetAllUsersByTrackId(int id, KarterGetAllUsersFilter? options = null);
         Task CreateUser(Karter karter, string email);
         Task<Karter> GetUserByGoogleId(string GoogleId, bool withTrack = false);
         Task<List<KarterView>> KarterModelToView(List<Karter> karters);

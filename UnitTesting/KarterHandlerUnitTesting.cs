@@ -210,5 +210,41 @@ namespace UnitTesting
             }
         }
 
+        [Fact]
+        public async Task GetAllKartersAtTrack_ValidInputs_KartersPresent()
+        {
+            await ResetDatabase();
+            Track t = Helpers.GenerateValidTrack("Test");
+
+            for (int i = 0; i < 5; i++)
+            {
+                Karter k = Helpers.GenerateValidKarters("Der", i);
+                k.Track = t;
+                k.TrackId = t.Id;
+                _context.Karter.Add(k);
+            }
+
+            _context.SaveChanges();
+
+            List<Karter> returned = await _karterHandler.GetAllUsersByTrackId(t.Id);
+
+            Assert.NotNull(returned);
+            Assert.Equal(5, returned.Count);
+
+        }
+
+        [Fact]
+        public async Task GetAllKartersAtTrack_ValidInputs_NonePresent()
+        {
+            await ResetDatabase();
+
+            _context.SaveChanges();
+
+            List<Karter> returned = await _karterHandler.GetAllUsersByTrackId(1);
+
+            Assert.NotNull(returned);
+            Assert.Equal(0, returned.Count);
+        }
+
     }
 }

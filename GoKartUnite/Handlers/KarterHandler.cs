@@ -129,9 +129,13 @@ namespace GoKartUnite.Handlers
             return _context.Karter.Include(k => k.Track).Count() / usersPerPage;
         }
 
-        public async Task<List<Karter>> GetAllUsersByTrackId(int id)
+        public async Task<List<Karter>> GetAllUsersByTrackId(int id, KarterGetAllUsersFilter? options = null)
         {
-            var karters = await _context.Karter
+            var query = _context.Karter.AsQueryable();
+            query = await QueryFilterIncludeOptions(options, query);
+
+
+            var karters = await query
                 .Where(k => k.TrackId == id)
                 .ToListAsync();
 
