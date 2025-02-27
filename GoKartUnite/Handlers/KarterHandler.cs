@@ -27,33 +27,7 @@ namespace GoKartUnite.Handlers
                 options = new KarterGetAllUsersFilter();
             }
             var query = _context.Karter.AsQueryable();
-            if (options.IncludeTrack)
-            {
-                query = query.Include(k => k.Track);
-            }
-
-            if (options.IncludeNotification)
-            {
-                query = query.Include(k => k.Notification);
-            }
-            if (options.IncludeBlogPosts)
-            {
-                query = query.Include(k => k.BlogPosts);
-            }
-            if (options.IncludeFriendships)
-            {
-                query = query.Include(k => k.Friendships);
-            }
-            if (options.IncludeUserRoles)
-            {
-                query = query.Include(k => k.UserRoles);
-            }
-
-            if (!string.IsNullOrEmpty(options.TrackToFetchFor))
-            {
-                query = query.Where(k => k.Track != null && k.Track.Title == options.TrackToFetchFor);
-            }
-
+            query = await QueryFilterIncludeOptions(options, query);
 
             var karterInDb = await query.SingleOrDefaultAsync(x => x.Id == id);
             return karterInDb;
@@ -66,33 +40,7 @@ namespace GoKartUnite.Handlers
                 options = new KarterGetAllUsersFilter();
             }
             var query = _context.Karter.AsQueryable();
-            if (options.IncludeTrack)
-            {
-                query = query.Include(k => k.Track);
-            }
-
-            if (options.IncludeNotification)
-            {
-                query = query.Include(k => k.Notification);
-            }
-            if (options.IncludeBlogPosts)
-            {
-                query = query.Include(k => k.BlogPosts);
-            }
-            if (options.IncludeFriendships)
-            {
-                query = query.Include(k => k.Friendships);
-            }
-            if (options.IncludeUserRoles)
-            {
-                query = query.Include(k => k.UserRoles);
-            }
-
-            if (!string.IsNullOrEmpty(options.TrackToFetchFor))
-            {
-                query = query.Where(k => k.Track != null && k.Track.Title == options.TrackToFetchFor);
-            }
-
+            query = await QueryFilterIncludeOptions(options, query);
 
             var karterInDb = await query.SingleOrDefaultAsync(k => k.Name.ToLower() == name.ToLower());
             return karterInDb;
@@ -106,8 +54,6 @@ namespace GoKartUnite.Handlers
                 .Where(f => f.KarterFirstId == karter.Id || f.KarterSecondId == karter.Id).ToListAsync();
             _context.Friendships.RemoveRange(friendshipsToRemove);
 
-
-
             _context.Karter.Remove(karter);
             await _context.SaveChangesAsync();
         }
@@ -116,38 +62,6 @@ namespace GoKartUnite.Handlers
         {
             await DeleteUser(await GetUser(id));
         }
-
-        //public async Task<bool> SendFriendRequestByName(string friendsName, string GoogleId)
-        //{
-        //    var karter2 = await GetUserByGoogleId(GoogleId);
-        //    var karter = await GetUser(friendsName);
-        //    if (karter == null || karter2 == null)
-        //    {
-        //        return false;
-        //    }
-
-        //    if (karter.Id > karter2.Id)
-        //    {
-        //        (karter, karter2) = (karter2, karter);
-        //    }
-
-        //    var ifExists = await _context.Friendships.FindAsync(karter.Id, karter2.Id); // uupdate when all handlers created
-        //    if (ifExists != null || karter.Id == karter2.Id)
-        //    {
-        //        //var modelErrText = karter.Id == karter2.Id ? "Cannot send a friend request to yourself" : "You are already friends <3";
-        //        //ModelState.AddModelError(string.Empty, modelErrText);
-        //        return false;
-        //    }
-
-        //    var friendship = new Friendships(karter.Id, karter2.Id);
-        //    _context.Attach(karter);
-        //    _context.Attach(karter2);
-
-        //    await _context.Friendships.AddAsync(friendship);
-        //    await _context.SaveChangesAsync();
-
-        //    return true;
-        //}
 
         public async Task<bool> SendFriendRequest(Karter sentBy, Karter requestedTo)
         {
@@ -165,8 +79,6 @@ namespace GoKartUnite.Handlers
             var ifExists = await _context.Friendships.FindAsync(sentBy.Id, requestedTo.Id); // uupdate when all handlers created
             if (ifExists != null || sentBy.Id == requestedTo.Id)
             {
-                //var modelErrText = karter.Id == karter2.Id ? "Cannot send a friend request to yourself" : "You are already friends <3";
-                //ModelState.AddModelError(string.Empty, modelErrText);
                 return false;
             }
 
@@ -189,32 +101,7 @@ namespace GoKartUnite.Handlers
                 options = new KarterGetAllUsersFilter();
             }
             var query = _context.Karter.AsQueryable();
-            if (options.IncludeTrack)
-            {
-                query = query.Include(k => k.Track);
-            }
-
-            if (options.IncludeNotification)
-            {
-                query = query.Include(k => k.Notification);
-            }
-            if (options.IncludeBlogPosts)
-            {
-                query = query.Include(k => k.BlogPosts);
-            }
-            if (options.IncludeFriendships)
-            {
-                query = query.Include(k => k.Friendships);
-            }
-            if (options.IncludeUserRoles)
-            {
-                query = query.Include(k => k.UserRoles);
-            }
-
-            if (!string.IsNullOrEmpty(options.TrackToFetchFor))
-            {
-                query = query.Where(k => k.Track != null && k.Track.Title == options.TrackToFetchFor);
-            }
+            query = await QueryFilterIncludeOptions(options, query);
 
             switch (options.sort)
             {
@@ -329,5 +216,41 @@ namespace GoKartUnite.Handlers
             _context.SaveChanges();
         }
 
+        private async Task<IQueryable<Karter>> QueryFilterIncludeOptions(KarterGetAllUsersFilter options, IQueryable<Karter> query)
+        {
+            if (options == null)
+            {
+                options = new KarterGetAllUsersFilter();
+            }
+
+            if (options.IncludeTrack)
+            {
+                query = query.Include(k => k.Track);
+            }
+
+            if (options.IncludeNotification)
+            {
+                query = query.Include(k => k.Notification);
+            }
+            if (options.IncludeBlogPosts)
+            {
+                query = query.Include(k => k.BlogPosts);
+            }
+            if (options.IncludeFriendships)
+            {
+                query = query.Include(k => k.Friendships);
+            }
+            if (options.IncludeUserRoles)
+            {
+                query = query.Include(k => k.UserRoles);
+            }
+
+            if (!string.IsNullOrEmpty(options.TrackToFetchFor))
+            {
+                query = query.Where(k => k.Track != null && k.Track.Title == options.TrackToFetchFor);
+            }
+
+            return query;
+        }
     }
 }
