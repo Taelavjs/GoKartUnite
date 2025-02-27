@@ -25,15 +25,20 @@ namespace GoKartUnite.Handlers
 
         public async Task<Karter> GetUser(string name)
         {
-            var karterInDb = await _context.Karter.SingleOrDefaultAsync(k => k.Name.ToLower() == name);
+            var karterInDb = await _context.Karter.SingleOrDefaultAsync(k => k.Name.ToLower() == name.ToLower());
             return karterInDb;
         }
 
         public async Task DeleteUser(Karter karter)
         {
+            if (await GetUser(karter.Id) != karter) return;
+
             var friendshipsToRemove = await _context.Friendships
                 .Where(f => f.KarterFirstId == karter.Id || f.KarterSecondId == karter.Id).ToListAsync();
             _context.Friendships.RemoveRange(friendshipsToRemove);
+
+
+
             _context.Karter.Remove(karter);
             await _context.SaveChangesAsync();
         }
@@ -43,65 +48,63 @@ namespace GoKartUnite.Handlers
             await DeleteUser(await GetUser(id));
         }
 
-        public async Task<bool> SendFriendRequestByName(string friendsName, string GoogleId)
+        //public async Task<bool> SendFriendRequestByName(string friendsName, string GoogleId)
+        //{
+        //    var karter2 = await GetUserByGoogleId(GoogleId);
+        //    var karter = await GetUser(friendsName);
+        //    if (karter == null || karter2 == null)
+        //    {
+        //        return false;
+        //    }
+
+        //    if (karter.Id > karter2.Id)
+        //    {
+        //        (karter, karter2) = (karter2, karter);
+        //    }
+
+        //    var ifExists = await _context.Friendships.FindAsync(karter.Id, karter2.Id); // uupdate when all handlers created
+        //    if (ifExists != null || karter.Id == karter2.Id)
+        //    {
+        //        //var modelErrText = karter.Id == karter2.Id ? "Cannot send a friend request to yourself" : "You are already friends <3";
+        //        //ModelState.AddModelError(string.Empty, modelErrText);
+        //        return false;
+        //    }
+
+        //    var friendship = new Friendships(karter.Id, karter2.Id);
+        //    _context.Attach(karter);
+        //    _context.Attach(karter2);
+
+        //    await _context.Friendships.AddAsync(friendship);
+        //    await _context.SaveChangesAsync();
+
+        //    return true;
+        //}
+
+        public async Task<bool> SendFriendRequest(Karter sentBy, Karter requestedTo)
         {
-            var karter2 = await GetUserByGoogleId(GoogleId);
-            var karter = await GetUser(friendsName);
-            if (karter == null || karter2 == null)
+            int sentById = sentBy.Id;
+            if (sentBy == null || requestedTo == null)
             {
                 return false;
             }
 
-            if (karter.Id > karter2.Id)
+            if (sentBy.Id > requestedTo.Id)
             {
-                (karter, karter2) = (karter2, karter);
+                (sentBy, requestedTo) = (requestedTo, sentBy);
             }
 
-            var ifExists = await _context.Friendships.FindAsync(karter.Id, karter2.Id); // uupdate when all handlers created
-            if (ifExists != null || karter.Id == karter2.Id)
+            var ifExists = await _context.Friendships.FindAsync(sentBy.Id, requestedTo.Id); // uupdate when all handlers created
+            if (ifExists != null || sentBy.Id == requestedTo.Id)
             {
                 //var modelErrText = karter.Id == karter2.Id ? "Cannot send a friend request to yourself" : "You are already friends <3";
                 //ModelState.AddModelError(string.Empty, modelErrText);
                 return false;
             }
 
-            var friendship = new Friendships(karter.Id, karter2.Id);
-            _context.Attach(karter);
-            _context.Attach(karter2);
-
-            await _context.Friendships.AddAsync(friendship);
-            await _context.SaveChangesAsync();
-
-            return true;
-        }
-
-        public async Task<bool> SendFriendRequestById(int friendId, string GoogleId)
-        {
-            var karter2 = await GetUserByGoogleId(GoogleId);
-            int sentBy = karter2.Id;
-            var karter = await GetUser(friendId);
-            if (karter == null || karter2 == null)
-            {
-                return false;
-            }
-
-            if (karter.Id > karter2.Id)
-            {
-                (karter, karter2) = (karter2, karter);
-            }
-
-            var ifExists = await _context.Friendships.FindAsync(karter.Id, karter2.Id); // uupdate when all handlers created
-            if (ifExists != null || karter.Id == karter2.Id)
-            {
-                //var modelErrText = karter.Id == karter2.Id ? "Cannot send a friend request to yourself" : "You are already friends <3";
-                //ModelState.AddModelError(string.Empty, modelErrText);
-                return false;
-            }
-
-            var friendship = new Friendships(karter.Id, karter2.Id);
-            _context.Attach(karter);
-            _context.Attach(karter2);
-            friendship.requestedByInt = sentBy;
+            var friendship = new Friendships(sentBy.Id, requestedTo.Id);
+            _context.Attach(sentBy);
+            _context.Attach(requestedTo);
+            friendship.requestedByInt = sentById;
 
             await _context.Friendships.AddAsync(friendship);
             await _context.SaveChangesAsync();

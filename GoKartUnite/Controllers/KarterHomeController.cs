@@ -215,32 +215,15 @@ namespace GoKartUnite.Controllers
         [Authorize]
         [AccountConfirmed]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SendFriendRequestByName(string friendId)
-        {
-            string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-
-            if (!await _karters.SendFriendRequestByName(friendId, googleId))
-            {
-                return View("Index");
-            }
-
-
-            return View("Index");
-        }
-        [HttpPost]
-        [Authorize]
-        [AccountConfirmed]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SendFriendRequestById(int friendId)
         {
             string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-
-            if (!await _karters.SendFriendRequestById(friendId, googleId))
+            Karter sentBy = await _karters.GetUserByGoogleId(googleId);
+            Karter sendTo = await _karters.GetUser(friendId);
+            if (!await _karters.SendFriendRequest(sentBy, sendTo))
             {
                 return View("Index");
             }
-
-
             return View("Index");
         }
 

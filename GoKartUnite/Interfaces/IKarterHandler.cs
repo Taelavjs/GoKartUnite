@@ -9,8 +9,7 @@ namespace GoKartUnite.Interfaces
         Task<Karter> GetUser(string name);
         Task DeleteUser(Karter karter);
         Task DeleteUser(int id);
-        Task<bool> SendFriendRequestByName(string friendsName, string GoogleId);
-        Task<bool> SendFriendRequestById(int friendId, string GoogleId);
+        Task<bool> SendFriendRequest(Karter sentBy, Karter requestedTo);
         Task<List<Karter>> GetAllUsers(bool fetchTracks, string? track = null, int pageNo = 0, int usersPerPage = 3, SortKartersBy sort = SortKartersBy.Alphabetically);
         Task<int> GetNumberOfUserPages(string track, int usersPerPage = 3);
         Task<List<Karter>> GetAllUsersByTrackId(int id);
