@@ -6,6 +6,8 @@ using System.Security.Claims;
 using GoKartUnite.ViewModel;
 using Microsoft.IdentityModel.Tokens;
 using GoKartUnite.Interfaces;
+using GoKartUnite.DataFilterOptions;
+using Microsoft.Extensions.Options;
 
 namespace GoKartUnite.Handlers
 {
@@ -17,15 +19,82 @@ namespace GoKartUnite.Handlers
             _context = context;
         }
 
-        public async Task<Karter> GetUser(int id)
+        public async Task<Karter> GetUser(int id, KarterGetAllUsersFilter? options = null)
         {
-            var karterInDb = await _context.Karter.SingleOrDefaultAsync(x => x.Id == id);
+
+            if (options == null)
+            {
+                options = new KarterGetAllUsersFilter();
+            }
+            var query = _context.Karter.AsQueryable();
+            if (options.IncludeTrack)
+            {
+                query = query.Include(k => k.Track);
+            }
+
+            if (options.IncludeNotification)
+            {
+                query = query.Include(k => k.Notification);
+            }
+            if (options.IncludeBlogPosts)
+            {
+                query = query.Include(k => k.BlogPosts);
+            }
+            if (options.IncludeFriendships)
+            {
+                query = query.Include(k => k.Friendships);
+            }
+            if (options.IncludeUserRoles)
+            {
+                query = query.Include(k => k.UserRoles);
+            }
+
+            if (!string.IsNullOrEmpty(options.TrackToFetchFor))
+            {
+                query = query.Where(k => k.Track != null && k.Track.Title == options.TrackToFetchFor);
+            }
+
+
+            var karterInDb = await query.SingleOrDefaultAsync(x => x.Id == id);
             return karterInDb;
         }
 
-        public async Task<Karter> GetUser(string name)
+        public async Task<Karter> GetUser(string name, KarterGetAllUsersFilter? options = null)
         {
-            var karterInDb = await _context.Karter.SingleOrDefaultAsync(k => k.Name.ToLower() == name.ToLower());
+            if (options == null)
+            {
+                options = new KarterGetAllUsersFilter();
+            }
+            var query = _context.Karter.AsQueryable();
+            if (options.IncludeTrack)
+            {
+                query = query.Include(k => k.Track);
+            }
+
+            if (options.IncludeNotification)
+            {
+                query = query.Include(k => k.Notification);
+            }
+            if (options.IncludeBlogPosts)
+            {
+                query = query.Include(k => k.BlogPosts);
+            }
+            if (options.IncludeFriendships)
+            {
+                query = query.Include(k => k.Friendships);
+            }
+            if (options.IncludeUserRoles)
+            {
+                query = query.Include(k => k.UserRoles);
+            }
+
+            if (!string.IsNullOrEmpty(options.TrackToFetchFor))
+            {
+                query = query.Where(k => k.Track != null && k.Track.Title == options.TrackToFetchFor);
+            }
+
+
+            var karterInDb = await query.SingleOrDefaultAsync(k => k.Name.ToLower() == name.ToLower());
             return karterInDb;
         }
 
@@ -112,20 +181,42 @@ namespace GoKartUnite.Handlers
             return true;
         }
 
-        public async Task<List<Karter>> GetAllUsers(bool fetchTracks, string? track = null, int pageNo = 0, int usersPerPage = 3, SortKartersBy sort = SortKartersBy.Alphabetically)
+        public async Task<List<Karter>> GetAllUsers(KarterGetAllUsersFilter? options = null)
         {
+
+            if (options == null)
+            {
+                options = new KarterGetAllUsersFilter();
+            }
             var query = _context.Karter.AsQueryable();
-            if (fetchTracks)
+            if (options.IncludeTrack)
             {
                 query = query.Include(k => k.Track);
             }
 
-            if (!string.IsNullOrEmpty(track))
+            if (options.IncludeNotification)
             {
-                query = query.Where(k => k.Track != null && k.Track.Title == track);
+                query = query.Include(k => k.Notification);
+            }
+            if (options.IncludeBlogPosts)
+            {
+                query = query.Include(k => k.BlogPosts);
+            }
+            if (options.IncludeFriendships)
+            {
+                query = query.Include(k => k.Friendships);
+            }
+            if (options.IncludeUserRoles)
+            {
+                query = query.Include(k => k.UserRoles);
             }
 
-            switch (sort)
+            if (!string.IsNullOrEmpty(options.TrackToFetchFor))
+            {
+                query = query.Where(k => k.Track != null && k.Track.Title == options.TrackToFetchFor);
+            }
+
+            switch (options.sort)
             {
                 case SortKartersBy.Alphabetically:
                     query = query.OrderBy(k => k.Name);
@@ -141,7 +232,7 @@ namespace GoKartUnite.Handlers
                     break;
             }
 
-            query = query.Skip(pageNo * usersPerPage).Take(usersPerPage);
+            query = query.Skip(options.pageNo * options.pageSize).Take(options.pageSize);
             return await query.ToListAsync();
 
         }

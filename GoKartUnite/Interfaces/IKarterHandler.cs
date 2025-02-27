@@ -1,16 +1,17 @@
-﻿using GoKartUnite.Models;
+﻿using GoKartUnite.DataFilterOptions;
+using GoKartUnite.Models;
 using GoKartUnite.ViewModel;
 
 namespace GoKartUnite.Interfaces
 {
     public interface IKarterHandler
     {
-        Task<Karter> GetUser(int id);
-        Task<Karter> GetUser(string name);
+        Task<Karter> GetUser(int id, KarterGetAllUsersFilter? options = null);
+        Task<Karter> GetUser(string name, KarterGetAllUsersFilter? options = null);
         Task DeleteUser(Karter karter);
         Task DeleteUser(int id);
         Task<bool> SendFriendRequest(Karter sentBy, Karter requestedTo);
-        Task<List<Karter>> GetAllUsers(bool fetchTracks, string? track = null, int pageNo = 0, int usersPerPage = 3, SortKartersBy sort = SortKartersBy.Alphabetically);
+        Task<List<Karter>> GetAllUsers(KarterGetAllUsersFilter? options = null);
         Task<int> GetNumberOfUserPages(string track, int usersPerPage = 3);
         Task<List<Karter>> GetAllUsersByTrackId(int id);
         Task CreateUser(Karter karter, string email);

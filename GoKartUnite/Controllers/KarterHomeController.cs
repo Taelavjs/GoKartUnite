@@ -12,6 +12,7 @@ using Microsoft.Identity.Client;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using GoKartUnite.Interfaces;
+using GoKartUnite.DataFilterOptions;
 
 namespace GoKartUnite.Controllers
 {
@@ -80,7 +81,12 @@ namespace GoKartUnite.Controllers
 
             Karter k = await _karters.GetUserByGoogleId(googleId);
 
-            List<Karter> karters = await _karters.GetAllUsers(true);
+
+            KarterGetAllUsersFilter filter = new KarterGetAllUsersFilter
+            {
+                IncludeTrack = true,
+            };
+            List<Karter> karters = await _karters.GetAllUsers(filter);
             List<KarterView> karterViews = await _karters.KarterModelToView(karters);
 
             karterViews = await _friendships.AddStatusToKarters(karterViews, k.Id);
@@ -97,7 +103,14 @@ namespace GoKartUnite.Controllers
             Karter k = await _karters.GetUserByGoogleId(googleId);
             ViewBag.TotalPages = await _karters.GetNumberOfUserPages(track);
             page = Math.Max(0, Math.Min(page, ViewBag.TotalPages));
-            List<Karter> karters = await _karters.GetAllUsers(false, track, page <= 0 ? 0 : page - 1, sort: sortby);
+
+            KarterGetAllUsersFilter filter = new KarterGetAllUsersFilter
+            {
+                pageNo = page <= 0 ? 0 : page - 1,
+                sort = sortby,
+            };
+
+            List<Karter> karters = await _karters.GetAllUsers(filter);
             List<KarterView> karterViews = await _karters.KarterModelToView(karters);
 
             karterViews = await _friendships.AddStatusToKarters(karterViews, k.Id);

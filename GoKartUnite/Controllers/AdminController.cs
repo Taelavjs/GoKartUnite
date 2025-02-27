@@ -1,4 +1,5 @@
-﻿using GoKartUnite.Handlers;
+﻿using GoKartUnite.DataFilterOptions;
+using GoKartUnite.Handlers;
 using GoKartUnite.Interfaces;
 using GoKartUnite.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +22,11 @@ namespace GoKartUnite.Controllers
 
         public async Task<IActionResult> ManageUsers()
         {
-            List<Karter> karters = await _karter.GetAllUsers(true);
+            KarterGetAllUsersFilter filter = new KarterGetAllUsersFilter
+            {
+                IncludeTrack = true
+            };
+            List<Karter> karters = await _karter.GetAllUsers(filter);
             return View(karters);
         }
     }
