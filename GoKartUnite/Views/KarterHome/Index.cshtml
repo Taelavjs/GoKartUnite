@@ -83,4 +83,12 @@
 		</table>
 	</div>
 	</div>
+
+
+	@await Html.PartialAsync("_CreateKarterStatTrack", new GoKartUnite.ViewModel.KarterStatAddPage
+	{
+		trackTitle = Model.trackTitles,
+		statToBeCreated = new GoKartUnite.ViewModel.KarterTrackStatsViewModel()
+	})
+
 </div>

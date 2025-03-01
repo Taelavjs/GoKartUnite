@@ -14,6 +14,7 @@ namespace GoKartUnite.Models
         // Relationships
         public virtual ICollection<Karter>? Karters { get; set; }
         public virtual ICollection<BlogPost>? BlogPosts { get; set; }
+        public virtual ICollection<KarterTrackStats>? KarterStats { get; set; }
     }
 
     public enum Locations

@@ -84,6 +84,7 @@ namespace GoKartUnite.Handlers
 
         public async Task<List<string>> GetAllTrackTitles()
         {
+            var test = await _context.Track.Select(track => track.Title).ToListAsync();
             return await _context.Track.Select(track => track.Title).ToListAsync();
         }
 

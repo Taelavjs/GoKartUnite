@@ -7,6 +7,7 @@
         public int RaceLength { get; set; }
         public bool isChampionshipRace { get; set; } = false;
         public Track? Track { get; set; }
+        public Karter? Karter { get; set; }
         public DateTime DateOnlyRecorded { get; set; } = DateTime.Today;
         public WEATHERSTATUS WEATHERSTATUS { get; set; } = WEATHERSTATUS.None;
         public TEMPERATURE TEMPERATURE { get; set; } = TEMPERATURE.None;

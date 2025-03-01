@@ -1,0 +1,63 @@
+﻿@*
+	For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model GoKartUnite.ViewModel.KarterStatAddPage
+@using GoKartUnite.Models
+<form asp-action="CreatTrackStat">
+	<div class="mb-3">
+		<label asp-for="statToBeCreated.RaceName" class="form-label">Race Name</label>
+		<input asp-for="statToBeCreated.WEATHERSTATUS" type="text" class="form-control" id="RaceName" name="RaceName" required minlength="5" maxlength="10" placeholder="Enter Race Name">
+		<div class="invalid-feedback">Please enter a race name between 5 and 10 characters.</div>
+	</div>
+
+	<div class="mb-3">
+		<label asp-for="statToBeCreated.RaceLength" for="RaceLength" class="form-label">Race Length (in minutes)</label>
+		<input asp-for="statToBeCreated.RaceLength" type="number" class="form-control" id="RaceLength" name="RaceLength" required min="1" max="1440" placeholder="Enter Race Length">
+	</div>
+
+	<div class="mb-3 form-check">
+		<input asp-for="statToBeCreated.isChampionshipRace" type="checkbox" class="form-check-input" id="isChampionshipRace" name="isChampionshipRace">
+		<label asp-for="statToBeCreated.isChampionshipRace" class="form-check-label" for="isChampionshipRace">Is Championship Race</label>
+	</div>
+
+	<div class="mb-3">
+		<label asp-for="statToBeCreated.trackTitle" for="TrackId" class="form-label">Track ID</label>
+		<select asp-for="statToBeCreated.trackTitle" class="form-select" required>
+			@foreach (var status in Model.trackTitle)
+			{
+					<option value="@status">@status</option>
+			}
+		</select>	</div>
+
+	<div class="mb-3">
+		<label asp-for="statToBeCreated.DateOnlyRecorded" for="DateOnlyRecorded" class="form-label">Date Recorded</label>
+		<input asp-for="statToBeCreated.DateOnlyRecorded" type="date" class="form-control" id="DateOnlyRecorded" name="DateOnlyRecorded" required value="{{ DateTime.Today }}">
+	</div>
+
+	<div class="mb-3">
+		<label asp-for="statToBeCreated.WEATHERSTATUS" for="WEATHERSTATUS" class="form-label">Weather Status</label>
+		<select asp-for="statToBeCreated.WEATHERSTATUS" class="form-select" id="WEATHERSTATUS" name="WEATHERSTATUS" required>
+			@foreach (var status in Enum.GetValues(typeof(GoKartUnite.Models.WEATHERSTATUS)))
+			{
+				<option value="@status">@status</option>
+			}
+		</select>
+	</div>
+
+	<div class="mb-3">
+		<label asp-for="statToBeCreated.WEATHERSTATUS" for="TEMPERATURE" class="form-label">Temperature</label>
+		<select asp-for="statToBeCreated.WEATHERSTATUS" class="form-select" id="TEMPERATURE" name="TEMPERATURE" required>
+			@foreach (var status in Enum.GetValues(typeof(GoKartUnite.Models.TEMPERATURE)))
+			{
+					<option value="@status">@status</option>
+			}
+		</select>
+	</div>
+
+	<div class="mb-3">
+		<label asp-for="statToBeCreated.BestLapTime" for="BestLapTime" class="form-label">Best Lap Time (Minutes :: Seconds :: MilliSeconds</label>
+		<input asp-for="statToBeCreated.BestLapTime" type="time" class="form-control" id="BestLapTime" name="BestLapTime" required step="1" min="00:20" max="10:00" placeholder="Best Lap Time">
+	</div>
+
+	<button type="submit" class="btn btn-primary">Submit</button>
+</form>

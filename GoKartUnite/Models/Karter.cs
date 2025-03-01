@@ -32,6 +32,8 @@ namespace GoKartUnite.Models
         public virtual ICollection<Friendships>? Friendships { get; set; }
         public virtual ICollection<BlogPost>? BlogPosts { get; set; }
         public ICollection<BlogNotifications>? Notification { get; set; }
+        public ICollection<KarterTrackStats>? Stats { get; set; }
+
 
 
     }

@@ -10,14 +10,17 @@ namespace GoKartUnite.ViewModel
         public string RaceName { get; set; } = string.Empty;
 
         [TimeSpanRangeAttribute("00:01:00", "24:00:00")]
-        public TimeSpan RaceLength { get; set; }
+        public int RaceLength { get; set; }
         public bool isChampionshipRace { get; set; } = false;
-        public Track? Track { get; set; }
+        public string trackTitle { get; set; }
         public DateTime DateOnlyRecorded { get; set; } = DateTime.Today;
         public WEATHERSTATUS WEATHERSTATUS { get; set; } = WEATHERSTATUS.None;
         public TEMPERATURE TEMPERATURE { get; set; } = TEMPERATURE.None;
         [TimeSpanRangeAttribute("00:00:20", "00:10:00")]
         public TimeSpan BestLapTime { get; set; }
+
+        public Track? track { get; set; }
+        public Karter? karter { get; set; }
     }
 
     public class TimeSpanRangeAttribute : ValidationAttribute

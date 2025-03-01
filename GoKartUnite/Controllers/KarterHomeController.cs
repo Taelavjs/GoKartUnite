@@ -49,7 +49,8 @@ namespace GoKartUnite.Controllers
                 karter = k,
                 karterFriends = await _karters.KarterModelToView(await _friendships.GetAllFriends(k.Id)),
                 karterFriendRequests = await _karters.KarterModelToView(await _friendships.GetAllFriendRequests(k.Id)),
-                sentFriendRequests = await _karters.KarterModelToView(await _friendships.GetAllSentRequests(k.Id))
+                sentFriendRequests = await _karters.KarterModelToView(await _friendships.GetAllSentRequests(k.Id)),
+                trackTitles = await _tracks.GetAllTrackTitles(),
             };
 
             // Adds Status to KarterView Lists
@@ -290,9 +291,21 @@ namespace GoKartUnite.Controllers
 
             await _friendships.RemoveFriendShip(k.Id, friendId);
         }
+        // ======================================
+        // FRIEND REQUEST METHODS
+        // ======================================
+
+        [HttpPost]
+        [Authorize]
+        [AccountConfirmed]
+        [ValidateAntiForgeryToken]
+        public async Task CreatTrackStat(KarterTrackStatsViewModel model)
+        {
+            return;
+        }
     }
 
-    // ======================================
-    // FRIEND REQUEST METHODS
-    // ======================================
+
+
+
 }
