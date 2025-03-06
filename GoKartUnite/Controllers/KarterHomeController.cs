@@ -22,9 +22,9 @@ namespace GoKartUnite.Controllers
         private readonly ITrackHandler _tracks;
         private readonly IRoleHandler _roles;
         private readonly IRelationshipHandler _friendships;
-        private readonly IKarterStat _statHandler;
+        private readonly IKarterStatHandler _statHandler;
 
-        public KarterHomeController(IKarterStat statHandler, IRelationshipHandler friendships, IKarterHandler karters, ITrackHandler tracks, IRoleHandler roles)
+        public KarterHomeController(IKarterStatHandler statHandler, IRelationshipHandler friendships, IKarterHandler karters, ITrackHandler tracks, IRoleHandler roles)
         {
             _karters = karters;
             _tracks = tracks;
@@ -313,6 +313,42 @@ namespace GoKartUnite.Controllers
             await _statHandler.CreateStatRecord(model, track, k, FormattedBestLapTime);
 
             return RedirectToAction("Index", model);
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<List<KarterStatViewModel>> GetKartersStats()
+        {
+            string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            var k = await _karters.GetUserByGoogleId(googleId);
+
+            return await ConvertModelToView(await _statHandler.GetStatsForKarter(k.Id));
+
+
+        }
+
+        private async Task<List<KarterStatViewModel>> ConvertModelToView(List<KarterTrackStats> stats)
+        {
+            List<KarterStatViewModel> StatsViewModel = new List<KarterStatViewModel>();
+            foreach (KarterTrackStats stat in stats)
+            {
+                KarterStatViewModel statViewModel = new KarterStatViewModel
+                {
+                    WEATHERSTATUS = stat.WEATHERSTATUS,
+                    BestLapTime = stat.BestLapTime.ToString(@"mm\:ss\:fff"),
+                    RaceLength = stat.RaceLength,
+                    isChampionshipRace = stat.isChampionshipRace,
+                    RaceName = stat.RaceName,
+                    TEMPERATURE = stat.TEMPERATURE,
+                    DateOnlyRecorded = stat.DateOnlyRecorded,
+                    TrackTitle = stat.RecordedTrack.Title,
+
+                };
+
+                StatsViewModel.Add(statViewModel);
+            }
+
+            return StatsViewModel;
         }
     }
 
