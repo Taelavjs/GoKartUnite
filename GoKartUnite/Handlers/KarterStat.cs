@@ -1,18 +1,19 @@
 ﻿using GoKartUnite.Data;
+using GoKartUnite.Interfaces;
 using GoKartUnite.Models;
 using GoKartUnite.ViewModel;
 
 namespace GoKartUnite.Handlers
 {
-    public class KarterTrackStatsHandler
+    public class KarterStat : IKarterStat
     {
         private readonly GoKartUniteContext _context;
-        public KarterTrackStatsHandler(GoKartUniteContext context, KarterHandler karterHandler, TrackHandler trackHandler)
+        public KarterStat(GoKartUniteContext context)
         {
-
+            _context = context;
         }
 
-        public async Task CreateStatRecord(KarterTrackStatsViewModel ViewModel, Track track)
+        public async Task CreateStatRecord(KarterStatViewModel ViewModel, Track track, Karter karter, TimeSpan BestLapFormatted)
         {
             if (track == null)
             {
@@ -22,16 +23,18 @@ namespace GoKartUnite.Handlers
             KarterTrackStats model = new KarterTrackStats
             {
                 RaceName = ViewModel.RaceName,
-                BestLapTime = ViewModel.BestLapTime,
+                BestLapTime = BestLapFormatted,
                 DateOnlyRecorded = ViewModel.DateOnlyRecorded,
                 isChampionshipRace = ViewModel.isChampionshipRace,
                 RaceLength = ViewModel.RaceLength,
                 TEMPERATURE = ViewModel.TEMPERATURE,
                 WEATHERSTATUS = ViewModel.WEATHERSTATUS,
-                Track = track,
+                RecordedTrack = track,
+                ForKarter = karter
             };
 
             _context.KarterTrackStats.Add(model);
+            _context.SaveChanges();
         }
     }
 }

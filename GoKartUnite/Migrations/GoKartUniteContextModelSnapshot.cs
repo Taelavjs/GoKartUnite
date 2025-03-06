@@ -199,6 +199,51 @@ namespace GoKartUnite.Migrations
                     b.ToTable("Karter");
                 });
 
+            modelBuilder.Entity("GoKartUnite.Models.KarterTrackStats", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<TimeSpan>("BestLapTime")
+                        .HasColumnType("time");
+
+                    b.Property<DateOnly>("DateOnlyRecorded")
+                        .HasColumnType("date");
+
+                    b.Property<int?>("ForKarterId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RaceLength")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RaceName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("RecordedTrackId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TEMPERATURE")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WEATHERSTATUS")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("isChampionshipRace")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ForKarterId");
+
+                    b.HasIndex("RecordedTrackId");
+
+                    b.ToTable("KarterTrackStats");
+                });
+
             modelBuilder.Entity("GoKartUnite.Models.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -414,6 +459,21 @@ namespace GoKartUnite.Migrations
                     b.Navigation("Track");
                 });
 
+            modelBuilder.Entity("GoKartUnite.Models.KarterTrackStats", b =>
+                {
+                    b.HasOne("GoKartUnite.Models.Karter", "ForKarter")
+                        .WithMany("Stats")
+                        .HasForeignKey("ForKarterId");
+
+                    b.HasOne("GoKartUnite.Models.Track", "RecordedTrack")
+                        .WithMany("KarterStats")
+                        .HasForeignKey("RecordedTrackId");
+
+                    b.Navigation("ForKarter");
+
+                    b.Navigation("RecordedTrack");
+                });
+
             modelBuilder.Entity("GoKartUnite.Models.TrackAdmins", b =>
                 {
                     b.HasOne("GoKartUnite.Models.Track", "ManagedTrack")
@@ -476,12 +536,16 @@ namespace GoKartUnite.Migrations
 
                     b.Navigation("Notification");
 
+                    b.Navigation("Stats");
+
                     b.Navigation("UserRoles");
                 });
 
             modelBuilder.Entity("GoKartUnite.Models.Track", b =>
                 {
                     b.Navigation("BlogPosts");
+
+                    b.Navigation("KarterStats");
 
                     b.Navigation("Karters");
                 });

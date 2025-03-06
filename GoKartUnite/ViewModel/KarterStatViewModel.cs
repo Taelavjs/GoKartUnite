@@ -1,26 +1,31 @@
 ﻿using GoKartUnite.Models;
+using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GoKartUnite.ViewModel
 {
-    public class KarterTrackStatsViewModel
+    public class KarterStatViewModel
     {
         [MinLength(5, ErrorMessage = "Please Minimuim 2 Characters")]
         [MaxLength(10, ErrorMessage = "Please Max 10 Characters")]
         public string RaceName { get; set; } = string.Empty;
+        [MinLength(5, ErrorMessage = "Please Minimuim 2 Characters")]
+        [MaxLength(10, ErrorMessage = "Please Max 10 Characters")]
+        public string TrackTitle { get; set; } = string.Empty;
+
 
         [TimeSpanRangeAttribute("00:01:00", "24:00:00")]
         public int RaceLength { get; set; }
         public bool isChampionshipRace { get; set; } = false;
-        public string trackTitle { get; set; }
-        public DateTime DateOnlyRecorded { get; set; } = DateTime.Today;
+
+        public DateOnly DateOnlyRecorded { get; set; } = DateOnly.FromDateTime(DateTime.Now);
         public WEATHERSTATUS WEATHERSTATUS { get; set; } = WEATHERSTATUS.None;
         public TEMPERATURE TEMPERATURE { get; set; } = TEMPERATURE.None;
-        [TimeSpanRangeAttribute("00:00:20", "00:10:00")]
-        public TimeSpan BestLapTime { get; set; }
+        [NotMapped] // Prevents EF from trying to map this
+        public string BestLapTime { get; set; } = string.Empty;
 
-        public Track? track { get; set; }
-        public Karter? karter { get; set; }
+
     }
 
     public class TimeSpanRangeAttribute : ValidationAttribute
@@ -42,6 +47,11 @@ namespace GoKartUnite.ViewModel
                 if (timeSpan < _min || timeSpan > _max)
                 {
                     return new ValidationResult(ErrorMessage);
+                }
+
+                if (timeSpan.Hours > 0 || timeSpan.Days > 0)
+                {
+                    return new ValidationResult("Only minutes, seconds, and milliseconds are allowed (no hours).");
                 }
             }
             return ValidationResult.Success;

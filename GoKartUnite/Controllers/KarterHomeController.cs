@@ -22,13 +22,15 @@ namespace GoKartUnite.Controllers
         private readonly ITrackHandler _tracks;
         private readonly IRoleHandler _roles;
         private readonly IRelationshipHandler _friendships;
+        private readonly IKarterStat _statHandler;
 
-        public KarterHomeController(IRelationshipHandler friendships, IKarterHandler karters, ITrackHandler tracks, IRoleHandler roles)
+        public KarterHomeController(IKarterStat statHandler, IRelationshipHandler friendships, IKarterHandler karters, ITrackHandler tracks, IRoleHandler roles)
         {
             _karters = karters;
             _tracks = tracks;
             _roles = roles;
             _friendships = friendships;
+            _statHandler = statHandler;
         }
         [HttpGet]
         [Authorize]
@@ -299,9 +301,18 @@ namespace GoKartUnite.Controllers
         [Authorize]
         [AccountConfirmed]
         [ValidateAntiForgeryToken]
-        public async Task CreatTrackStat(KarterTrackStatsViewModel model)
+        public async Task<IActionResult> CreatTrackStat(KarterStatViewModel model)
         {
-            return;
+            TimeSpan.TryParseExact(model.BestLapTime, @"mm\:ss\:ff", null, out TimeSpan FormattedBestLapTime);
+            var v = await _tracks.GetTrackIdByTitle(model.TrackTitle);
+
+            string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            var k = await _karters.GetUserByGoogleId(googleId);
+            var track = await _tracks.GetTrackById(v);
+
+            await _statHandler.CreateStatRecord(model, track, k, FormattedBestLapTime);
+
+            return RedirectToAction("Index", model);
         }
     }
 

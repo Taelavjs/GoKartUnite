@@ -1,94 +1,173 @@
-﻿
-@{
-	ViewData["Title"] = "Index";
-}
+﻿@model GoKartUnite.ViewModel.KarterIndex
 
-@model GoKartUnite.ViewModel.KarterIndex
 <h1>GoKartersHome</h1>
 <div class="container">
 	<!-- Profile Section -->
 	<div class="profile-section">
-	<div class="profile-header">
-		<div class="profile-image"></div>
-		<div class="profile-details">
-		<div class="profile-name">@Model.karter.Name <a asp-action="EditUserDetails" class="btn btn-primary">Edit</a></div>
-		<div class="profile-info">
-			<div><label>Local Track:</label> @(Model.karter.Track == null ? "None" : Model.karter.Track.Title)</div>
-			<div><label>Email:</label> @Model.karter.Email</div>
+		<div class="profile-header">
+			<div class="profile-image"></div>
+			<div class="profile-details">
+				<div class="profile-name">@Model.karter.Name <a asp-action="EditUserDetails" class="btn btn-primary">Edit</a></div>
+				<div class="profile-info">
+					<div><label>Local Track:</label> @(Model.karter.Track == null ? "None" : Model.karter.Track.Title)</div>
+					<div><label>Email:</label> @Model.karter.Email</div>
+				</div>
+			</div>
 		</div>
-		</div>
-	</div>
 	</div>
 
 	<!-- Table Section -->
 	<div class="table-section">
-	<!-- Friends Table -->
-	<div class="table-container">
-		<table>
-		<thead>
-			<tr>
-			<th></th>
-			<th></th>
-			<th>Friends</th>
-			<th></th>
-			<th></th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach(var friend in Model.karterFriends){
-				@await Html.PartialAsync("karter", friend)
-			}
-		</tbody>
-		</table>
+		<!-- Friends Table -->
+		<div class="table-container">
+			<table>
+				<thead>
+					<tr>
+						<th></th>
+						<th></th>
+						<th>Friends</th>
+						<th></th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var friend in Model.karterFriends)
+					{
+						@await Html.PartialAsync("karter", friend)
+					}
+				</tbody>
+			</table>
+		</div>
+
+		<div class="table-container">
+			<table>
+				<thead>
+					<tr>
+						<th></th>
+						<th></th>
+						<th>Incoming Requests</th>
+						<th></th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var friend in Model.karterFriendRequests)
+					{
+						@await Html.PartialAsync("karter", friend)
+					}
+				</tbody>
+			</table>
+		</div>
 	</div>
 
 	<div class="table-container">
 		<table>
-		<thead>
-			<tr>
-			<th></th>
-			<th></th>
-			<th>Incoming Requests</th>
-			<th></th>
-			<th></th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach (var friend in Model.karterFriendRequests)
-			{
-				@await Html.PartialAsync("karter", friend)
-			}
-		</tbody>
-		</table>
-	</div>
-	</div>
-
-	<div class="table-container">
-		<table>
-		<thead>
-			<tr>
-			<th></th>
-			<th></th>
-			<th>Outgoing Requests</th>
-			<th></th>
-			<th></th>
-			</tr>
-		</thead>
-		<tbody>
+			<thead>
+				<tr>
+					<th></th>
+					<th></th>
+					<th>Outgoing Requests</th>
+					<th></th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
 				@foreach (var friend in Model.sentFriendRequests)
 				{
 					@await Html.PartialAsync("karter", friend)
 				}
-		</tbody>
+			</tbody>
 		</table>
 	</div>
+
+	<div style="width: 80%; margin: auto;">
+		<canvas id="myLineChart"></canvas>
 	</div>
 
+	<!-- Button to Toggle Partial View (Always Visible) -->
+	<div class="d-flex justify-content-start mt-3">
+		<button id="toggleStatForm" class="btn btn-success" type="button" data-bs-toggle="collapse" data-bs-target="#statFormContainer">
+			Add Stat
+		</button>
+	</div>
 
-	@await Html.PartialAsync("_CreateKarterStatTrack", new GoKartUnite.ViewModel.KarterStatAddPage
-	{
-		trackTitle = Model.trackTitles,
-		statToBeCreated = new GoKartUnite.ViewModel.KarterTrackStatsViewModel()
-	})
+	<!-- Collapsible Partial View Container (Slides In/Out) -->
+	<div id="statFormContainer" class="collapse mt-3">
+		<div class="card card-body shadow-sm">
+				@await Html.PartialAsync("_CreateKarterStatTrack", new GoKartUnite.ViewModel.KarterStatCreatePage
+	   {
+		   trackTitle = Model.trackTitles
+	   })
+		</div>
+	</div>
 
 </div>
+
+@section Scripts
+{
+		<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script> <!-- Chart.js Date Adapter -->
+		<script>
+		$(document).ready(function () {
+	  function convertToMilliseconds(timeString) {
+		const parts = timeString.split(':');
+		const minutes = parseInt(parts[0], 10);
+		const seconds = parseInt(parts[1], 10);
+		const milliseconds = parseInt(parts[2], 10);
+		return (minutes * 60 + seconds) * 1000 + milliseconds; // Convert to milliseconds
+	  }
+	// Example data points for time-based chart
+	const timeData = [
+	  {x: "00:00:000", y: 65},  // Time: 00 minutes, 00 seconds, 000 milliseconds
+	  {x: "01:15:000", y: 70},  // Time: 01 minute, 15 seconds, 000 milliseconds
+	  {x: "02:30:000", y: 85},  // Time: 02 minutes, 30 seconds, 000 milliseconds
+	  {x: "03:45:000", y: 90},  // Time: 03 minutes, 45 seconds, 000 milliseconds
+	  {x: "04:59:000", y: 80}   // Time: 04 minutes, 59 seconds, 000 milliseconds
+	];
+
+	// Updated Chart.js code with time-based data
+	const ctx = document.getElementById('myLineChart').getContext('2d');
+	const myChart = new Chart(ctx, {
+	  type: 'line',
+	  data: {
+		labels: [
+		  "00:00:000", "01:15:000", "02:30:000", "03:45:000", "04:59:000"
+		],
+		datasets: [{
+		  label: 'My Time-based Dataset',
+		  data: timeData,  // Updated data points
+		  borderColor: 'rgba(75, 192, 192, 1)',
+		  fill: false
+		}]
+	  },
+	  options: {
+		responsive: true,
+		scales: {
+		  x: {
+			type: 'time',
+			time: {
+			  unit: 'minute',
+			  tooltipFormat: 'll HH:mm:ss',
+			  unitStepSize: 1,
+			  displayFormats: {
+				minute: 'mm:ss:SSS',
+			  }
+			},
+			title: {
+			  display: true,
+			  text: 'Time (mm:ss:ms)'
+			}
+		  },
+		  y: {
+			title: {
+			  display: true,
+			  text: 'Values'
+			}
+		  }
+		}
+	  }
+	});
+
+		});
+		</script>
+}
+
