@@ -49,11 +49,18 @@
                         label: trackToFilterFor,
                         data: timesInMilliseconds,
                         borderColor: 'rgb(75, 192, 192)',
+                        pointRadius: 4,
                         fill: false
                     }]
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
+                    elements: {
+                        line: {
+                            tension: 0.1
+                        }
+                    },
                     scales: {
                         x: {
                             type: 'time',
@@ -66,12 +73,18 @@
                             title: {
                                 display: true,
                                 text: 'Date'
-                            }
+                            },
+                            ticks: {
+                                maxRotation: 90,
+                            },
                         },
                         y: {
                             ticks: {
+                                font: {
+                                    size: window.innerWidth < 600 ? 12 : 18 // Smaller font on mobile
+                                },
                                 beginAtZero: false,
-                                suggestedMin: Math.min(...timesInMilliseconds) - 1000,
+                                suggestedMin: Math.min(...timesInMilliseconds) - 100000,
                                 callback: function (value) {
                                     const minutes = Math.floor(value / (60 * 1000));
                                     const seconds = Math.floor((value % (60 * 1000)) / 1000);
@@ -80,7 +93,7 @@
                                 }
                             },
                             title: {
-                                display: true,
+                                display: false,
                                 text: 'Lap Time'
                             }
                         }
@@ -112,19 +125,32 @@
 
 
     });
+
+
     $('#GraphTitleSelector').change(function () {
         const newTitle = $(this).val();
         let filteredData;
 
         filteredData = dateTimeData.filter(item => item.trackTitle == newTitle);
-        console.log(filteredData);
-        console.log(dateTimeData);
         const filteredDates = filteredData.map(item => item.date);
         const filteredTimesInMilliseconds = filteredData.map(item => item.time);
 
         myChart.data.labels = filteredDates;
         myChart.data.datasets[0].data = filteredTimesInMilliseconds;
         myChart.data.datasets[0].label = newTitle;
+
+        if (filteredData.length > 0) {
+            const mostRecentDate = filteredData[filteredData.length - 1].date;
+
+            let threeMonthsAgo = new Date(mostRecentDate);
+            threeMonthsAgo.setMonth(mostRecentDate.getMonth() - 3);
+
+            myChart.options.scales.x.min = threeMonthsAgo;
+            myChart.options.scales.x.max = mostRecentDate;
+
+            console.log(filteredData);
+        }
         myChart.update();
     });
+
 });

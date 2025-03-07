@@ -9,32 +9,35 @@
     <td>@Model.Name</td>
     <td>@Model.YearsExperience</td>
     <td>@(Model.LocalTrack == null ? "MISSING" : Model.LocalTrack.Title)</td>
-    <td>
-        <form asp-controller="KarterHome" asp-action="HandleFriendRequest" asp-route-friendId="@Model.Id" method="post" style="display:inline;">
+    <td class="text-center align-middle">
+        <form asp-controller="KarterHome" asp-action="HandleFriendRequest" asp-route-friendId="@Model.Id" method="post"
+        class="w-100 h-100 text-center align-middle">
             @Html.AntiForgeryToken()
             @switch (Model.FriendStatus)
             {
                 case FriendshipStatus.Requested:
-                    <button type="submit" name="action" value="Accept" class="btn btn-success">Accept Friend</button>
+                        <button type="submit" name="action" value="Accept" class="btn-sm btn-success">Accept</button>
                     break;
                 case FriendshipStatus.Friend:
-                    <button type="submit" name="action" value="Remove" class="btn btn-danger">Remove Friend</button>
+                        <button type="submit" name="action" value="Remove" class="btn-sm btn-danger">Remove</button>
                     break;
                 case FriendshipStatus.Received:
-                    <button type="submit" name="action" value="Cancel" class="btn btn-danger">Cancel Request</button>
+                        <button type="submit" name="action" value="Cancel" class="btn-sm btn-secondary">Cancel</button>
                     break;
                 default:
-                    <button type="submit" name="action" value="Add" class="btn btn-danger">Add Friend</button>
+                        <button type="submit" name="action" value="Add" class="btn-sm btn-info">Add</button>
                     break;
             }
         </form>
     </td>
     @if(User.IsInRole("Admin")){
-                <td><a asp-action="Create" asp-route-id="@Model.Id">Edit</a></td>
-        <td>
+            <td class="d-flex justify-content-around align-items-center">
+                <a asp-action="Create" asp-route-id="@Model.Id"><i class="bi bi-pencil-square"></i></a>
             <form asp-action="Delete" asp-route-id="@Model.Id" method="post" style="display:inline;">
                 @Html.AntiForgeryToken()
-                <input type="submit" value="Delete" class="btn btn-danger" />
+                <button type="submit" class="border-0 bg-transparent p-0 text-danger">
+                    <i class="bi bi-x-lg"></i>                
+                </button>            
             </form>
         </td>
     }
