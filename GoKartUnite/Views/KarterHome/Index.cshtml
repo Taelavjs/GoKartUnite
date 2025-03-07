@@ -6,7 +6,12 @@
 		<div class="profile-header">
 			<div class="profile-image"></div>
 			<div class="profile-details">
-				<div class="profile-name">@Model.karter.Name <a asp-action="EditUserDetails" class="btn btn-primary">Edit</a></div>
+				<div class="profile-name">
+									@Model.karter.Name 
+					<a asp-action="EditUserDetails" class="btn btn-sm btn-success p-0" style="border: none; background-color: transparent;">
+						<i class="bi bi-pencil-fill" style="color: green;"></i>
+					</a>
+				</div>				
 				<div class="profile-info">
 					<div><label>Local Track:</label> @(Model.karter.Track == null ? "None" : Model.karter.Track.Title)</div>
 					<div><label>Email:</label> @Model.karter.Email</div>
@@ -93,6 +98,16 @@
 		<canvas class="w-100" id="myLineChart"></canvas>
 	</div>
 
+	<!-- Collapsible Partial View Container (Slides In/Out) -->
+	<div id="statFormContainer" class="collapse mt-3">
+		<div class="card card-body shadow-sm">
+			@await Html.PartialAsync("_CreateKarterStatTrack", new GoKartUnite.ViewModel.KarterStatCreatePage
+			{
+				trackTitle = Model.trackTitles
+			})
+		</div>
+	</div>
+
 	<!-- Button to Toggle Partial View (Always Visible) -->
 	<div class="d-flex justify-content-start mt-3">
 		<button id="toggleStatForm" class="btn btn-success" type="button" data-bs-toggle="collapse" data-bs-target="#statFormContainer">
@@ -100,15 +115,7 @@
 		</button>
 	</div>
 
-	<!-- Collapsible Partial View Container (Slides In/Out) -->
-	<div id="statFormContainer" class="collapse mt-3">
-		<div class="card card-body shadow-sm">
-				@await Html.PartialAsync("_CreateKarterStatTrack", new GoKartUnite.ViewModel.KarterStatCreatePage
-	   {
-		   trackTitle = Model.trackTitles
-	   })
-		</div>
-	</div>
+
 
 </div>
 

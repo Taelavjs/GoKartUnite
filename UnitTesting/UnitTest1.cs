@@ -430,10 +430,10 @@ namespace UnitTesting
         public async Task GetModelToView_EmptyListForEmptyReturn()
         {
             var blogPostsViews = await _blogHandler.GetModelToView(new List<BlogPost>());
-            var blogPostsNull = await _blogHandler.GetModelToView(null);
+            var blogPostsNull = await _blogHandler.GetModelToView((BlogPost)null);
 
             Assert.True(blogPostsViews.Count == 0, "Invalid Return");
-            Assert.True(blogPostsNull.Count == 0, "Invalid Return when passed NULL");
+            Assert.True(blogPostsNull == null, "Invalid Return when passed NULL");
 
         }
 

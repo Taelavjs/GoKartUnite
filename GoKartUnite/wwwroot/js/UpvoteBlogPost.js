@@ -1,6 +1,5 @@
 ﻿"use strict";
 
-
 document.addEventListener("DOMContentLoaded", function () {
     const upvoteButtons = document.querySelectorAll('.upvote-btn');
 
@@ -21,23 +20,18 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-
     const commentBtns = document.querySelectorAll('.commentBtn');
 
     commentBtns.forEach(button => {
         button.addEventListener("click", function () {
 
             var lastCommentId = $(this).closest('.post').data('lastcommentid');
-
             const postId = button.getAttribute('data-postid');
             const baseUrl = `${window.location.origin}/BlogHome/GetCommentsForBlog?blogId=${postId}&lastCommentId=${lastCommentId}`;
 
             fetch(baseUrl, {
                 method: "GET",
-
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
             })
                 .then(res => {
                     if (res.ok) {
@@ -52,38 +46,48 @@ document.addEventListener("DOMContentLoaded", function () {
                     commentSection.innerHTML = '';
 
                     const lastCommentId = data[data.length - 1]?.id;
-
                     $(this).closest('.post').data('lastcommentid', lastCommentId);
+
+                    if (data.length == 0) {
+                        commentSection.innerHTML = '<li class="text-danger small">No comments.</li>';
+                    }
 
                     data.forEach(comment => {
                         const commentContainer = document.createElement('div');
-                        commentContainer.classList.add('comment-item');
+                        commentContainer.classList.add('comment-item', 'p-2', 'border-bottom', 'rounded', 'text-wrap');
+
+                        // Create a wrapper for the author and the date
+                        const commentHeader = document.createElement('div');
+                        commentHeader.classList.add('d-flex', 'justify-content-between', 'align-items-center');
 
                         const commentAuthor = document.createElement('div');
-                        commentAuthor.classList.add('CommentAuthor');
+                        commentAuthor.classList.add('fw-bold', 'text-primary', 'small');
                         commentAuthor.textContent = comment.authorName;
 
-                        const commentContent = document.createElement('div');
-                        commentContent.classList.add('CommentContent');
-                        commentContent.textContent = comment.text;
-
                         const commentDate = document.createElement('div');
-                        commentDate.classList.add('CommentDate');
+                        commentDate.classList.add('text-secondary', 'small');
                         commentDate.textContent = new Date(comment.typedAt).toLocaleDateString();
 
-                        commentContainer.appendChild(commentAuthor);
+                        commentHeader.appendChild(commentAuthor);
+                        commentHeader.appendChild(commentDate);
+
+                        const commentContent = document.createElement('div');
+                        commentContent.classList.add('text-muted', 'small', 'mt-1', 'text-wrap', 'text-break');
+
+                        commentContent.textContent = comment.text;
+
+                        commentContainer.appendChild(commentHeader);
                         commentContainer.appendChild(commentContent);
-                        commentContainer.appendChild(commentDate);
 
                         commentSection.appendChild(commentContainer);
+
                     });
                 })
                 .catch(err => {
                     console.log(err);
                     const commentSection = document.getElementById(`comment-section-${postId}`);
-                    commentSection.innerHTML = '<li>Failed to load comments.</li>';
+                    commentSection.innerHTML = '<li class="text-danger small">Failed to load comments.</li>';
                 });
         });
     });
-
 });

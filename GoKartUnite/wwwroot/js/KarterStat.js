@@ -89,7 +89,7 @@
                                     const minutes = Math.floor(value / (60 * 1000));
                                     const seconds = Math.floor((value % (60 * 1000)) / 1000);
                                     const milliseconds = value % 1000;
-                                    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}:${milliseconds < 100 ? '0' : ''}${milliseconds}`;
+                                    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
                                 }
                             },
                             title: {
