@@ -292,7 +292,7 @@ namespace UnitTesting
             var blogPostsView = new BlogPostView
             {
                 Title = "My First Blog Post",
-                Descripttion = "This is a sample blog post description.",
+                Description = "This is a sample blog post description.",
                 Author = karter,
                 authorId = 123,
                 Upvotes = 10,
@@ -336,7 +336,7 @@ namespace UnitTesting
             var blogPostsView = new BlogPostView
             {
                 Title = "My First Blog Post",
-                Descripttion = "This is a sample blog post description.",
+                Description = "This is a sample blog post description.",
                 Author = karter,
                 authorId = karter.Id,
                 Upvotes = 10,
@@ -380,7 +380,7 @@ namespace UnitTesting
             var blogPostsView = new BlogPostView
             {
                 Title = "My First Blog Post",
-                Descripttion = "This is a sample blog post description.",
+                Description = "This is a sample blog post description.",
                 Author = karter,
                 authorId = karter.Id, // Invalid
                 Upvotes = 10,

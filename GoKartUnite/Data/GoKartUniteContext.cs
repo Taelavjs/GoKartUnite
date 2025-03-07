@@ -53,6 +53,26 @@ namespace GoKartUnite.Data
                 .WithMany(bp => bp.Comments)
                 .HasForeignKey(c => c.BlogPostId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<BlogPost>()
+                .HasOne(c => c.Author)
+                .WithMany()
+                .HasForeignKey(c => c.AuthorId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<BlogNotifications>()
+                .HasOne(c => c.Author)
+                .WithMany()
+                .HasForeignKey(c => c.userId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Upvotes>()
+                .HasOne(c => c.Karter)
+                .WithMany()
+                .HasForeignKey(c => c.VoterId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
         }
         public DbSet<GoKartUnite.Models.Karter> Karter { get; set; } = default!;
         public DbSet<GoKartUnite.Models.Track> Track { get; set; } = default!;

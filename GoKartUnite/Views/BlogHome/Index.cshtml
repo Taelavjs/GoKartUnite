@@ -3,9 +3,10 @@
 
 <div class="container">
     <h1>Blog</h1>
+    @await Html.PartialAsync("Create", Model.editedPost)
+
+
     @await Html.PartialAsync("_Posts", Model.notifiedPosts)
-    <br />
-    <br />
     <br />
     @await Html.PartialAsync("_Posts", Model.posts)
 </div>

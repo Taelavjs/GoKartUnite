@@ -69,6 +69,7 @@ namespace GoKartUnite.Controllers
                 posts = await _blog.GetModelToView(allPosts),
                 notifiedPosts = await _blog.GetModelToView(notifiedPosts)
             };
+            ViewBag.AllTracks = await _tracks.ModelToView(await _tracks.GetAllTracks());
 
             return View(blogPage);
         }
@@ -170,15 +171,17 @@ namespace GoKartUnite.Controllers
             BlogPost post = await _blog.GetPost(id, new BlogPostFilterOptions { IncludeUpvotes = true });
             Karter karter = await _karter.GetUserByGoogleId(GoogleId);
 
-            bool alreadyUpvoted = post.Upvotes
-                .Any(upvote => upvote.VoterId == karter.Id);
+            Upvotes upvote = post.Upvotes
+                .SingleOrDefault(upvote => upvote.VoterId == karter.Id);
+
+            bool alreadyUpvoted = upvote != null;
 
             if (alreadyUpvoted)
             {
-
+                await _blog.DeleteUpvote(upvote);
                 return;
             }
-            var upvote = new Upvotes();
+            upvote = new Upvotes();
             upvote.PostId = id;
             upvote.VoterId = karter.Id;
             await _blog.UpvotePost(id, upvote);

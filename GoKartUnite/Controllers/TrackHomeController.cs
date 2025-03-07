@@ -183,5 +183,12 @@ namespace GoKartUnite.Controllers
 
         }
 
+        private async Task<Karter> GetKarterFromUUID()
+        {
+            string GoogleId = User.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            return await _karters.GetUserByGoogleId(GoogleId);
+        }
+
     }
 }

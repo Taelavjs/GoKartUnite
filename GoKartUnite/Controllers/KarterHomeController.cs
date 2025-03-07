@@ -80,6 +80,7 @@ namespace GoKartUnite.Controllers
         [AccountConfirmed]
         public async Task<IActionResult> Details(int? id)
         {
+
             string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
 
             Karter k = await _karters.GetUserByGoogleId(googleId);
@@ -111,6 +112,8 @@ namespace GoKartUnite.Controllers
             {
                 pageNo = page <= 0 ? 0 : page - 1,
                 sort = sortby,
+                TrackToFetchFor = track,
+                IncludeTrack = true,
             };
 
             List<Karter> karters = await _karters.GetAllUsers(filter);
@@ -220,7 +223,7 @@ namespace GoKartUnite.Controllers
                 await _karters.DeleteUser(karter.Id);
             }
 
-            return RedirectToAction("Details");
+            return RedirectToAction("DetailsByTrack");
         }
 
         // ======================================
