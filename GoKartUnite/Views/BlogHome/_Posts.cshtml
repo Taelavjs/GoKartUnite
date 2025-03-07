@@ -3,7 +3,7 @@
 @foreach (var post in Model)
 {
         <div class="post" data-postid="@post.Id" data-lastcommentid="0">
-        @await Html.PartialAsync("Blog", post)
+            @await Html.PartialAsync("Blog", post)
             <button data-postid="@post.Id" class="commentBtn">Comments</button>
             <div class="comment-section-@post.Id comment"></div>
             <button class="create-comment-btn btn-primary" data-postid="@post.Id">Create Comment</button>

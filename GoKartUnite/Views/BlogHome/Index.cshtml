@@ -8,6 +8,16 @@
 
     @await Html.PartialAsync("_Posts", Model.notifiedPosts)
     <br />
+    <form method="get" asp-controller="BlogHome" asp-action="Index" id="trackForm">
+        <select name="track" id="track" class="form-control" onchange="document.getElementById('trackForm').submit();">
+            <option value="">-- Select a Track --</option>
+                @foreach (var item in ViewBag.AllTracks)
+                {
+                    <option value="@item.Title">@item.Title</option>
+                }
+        </select>
+    </form>
+
     @await Html.PartialAsync("_Posts", Model.posts)
 </div>
 

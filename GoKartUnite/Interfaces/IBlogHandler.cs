@@ -11,6 +11,7 @@ namespace GoKartUnite.Interfaces
         Task<int> AddPost(BlogPostView post);
 
         Task<List<BlogPostView>> GetModelToView(List<BlogPost> posts);
+        Task<BlogPostView> GetModelToView(BlogPost posts);
 
         Task<BlogPost> GetPost(int Id, BlogPostFilterOptions? options = null);
 
@@ -26,6 +27,10 @@ namespace GoKartUnite.Interfaces
 
         Task CreateComment(Comment comment);
 
+        Task<BlogPost> GetPostById(int id);
+
         Task<List<BlogPost>> GetPostsForTrack(string trackTitle, int count = 0);
+
+        Task UpdatePost(BlogPostView post, int id);
     }
 }

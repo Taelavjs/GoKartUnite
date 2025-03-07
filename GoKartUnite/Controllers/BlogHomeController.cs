@@ -37,7 +37,7 @@ namespace GoKartUnite.Controllers
         [HttpGet]
         [Authorize]
         [AccountConfirmed]
-        public async Task<IActionResult> Index(int page = 1, string? track = null)
+        public async Task<IActionResult> Index(int page = 1, string track = null)
         {
 
             ViewBag.TotalPages = await _blog.GetTotalPageCount();
@@ -58,7 +58,8 @@ namespace GoKartUnite.Controllers
                 PageSize = 10,
                 PageNo = page,
                 TrackNameFilter = track,
-                IncludeAuthor = true
+                IncludeAuthor = true,
+                IncludeTrack = true,
             };
 
             List<BlogPost> allPosts = await _blog.GetAllPosts(blogFilter);
@@ -78,17 +79,27 @@ namespace GoKartUnite.Controllers
         [HttpGet]
         [Authorize]
         [AccountConfirmed]
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(int id = -1)
         {
             ViewBag.AllTracks = await _tracks.ModelToView(await _tracks.GetAllTracks());
+            if (id != -1)
+            {
+                BlogPostView retrievedPost = await _blog.GetModelToView(await _blog.GetPostById(id));
+
+                return View(retrievedPost);
+            }
+
+
             return View();
         }
+
+
 
         [HttpPost]
         [Authorize]
         [AccountConfirmed]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(BlogPostView post)
+        public async Task<ActionResult> Create(BlogPostView post, int id = -1)
         {
             if (!ModelState.IsValid)
             {
@@ -97,6 +108,14 @@ namespace GoKartUnite.Controllers
 
             string GoogleId = User.Claims
                 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+
+            if (id != -1)
+            {
+                // EDITING AN ALREADY EXISTING POST
+                await _blog.UpdatePost(post, id);
+                return RedirectToAction("Index");
+
+            }
 
             Karter k = await _karter.GetUserByGoogleId(GoogleId);
             int postId;

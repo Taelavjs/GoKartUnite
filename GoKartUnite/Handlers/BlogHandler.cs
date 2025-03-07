@@ -123,6 +123,22 @@ namespace GoKartUnite.Handlers
             return retPosts;
         }
 
+        public async Task<BlogPostView> GetModelToView(BlogPost posts)
+        {
+            if (posts == null) return new BlogPostView();
+
+            BlogPostView post = new BlogPostView();
+            post.Id = posts.Id;
+            post.Title = posts.Title;
+            post.Description = posts.Description;
+            post.Author = posts.Author;
+            post.Upvotes = posts.Upvotes.Count;
+            post.TaggedTrack = posts.TaggedTrack;
+            post.authorId = posts.AuthorId;
+
+            return post;
+        }
+
         public async Task<BlogPost> GetPost(int Id, BlogPostFilterOptions? options = null)
         {
             if (options == null) options = new BlogPostFilterOptions();
@@ -210,5 +226,28 @@ namespace GoKartUnite.Handlers
 
             return posts;
         }
+
+        public async Task<BlogPost> GetPostById(int id)
+        {
+            BlogPost post = _context.BlogPosts.SingleOrDefault(t => t.Id == id);
+
+            return post;
+        }
+
+        public async Task UpdatePost(BlogPostView post, int id)
+        {
+            BlogPost retrievedPost = _context.BlogPosts.SingleOrDefault(t => t.Id == id);
+            if (retrievedPost == null) return;
+
+            retrievedPost.Title = post.Title;
+            retrievedPost.Description = post.Description;
+
+            Track track = _context.Track.SingleOrDefault(t => t.Title == post.TaggedTrackTitle);
+            if (track == null) return;
+
+            retrievedPost.TaggedTrack = track;
+            _context.SaveChanges();
+        }
+
     }
 }
