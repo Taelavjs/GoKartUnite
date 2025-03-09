@@ -8,7 +8,7 @@ namespace GoKartUnite.ViewModel
         public int? Id { get; set; }
         [Required(ErrorMessage = "Title is required.")]
         public string Title { get; set; } = string.Empty;
-        [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters.")]
+        [StringLength(40, ErrorMessage = "Description cannot exceed 500 characters.")]
         public string Description { get; set; } = string.Empty;
         public Karter? Author { get; set; }
         public int? authorId { get; set; }

@@ -37,7 +37,7 @@ namespace GoKartUnite.Controllers
         [HttpGet]
         [Authorize]
         [AccountConfirmed]
-        public async Task<IActionResult> Index(int page = 1, string track = null)
+        public async Task<IActionResult> Index(int page = 1, string track = null, string filterBy = "Recent")
         {
 
             ViewBag.TotalPages = await _blog.GetTotalPageCount();
@@ -60,6 +60,7 @@ namespace GoKartUnite.Controllers
                 TrackNameFilter = track,
                 IncludeAuthor = true,
                 IncludeTrack = true,
+                SortByPopular = filterBy == "Popular"
             };
 
             List<BlogPost> allPosts = await _blog.GetAllPosts(blogFilter);
@@ -68,9 +69,12 @@ namespace GoKartUnite.Controllers
             BlogPage blogPage = new BlogPage
             {
                 posts = await _blog.GetModelToView(allPosts),
-                notifiedPosts = await _blog.GetModelToView(notifiedPosts)
+                notifiedPosts = await _blog.GetModelToView(notifiedPosts),
+                SortedBy = filterBy,
+                FilteredTrack = track
             };
             ViewBag.AllTracks = await _tracks.ModelToView(await _tracks.GetAllTracks());
+
 
             return View(blogPage);
         }
@@ -103,7 +107,7 @@ namespace GoKartUnite.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return RedirectToAction("Create");
+                return RedirectToAction("Index");
             }
 
             string GoogleId = User.Claims

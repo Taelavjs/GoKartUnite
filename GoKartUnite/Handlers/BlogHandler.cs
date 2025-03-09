@@ -64,6 +64,11 @@ namespace GoKartUnite.Handlers
                 query = query.OrderByDescending(i => i.DateTimePosted);
             }
 
+            if (filterOptions.SortByPopular)
+            {
+                query = query.OrderByDescending(i => i.Upvotes.Count);
+            }
+
             if (filterOptions.PreDateFilter != null)
             {
                 query = query.Where(x => x.DateTimePosted < filterOptions.PreDateFilter);
