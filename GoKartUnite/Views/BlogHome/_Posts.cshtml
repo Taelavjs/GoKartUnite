@@ -19,6 +19,6 @@
                 </button>
             </div>
 
-            <div class="comment-section mt-2 comment-section-@post.Id"></div>
+            @await Html.PartialAsync("_BlogFetchCommentsTemplate", post.Id)
         </div>
 }
