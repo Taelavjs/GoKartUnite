@@ -1,10 +1,37 @@
-html {
-    font-size: 14px;
+
+
+:root {
+    --main-bg-color: #f8f9fa;
+    --profile-bg-color: #ffffff;
+    --border-color: #e0e0e0;
+    --accent-color: rgba(220, 212, 212, 0.428);
+    --blog-color: #8cd4ad59;
+    --GeneralText: 1rem;
+    --PlaceholderText: 0.8rem;
+    --SelectText: 1rem;
+    --SectionTitles: 1.3rem;
+    --SectionSubtitles: 1.1rem;
+    --SeciontMinorTitles: 0.8rem;
+    --IconText: 1rem;
+    --LabelText: 1rem;
+    font-size: var(--GeneralText);
+}
+
+label {
+    font-size: var(--LabelText);
+}
+
+::placeholder {
+    font-size: var(--PlaceholderText);
+    opacity: 0.7;
+}
+
+option {
+    font-size: var(--PlaceholderText);
 }
 
 @media (min-width: 768px) {
     html {
-        font-size: 16px;
     }
 }
 
@@ -68,13 +95,6 @@ body {
     }
 }
 
-:root {
-    --main-bg-color: #f8f9fa;
-    --profile-bg-color: #ffffff;
-    --border-color: #e0e0e0;
-    --accent-color: rgba(220, 212, 212, 0.428);
-    --blog-color: #8cd4ad59;
-}
 
 * {
     font-family: "Hind Vadodara", serif;
@@ -126,7 +146,7 @@ body {
 }
 
 .profile-name {
-    font-size: 1.5rem;
+    font-size: var(--SectionTitles);
     font-weight: bold;
     margin-bottom: 0.5rem;
 }
@@ -207,15 +227,18 @@ th {
 }
 
 .blog-post-title {
-    font-size: 1.25rem;
+    font-size: var(--SectionTitles);
     font-weight: bold;
     color: #333;
 }
 
-.blog-post-author,
-.blog-post-description {
-    font-size: 1rem;
+.blog-post-author {
+    font-size: var(--SeciontMinorTitles);
     color: #555;
+}
+
+.blog-post-description {
+    font-size: var(--GeneralText);
 }
 
 .blog-post-upvotes {
@@ -226,7 +249,7 @@ th {
 
 .upvote-btn {
     padding: 0.5rem 1rem;
-    font-size: 0.875rem;
+    font-size: var(--IconText);
     background-color: #28a745;
     color: white;
     border: none;
@@ -249,14 +272,15 @@ th {
 
     .upvote-btn {
         padding: 0.4rem 0.8rem;
-        font-size: 0.8rem;
+        font-size: var(--IconText);
     }
 }
 
+
+/* TRACK PROFILE */
 .trackProfile {
     height: fit-content;
     width: 100%;
-    background-color: var(--blog-color);
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -286,7 +310,7 @@ th {
 }
 
     .trackProfileCol .post {
-        margin-top: 3ch;
+        margin-top: 1rem;
         height: fit-content;
         padding-top: 1ch;
         display: flex;
@@ -294,6 +318,14 @@ th {
         justify-content: space-between;
         height: fit-content;
     }
+
+/* TRACK PROFILE */
+
+
+.boxShadow {
+    box-shadow: 0px 0px 4px #7d7c69;
+    background-color: #3c0d0d1e;
+}
 
 .recentPosts {
     margin-top: 2ch;
@@ -327,19 +359,9 @@ th {
         right: 0;
         bottom: 0;
         color: #d7e3e3;
-        font-size: 12px;
         line-height: 1;
         padding: 5px;
     }
-
-.knob,
-.btn-bg {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-}
 
 .btn {
     position: relative;
@@ -350,10 +372,6 @@ th {
     overflow: hidden;
 }
 
-    .btn.btn-pill,
-    .btn.btn-pill > .btn-bg {
-        border-radius: 100px;
-    }
 
     .btn.btn-rect {
         border-radius: 2px;
@@ -372,87 +390,4 @@ th {
 
 .knob {
     z-index: 2;
-}
-
-.btn-bg {
-    width: 100%;
-    background-color: #ebf7fc;
-    transition: 0.3s ease all;
-    z-index: 1;
-}
-
-/* Button 12 */
-#button-12 .knob:before,
-#button-12 .knob:after,
-#button-12 .knob span,
-#button-12 .knob span:before,
-#button-12 .knob span:after {
-    position: absolute;
-    top: 4px;
-    font-size: 10px;
-    font-weight: bold;
-    text-align: center;
-    line-height: 1;
-    border-radius: 2px;
-    transition: 0.3s ease all;
-}
-
-#button-12 .knob:before {
-    content: "YES";
-    left: 4px;
-}
-
-#button-12 .knob:after {
-    content: "NO";
-    right: 4px;
-}
-
-#button-12 .knob:before,
-#button-12 .knob:after {
-    width: 27px;
-    height: 10px;
-    color: #4e4e4e;
-    padding: 9px 3px;
-    z-index: 1;
-}
-
-#button-12 .knob span {
-    display: inline-block;
-    z-index: 2;
-}
-
-    #button-12 .knob span,
-    #button-12 .knob span:before,
-    #button-12 .knob span:after {
-        width: 20px;
-        height: 10px;
-        padding: 9px 4px;
-    }
-
-        #button-12 .knob span:before,
-        #button-12 .knob span:after {
-            content: "";
-            top: 0;
-        }
-
-        #button-12 .knob span:before {
-            left: -28px;
-            background-color: #f44336;
-        }
-
-        #button-12 .knob span:after {
-            right: -42px;
-            background-color: #03a9f4;
-        }
-
-#button-12 .checkbox:checked + .knob span:before {
-    left: 4px;
-}
-
-#button-12 .checkbox:checked + .knob span:after {
-    right: -74px;
-}
-
-#button-12 .checkbox:checked ~ .btn-bg {
-    background-color: #fcebeb;
 }

@@ -1,4 +1,23 @@
 ﻿document.addEventListener("DOMContentLoaded", function () {
+    const upvoteButtons = document.querySelectorAll('.upvote-btn');
+
+    upvoteButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const postId = button.getAttribute('data-id');
+            const postUpvotes = button.getAttribute('data-upvoteCount');
+
+            console.log('ID:', postId);
+            const newUpvotes = parseInt(postUpvotes) + 1;
+            button.setAttribute('data-upvoteCount', newUpvotes);
+            button.parentNode.textContent = newUpvotes.toString();
+            const baseUrl = `${window.location.origin}/BlogHome/UpvoteBlog?id=${postId}`;
+            console.log(baseUrl);
+            fetch(baseUrl, {
+                method: "POST"
+            }).catch(err => console.log(err));
+        });
+    });
+
     // Select all comment buttons
     const commentBtns = document.querySelectorAll(".commentBtn");
 

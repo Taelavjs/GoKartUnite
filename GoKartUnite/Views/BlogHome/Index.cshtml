@@ -3,22 +3,26 @@
 
 <div class="container">
     <h1>Blog</h1>
-    @await Html.PartialAsync("Create", Model.editedPost)
+    <div class="p-3">
+        <h3>Create Blog Post</h3>
+        @await Html.PartialAsync("Create", Model.editedPost)
+    </div>
 
 
     @await Html.PartialAsync("_Posts", Model.notifiedPosts)
-    <br />
-    <form method="get" asp-controller="BlogHome" asp-action="Index" id="trackForm">
-        <select name="track" id="track" class="form-control" onchange="document.getElementById('trackForm').submit();">
-            <option value="">-- Select a Track --</option>
-                @foreach (var item in ViewBag.AllTracks)
-                {
-                    <option value="@item.Title">@item.Title</option>
-                }
-        </select>
-    </form>
+    <div class="CreateBlogPost rounded p-3 boxShadow">
 
-    @await Html.PartialAsync("_Posts", Model.posts)
+        <form method="get" asp-controller="BlogHome" asp-action="Index" id="trackForm">
+            <select name="track" id="track" class="form-control" onchange="document.getElementById('trackForm').submit();">
+                <option value="">-- Select a Track --</option>
+                    @foreach (var item in ViewBag.AllTracks)
+                    {
+                        <option value="@item.Title">@item.Title</option>
+                    }
+            </select>
+        </form>
+        @await Html.PartialAsync("_Posts", Model.posts)
+    </div>
 </div>
 
 @await Html.PartialAsync("_Pagination", new { Page = ViewBag.Page, TotalPages = ViewBag.TotalPages, QueryString = ViewContext.HttpContext.Request.Query })
