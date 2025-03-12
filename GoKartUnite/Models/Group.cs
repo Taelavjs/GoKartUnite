@@ -13,5 +13,6 @@ namespace GoKartUnite.Models
         public virtual Karter HostKarter { get; set; }
         public virtual List<Karter> MemberKarters { get; set; } = new List<Karter>();
         public virtual List<BlogPost> GroupPosts { get; set; } = new List<BlogPost>();
+        public DateTime DateCreated { get; set; } = DateTime.UtcNow;
     }
 }
