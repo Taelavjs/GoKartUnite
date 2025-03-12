@@ -157,6 +157,10 @@ namespace GoKartUnite.Handlers
             {
                 query = query.Include(k => k.Upvotes);
             }
+            if (options.IncludeAuthor)
+            {
+                query = query.Include(x => x.Comments).ThenInclude(x => x.Author);
+            }
             return await query.SingleOrDefaultAsync(k => k.Id == Id);
         }
 
@@ -184,7 +188,7 @@ namespace GoKartUnite.Handlers
 
         public async Task<List<Comment>> GetAllCommentsForPost(int blogPostId, int lastIdSent)
         {
-            BlogPost post = await GetPost(blogPostId, new BlogPostFilterOptions { IncludeComments = true, IncludeUpvotes = true });
+            BlogPost post = await GetPost(blogPostId, new BlogPostFilterOptions { IncludeComments = true, IncludeUpvotes = true, IncludeAuthor = true });
             if (post == null) return new List<Comment>();
             if (lastIdSent == 0)
             {
@@ -203,7 +207,7 @@ namespace GoKartUnite.Handlers
                 {
                     Id = comment.Id,
                     Text = comment.Text,
-                    AuthorName = "Taeka",
+                    AuthorName = comment.Author.Name,
                     TypedAt = comment.CreatedDate
                 };
 
@@ -216,6 +220,13 @@ namespace GoKartUnite.Handlers
 
         public async Task CreateComment(Comment comment)
         {
+            comment.Author = _context.Karter.SingleOrDefault(x => x.Id == comment.AuthorId);
+
+            if (comment.Author == null)
+            {
+                return;
+            }
+
             await _context.Comments.AddAsync(comment);
             await _context.SaveChangesAsync();
         }
