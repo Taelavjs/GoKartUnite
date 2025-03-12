@@ -2,7 +2,7 @@
 
 <div class="w-100">
     <div class="w-100">
-        <form asp-action="Create">
+        <form asp-action="Create" method="post" data-ajax="true" data-ajax-post="true" id="blogPostForm">
             @Html.AntiForgeryToken()
 
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -32,9 +32,6 @@
     </div>
 </div>
 
-@* @if(Model.Description != ""){ *@
-@*     <div> *@
-@*         <a asp-action="Index">Back to List</a> *@
-@*     </div> *@
-@* } *@
+@section Scripts {
 
+}

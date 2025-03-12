@@ -3,22 +3,40 @@
 
 <div class="container">
     <h1>Blog</h1>
-    @await Html.PartialAsync("Create", Model.editedPost)
+    <div class="p-3">
+        <h3>Create Blog Post</h3>
+        @await Html.PartialAsync("Create", Model.editedPost)
+    </div>
 
 
     @await Html.PartialAsync("_Posts", Model.notifiedPosts)
-    <br />
-    <form method="get" asp-controller="BlogHome" asp-action="Index" id="trackForm">
-        <select name="track" id="track" class="form-control" onchange="document.getElementById('trackForm').submit();">
-            <option value="">-- Select a Track --</option>
+    <div class="CreateBlogPost rounded p-3 boxShadow">
+
+        <form method="get" asp-controller="BlogHome" asp-action="Index" id="trackForm">
+            <select name="track" id="track" class="form-control" onchange="document.getElementById('trackForm').submit();">
+                <option value="@Model.FilteredTrack">
+                    @(string.IsNullOrEmpty(Model.FilteredTrack) ? "-- Select a Track --" : Model.FilteredTrack)
+                </option>
                 @foreach (var item in ViewBag.AllTracks)
                 {
+                    @if (item.Title == Model.FilteredTrack) continue;
                     <option value="@item.Title">@item.Title</option>
                 }
-        </select>
-    </form>
+            </select>
+            <select name="filterBy" id="sort" class="form-control" onchange="document.getElementById('trackForm').submit();">
+                @if(Model.SortedBy == "Recent"){
+                    <option value="Recent">Sort By Recency</option>
+                    <option value="Popular">Sort By Upvotes</option>
 
-    @await Html.PartialAsync("_Posts", Model.posts)
+
+                } else {
+                    <option value="Popular">Sort By Upvotes</option>
+                    <option value="Recent">Sort By Recency</option>
+                }
+            </select>
+        </form>
+        @await Html.PartialAsync("_Posts", Model.posts)
+    </div>
 </div>
 
 @await Html.PartialAsync("_Pagination", new { Page = ViewBag.Page, TotalPages = ViewBag.TotalPages, QueryString = ViewContext.HttpContext.Request.Query })
