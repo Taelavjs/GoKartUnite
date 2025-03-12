@@ -37,6 +37,7 @@ namespace GoKartUnite
             builder.Services.AddScoped<INotificationHandler, NotificationHandler>();
             builder.Services.AddScoped<IRoleHandler, RoleHandler>();
             builder.Services.AddScoped<IKarterStatHandler, KarterStatHandler>();
+            builder.Services.AddScoped<IGroupHandler, GroupHandler>();
             builder.Services.AddControllers().AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             );

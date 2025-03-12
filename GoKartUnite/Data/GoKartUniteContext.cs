@@ -85,5 +85,6 @@ namespace GoKartUnite.Data
         public DbSet<GoKartUnite.Models.Role> Role { get; set; } = default!;
         public DbSet<GoKartUnite.Models.TrackAdmins> TrackAdmin { get; set; } = default!;
         public DbSet<GoKartUnite.Models.KarterTrackStats> KarterTrackStats { get; set; } = default!;
+        public DbSet<GoKartUnite.Models.Group> Groups { get; set; } = default!;
     }
 }
