@@ -7,7 +7,8 @@
         public string Description { get; set; }
         public string? LeaderName { get; set; }
 
-        public bool? isMember { get; set; } = false;
+        public bool isMember { get; set; } = false;
+        public bool isOwner { get; set; } = false;
 
         public int NumberMembers { get; set; } = 0;
         public DateTime DateCreated { get; set; }

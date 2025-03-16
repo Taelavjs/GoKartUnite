@@ -4,6 +4,10 @@
 @{
 }
 @model GoKartUnite.ViewModel.GroupView
+
+@Model.isMember
+@Model.isOwner
+
 <div class="card-body mb-1 border-bottom" id="group-@Model.Id">
     <h5 class="card-title">@Model.Name</h5>
     <p class="card-text">@Model.Description</p>
@@ -11,17 +15,17 @@
         <div><i class="bi bi-person-circle"></i> Leader: @Model.LeaderName</div>
         <div><i class="bi bi-calendar"></i> Created: @Model.DateCreated.ToString("yyyy-MM-dd")</div>
         <div><i class="bi bi-people"></i> Members: <span id="members-count-@Model.Id">@Model.NumberMembers</span></div>
-        @if (!Model.isMember ?? false)
+        @if (!Model.isMember && !Model.isOwner)
         {
                 <form asp-action="JoinGroup" asp-controller="Group" method="post" data-group-id="@Model.Id" class="join-form">
                 @Html.AntiForgeryToken()
                     <input type="hidden" name="GroupId" value="@Model.Id" />
                     <button type="submit" class="btn btn-primary btn-sm">Join</button>
                 </form>
-        }
-        else
-        {
-                <i class="bi bi-bookmark-star-fill"></i>
+        } else if(Model.isMember){
+            <i class="bi bi-bookmark-star-fill"></i>
+        } else if(Model.isOwner){
+            <div>You own</div>
         }
     </div>
 </div>

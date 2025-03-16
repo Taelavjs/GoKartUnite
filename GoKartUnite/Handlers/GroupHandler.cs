@@ -29,7 +29,7 @@ namespace GoKartUnite.Handlers
             _context.SaveChanges();
         }
 
-        public async Task<List<GroupView>> GetAllGroups()
+        public async Task<List<GroupView>> GetAllGroups(Karter k)
         {
             List<GroupView> groups = await _context.Groups
                 .Include(g => g.HostKarter)
@@ -43,6 +43,8 @@ namespace GoKartUnite.Handlers
                     LeaderName = g.HostKarter.Name,
                     NumberMembers = g.MemberKarters.Count,
                     DateCreated = g.DateCreated,
+                    isMember = g.MemberKarters.Contains(k),
+                    isOwner = g.HostKarter == k,
                 })
                 .ToListAsync();
 
@@ -55,7 +57,7 @@ namespace GoKartUnite.Handlers
                 .SingleOrDefaultAsync(g => g.Id == groupId);
             if (group == null) return;
 
-            if (!group.MemberKarters.Contains(karter) || group.HostKarter == karter) return;
+            if (group.MemberKarters.Contains(karter) || group.HostKarter == karter) return;
 
             group.MemberKarters.Add(karter);
 

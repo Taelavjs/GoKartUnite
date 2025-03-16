@@ -17,10 +17,12 @@ namespace GoKartUnite.Controllers
             _karters = karters;
         }
 
-
         public async Task<ActionResult> Index()
         {
-            List<GroupView> groups = await _groups.GetAllGroups();
+            Karter? k = await _karters.GetUserByGoogleId(User.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
+
+            List<GroupView> groups = await _groups.GetAllGroups(k);
 
             var groupPage = new GroupPageView
             {
@@ -40,16 +42,20 @@ namespace GoKartUnite.Controllers
                 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
             await _groups.CreateNewGroup(group, k);
 
-
             return RedirectToAction("Index");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult JoinGroup(int GroupId)
+        public async Task<IActionResult> JoinGroup(int GroupId)
         {
+            Karter? k = await _karters.GetUserByGoogleId(User.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
+            if (k == null) return Json(new { success = false, newMemberCount = 6 });
+
+            await _groups.JoinGroup(GroupId, k);
+
             return Json(new { success = true, newMemberCount = 6 });
         }
-
     }
 }
