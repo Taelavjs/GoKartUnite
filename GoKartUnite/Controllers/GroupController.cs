@@ -51,11 +51,25 @@ namespace GoKartUnite.Controllers
         {
             Karter? k = await _karters.GetUserByGoogleId(User.Claims
                 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
-            if (k == null) return Json(new { success = false, newMemberCount = 6 });
+            if (k == null) return RedirectToAction("Index");
+
 
             await _groups.JoinGroup(GroupId, k);
 
-            return Json(new { success = true, newMemberCount = 6 });
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LeaveGroup(int GroupId)
+        {
+            Karter? k = await _karters.GetUserByGoogleId(User.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
+            if (k == null) return RedirectToAction("Index");
+
+            await _groups.LeaveGroup(GroupId, k);
+
+            return RedirectToAction("Index");
         }
     }
 }

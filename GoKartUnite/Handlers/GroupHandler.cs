@@ -1,6 +1,7 @@
 ﻿using GoKartUnite.Data;
 using GoKartUnite.Interfaces;
 using GoKartUnite.Models;
+using GoKartUnite.Models.Groups;
 using GoKartUnite.ViewModel;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,19 +21,32 @@ namespace GoKartUnite.Handlers
             Group newGroup = new Group
             {
                 Title = group.Name,
-                HostKarter = k,
                 Description = group.Description,
                 HostId = k.Id,
             };
 
             _context.Groups.Add(newGroup);
             _context.SaveChanges();
+
+
+            Membership newMembership = new Membership
+            {
+                KarterId = k.Id,
+                User = k,
+                GroupId = newGroup.Id,
+                Group = newGroup,
+                MemberRole = GroupMemberStatus.OWNER
+            };
+
+            newGroup.MemberKarters = new List<Membership> { newMembership };
+
+            _context.Memberships.Add(newMembership);
+            _context.SaveChanges();
         }
 
         public async Task<List<GroupView>> GetAllGroups(Karter k)
         {
             List<GroupView> groups = await _context.Groups
-                .Include(g => g.HostKarter)
                 .Include(g => g.MemberKarters)
                 .Include(g => g.GroupPosts)
                 .Select(g => new GroupView
@@ -43,8 +57,7 @@ namespace GoKartUnite.Handlers
                     LeaderName = g.HostKarter.Name,
                     NumberMembers = g.MemberKarters.Count,
                     DateCreated = g.DateCreated,
-                    isMember = g.MemberKarters.Contains(k),
-                    isOwner = g.HostKarter == k,
+                    isMember = g.MemberKarters.Any(x => x.KarterId == k.Id) || g.HostKarter == k,
                 })
                 .ToListAsync();
 
@@ -53,13 +66,20 @@ namespace GoKartUnite.Handlers
 
         public async Task JoinGroup(int groupId, Karter karter)
         {
-            Group? group = await _context.Groups
+            var group = await _context.Groups.Include(x => x.MemberKarters)
                 .SingleOrDefaultAsync(g => g.Id == groupId);
             if (group == null) return;
 
-            if (group.MemberKarters.Contains(karter) || group.HostKarter == karter) return;
+            if (group.MemberKarters.Any(x => x.User == karter && x.Group == group) || group.HostKarter == karter) return;
 
-            group.MemberKarters.Add(karter);
+            group.MemberKarters.Add(new Membership
+            {
+                User = karter,
+                KarterId = karter.Id,
+                Group = group,
+                GroupId = group.Id,
+                MemberRole = GroupMemberStatus.MEMBER,
+            });
 
             _context.Groups.Update(group);
             await _context.SaveChangesAsync();
@@ -71,12 +91,15 @@ namespace GoKartUnite.Handlers
                 .SingleOrDefaultAsync(g => g.Id == groupId);
             if (group == null) return;
 
-            if (!group.MemberKarters.Contains(karter)) return;
-
-            group.MemberKarters.Remove(karter);
-
-            _context.Groups.Update(group);
-            await _context.SaveChangesAsync();
+            if (!group.MemberKarters.Any(x => x.KarterId == karter.Id)) return;
+            var membershipToRemove = group.MemberKarters
+                .FirstOrDefault(x => x.GroupId == group.Id && x.KarterId == karter.Id);
+            if (membershipToRemove != null)
+            {
+                group.MemberKarters.Remove(membershipToRemove);
+                _context.Memberships.Remove(membershipToRemove);
+                await _context.SaveChangesAsync();
+            }
         }
 
 

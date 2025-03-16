@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using GoKartUnite.Models;
+using GoKartUnite.Models.Groups;
 using Microsoft.EntityFrameworkCore;
-using GoKartUnite.Models;
 
 namespace GoKartUnite.Data
 {
@@ -72,8 +69,41 @@ namespace GoKartUnite.Data
                 .HasForeignKey(c => c.VoterId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Membership>()
+                .HasKey(f => new { f.GroupId, f.KarterId });
 
+            modelBuilder.Entity<Membership>()
+                .HasOne(f => f.User)
+                .WithMany()
+                .HasForeignKey(f => f.KarterId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Membership>()
+                .HasOne(f => f.Group)
+                .WithMany()
+                .HasForeignKey(f => f.GroupId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Group>()
+    .HasOne(g => g.HostKarter)  // Group has one HostKarter
+    .WithMany()  // A Karter can be a host of multiple groups
+    .HasForeignKey(g => g.HostId)  // HostId is the foreign key
+    .OnDelete(DeleteBehavior.Restrict);  // Prevent cascade delete (optional)
+
+            // Configuring the Membership-Karter-Group relationships
+            modelBuilder.Entity<Membership>()
+                .HasOne(m => m.Group)
+                .WithMany(g => g.MemberKarters)
+                .HasForeignKey(m => m.GroupId)
+                .OnDelete(DeleteBehavior.Cascade);  // When Group is deleted, remove Memberships (optional)
+
+            modelBuilder.Entity<Membership>()
+                .HasOne(m => m.User)
+                .WithMany()  // A Karter can have multiple Memberships
+                .HasForeignKey(m => m.KarterId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
+
         public DbSet<GoKartUnite.Models.Karter> Karter { get; set; } = default!;
         public DbSet<GoKartUnite.Models.Track> Track { get; set; } = default!;
         public DbSet<GoKartUnite.Models.Friendships> Friendships { get; set; } = default!;
@@ -85,6 +115,7 @@ namespace GoKartUnite.Data
         public DbSet<GoKartUnite.Models.Role> Role { get; set; } = default!;
         public DbSet<GoKartUnite.Models.TrackAdmins> TrackAdmin { get; set; } = default!;
         public DbSet<GoKartUnite.Models.KarterTrackStats> KarterTrackStats { get; set; } = default!;
-        public DbSet<GoKartUnite.Models.Group> Groups { get; set; } = default!;
+        public DbSet<GoKartUnite.Models.Groups.Membership> Memberships { get; set; } = default!;
+        public DbSet<Group> Groups { get; set; } = default!;
     }
 }
