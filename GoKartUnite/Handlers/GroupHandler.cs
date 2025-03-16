@@ -16,7 +16,7 @@ namespace GoKartUnite.Handlers
             _context = context;
         }
 
-        public async Task CreateNewGroup(GroupView group, Karter k)
+        public async Task CreateNewGroup(ListedGroupView group, Karter k)
         {
             Group newGroup = new Group
             {
@@ -44,12 +44,12 @@ namespace GoKartUnite.Handlers
             _context.SaveChanges();
         }
 
-        public async Task<List<GroupView>> GetAllGroups(Karter k)
+        public async Task<List<ListedGroupView>> GetAllGroups(Karter k)
         {
-            List<GroupView> groups = await _context.Groups
+            List<ListedGroupView> groups = await _context.Groups
                 .Include(g => g.MemberKarters)
                 .Include(g => g.GroupPosts)
-                .Select(g => new GroupView
+                .Select(g => new ListedGroupView
                 {
                     Id = g.Id,
                     Name = g.Title,
@@ -57,6 +57,7 @@ namespace GoKartUnite.Handlers
                     LeaderName = g.HostKarter.Name,
                     NumberMembers = g.MemberKarters.Count,
                     DateCreated = g.DateCreated,
+                    isOwner = g.HostKarter == k,
                     isMember = g.MemberKarters.Any(x => x.KarterId == k.Id) || g.HostKarter == k,
                 })
                 .ToListAsync();

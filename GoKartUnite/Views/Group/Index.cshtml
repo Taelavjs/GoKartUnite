@@ -9,12 +9,12 @@
         <form asp-action="CreateGroup" method="post">
             @Html.AntiForgeryToken()
 
-            <input asp-for="@Model.PostageGroup.Name" class="form-control form-control-lg" placeholder="Enter Group Name" />
-            <span asp-validation-for="@Model.PostageGroup.Name" class="text-danger"></span>
+            <input asp-for="PostageGroup.Name" class="form-control form-control-lg" placeholder="Enter Group Name" />
+            <span asp-validation-for="PostageGroup.Name" class="text-danger"></span>
 
-            <textarea asp-for="@Model.PostageGroup.Description" class="form-control form-control-sm border-0 shadow-sm w-100" 
+        <textarea asp-for="PostageGroup.Description" class="form-control form-control-sm border-0 shadow-sm w-100"
                   placeholder="Write A Description" rows="3"></textarea>            
-            <span asp-validation-for="@Model.PostageGroup.Description" class="text-danger"></span>
+            <span asp-validation-for="PostageGroup.Description" class="text-danger"></span>
             <input type="submit" class="mb-2 btn btn-primary" />
 
         </form>

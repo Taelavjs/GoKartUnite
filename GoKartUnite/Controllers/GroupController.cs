@@ -22,25 +22,27 @@ namespace GoKartUnite.Controllers
             Karter? k = await _karters.GetUserByGoogleId(User.Claims
                 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
 
-            List<GroupView> groups = await _groups.GetAllGroups(k);
+            List<ListedGroupView> groups = await _groups.GetAllGroups(k);
 
             var groupPage = new GroupPageView
             {
                 Groups = groups,
+                PostageGroup = new ListedGroupView()
             };
             return View(groupPage);
         }
 
         [HttpPost]
-        public async Task<ActionResult> CreateGroup(GroupView group)
+        public async Task<ActionResult> CreateGroup(GroupPageView model)
         {
-            if (!ModelState.IsValid)
+            ListedGroupView listedGroup = new ListedGroupView();
+            if (ModelState.IsValid)
             {
-                return View("Index");
+                listedGroup = model.PostageGroup;  // This refers to ListedGroupView within GroupPageView
             }
             Karter k = await _karters.GetUserByGoogleId(User.Claims
                 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
-            await _groups.CreateNewGroup(group, k);
+            await _groups.CreateNewGroup(listedGroup, k);
 
             return RedirectToAction("Index");
         }

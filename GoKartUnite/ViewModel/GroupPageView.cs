@@ -2,8 +2,8 @@
 {
     public class GroupPageView
     {
-        public List<GroupView> Groups { get; set; } = new List<GroupView>();
-        public GroupView PostageGroup { get; set; } = new GroupView();
+        public List<ListedGroupView> Groups { get; set; } = new List<ListedGroupView>();
+        public ListedGroupView PostageGroup { get; set; } = new ListedGroupView();
 
 
     }
