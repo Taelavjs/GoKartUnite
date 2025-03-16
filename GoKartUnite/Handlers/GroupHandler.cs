@@ -2,7 +2,6 @@
 using GoKartUnite.Interfaces;
 using GoKartUnite.Models;
 using GoKartUnite.ViewModel;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace GoKartUnite.Handlers
@@ -49,5 +48,35 @@ namespace GoKartUnite.Handlers
 
             return groups;
         }
+
+        public async Task JoinGroup(int groupId, Karter karter)
+        {
+            Group? group = await _context.Groups
+                .SingleOrDefaultAsync(g => g.Id == groupId);
+            if (group == null) return;
+
+            if (!group.MemberKarters.Contains(karter) || group.HostKarter == karter) return;
+
+            group.MemberKarters.Add(karter);
+
+            _context.Groups.Update(group);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task LeaveGroup(int groupId, Karter karter)
+        {
+            Group? group = await _context.Groups
+                .SingleOrDefaultAsync(g => g.Id == groupId);
+            if (group == null) return;
+
+            if (!group.MemberKarters.Contains(karter)) return;
+
+            group.MemberKarters.Remove(karter);
+
+            _context.Groups.Update(group);
+            await _context.SaveChangesAsync();
+        }
+
+
     }
 }

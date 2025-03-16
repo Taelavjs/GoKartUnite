@@ -7,6 +7,9 @@ namespace GoKartUnite.Interfaces
     {
         Task CreateNewGroup(GroupView group, Karter k);
         Task<List<GroupView>> GetAllGroups();
+        Task JoinGroup(int groupId, Karter karter);
+        Task LeaveGroup(int groupId, Karter karter);
+
 
     }
 }
