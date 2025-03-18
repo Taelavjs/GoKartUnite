@@ -4,6 +4,7 @@ using GoKartUnite.Models;
 using GoKartUnite.Models.Groups;
 using GoKartUnite.ViewModel;
 using Microsoft.EntityFrameworkCore;
+using SendGrid.Helpers.Mail;
 
 namespace GoKartUnite.Handlers
 {
@@ -101,6 +102,13 @@ namespace GoKartUnite.Handlers
                 _context.Memberships.Remove(membershipToRemove);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task<List<Group>> GetMessagesForGroup(int groupId)
+        {
+            List<Group> groupsToReturn = _context.Groups.Where(x => x.Id == groupId)
+                .Include(x => x.GroupPosts).ToList();
+            return groupsToReturn;
         }
 
 

@@ -1,7 +1,6 @@
 ﻿using GoKartUnite.CustomAttributes;
 using GoKartUnite.Handlers;
 using GoKartUnite.Models;
-using GoKartUnite.ViewModel;
 using GoKartUnite.DataFilterOptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
@@ -13,6 +12,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using GoKartUnite.DataFilterOptions;
 using System.Drawing.Printing;
 using GoKartUnite.Interfaces;
+using GoKartUnite.ViewModel;
 
 namespace GoKartUnite.Controllers
 {

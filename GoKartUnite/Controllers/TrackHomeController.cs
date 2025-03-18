@@ -2,7 +2,6 @@
 using GoKartUnite.Data;
 using GoKartUnite.Handlers;
 using GoKartUnite.Models;
-using GoKartUnite.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +11,7 @@ using System.Reflection.Metadata;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using GoKartUnite.Interfaces;
+using GoKartUnite.ViewModel;
 
 namespace GoKartUnite.Controllers
 {

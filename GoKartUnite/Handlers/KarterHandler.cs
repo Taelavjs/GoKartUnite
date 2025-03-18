@@ -3,11 +3,11 @@ using GoKartUnite.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Web.Mvc;
 using System.Security.Claims;
-using GoKartUnite.ViewModel;
 using Microsoft.IdentityModel.Tokens;
 using GoKartUnite.Interfaces;
 using GoKartUnite.DataFilterOptions;
 using Microsoft.Extensions.Options;
+using GoKartUnite.ViewModel;
 
 namespace GoKartUnite.Handlers
 {

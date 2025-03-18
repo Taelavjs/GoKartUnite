@@ -10,11 +10,13 @@ namespace GoKartUnite.Controllers
     {
         private readonly IGroupHandler _groups;
         private readonly IKarterHandler _karters;
+        private readonly IBlogHandler _blog;
 
-        public GroupController(IKarterHandler karters, IGroupHandler groups)
+        public GroupController(IKarterHandler karters, IGroupHandler groups, IBlogHandler blog)
         {
             _groups = groups;
             _karters = karters;
+            _blog = blog;
         }
 
         public async Task<ActionResult> Index()
@@ -72,6 +74,16 @@ namespace GoKartUnite.Controllers
             await _groups.LeaveGroup(GroupId, k);
 
             return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> Home()
+        {
+
+            GroupHomeView returnObj = new GroupHomeView
+            {
+                Posts = await _blog.GetModelToView(await _blog.GetAllPosts(new DataFilterOptions.BlogFilterOptions())),
+            };
+            return View(returnObj);
         }
     }
 }

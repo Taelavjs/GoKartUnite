@@ -3,7 +3,6 @@ using GoKartUnite.CustomAttributes;
 using GoKartUnite.Data;
 using GoKartUnite.Handlers;
 using GoKartUnite.Models;
-using GoKartUnite.ViewModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp;
@@ -13,6 +12,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using GoKartUnite.Interfaces;
 using GoKartUnite.DataFilterOptions;
+using GoKartUnite.ViewModel;
 
 namespace GoKartUnite.Controllers
 {
