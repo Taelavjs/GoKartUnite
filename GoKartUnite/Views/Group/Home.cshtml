@@ -18,4 +18,11 @@
             <div>@message.MessageContent</div>
         }
     </div>
+
+    <div class="w-100">
+        @foreach (var member in Model.Members)
+        {
+            <div>@member.Name</div>
+        }
+    </div>
 </div>

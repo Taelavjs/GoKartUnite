@@ -86,6 +86,7 @@ namespace GoKartUnite.Controllers
             {
                 Posts = await _blog.GetModelToView(await _blog.GetAllPosts(new DataFilterOptions.BlogFilterOptions())),
                 Group = await _groups.ToDTO(g),
+                Members = await _groups.GetAllMembersProjection(GroupId),
             };
             return View(returnObj);
         }

@@ -2,6 +2,7 @@
 using GoKartUnite.Interfaces;
 using GoKartUnite.Models;
 using GoKartUnite.Models.Groups;
+using GoKartUnite.Projection;
 using GoKartUnite.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using SendGrid.Helpers.Mail;
@@ -157,7 +158,20 @@ namespace GoKartUnite.Handlers
         {
             return await _context.Groups
                 .Include(X => X.GroupMessages)
+                .Include(x => x.MemberKarters)
                 .SingleOrDefaultAsync(x => x.Id == groupId);
+        }
+
+        public async Task<List<GroupMember>> GetAllMembersProjection(int groupId)
+        {
+            return await _context.Groups
+                .Where(x => x.Id == groupId)
+                .SelectMany(p => p.MemberKarters.Select(m => new GroupMember
+                {
+                    Id = m.KarterId,
+                    Name = m.User.Name,
+                }))
+                .ToListAsync();
         }
     }
 }

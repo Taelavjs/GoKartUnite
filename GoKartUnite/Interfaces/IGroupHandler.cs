@@ -1,5 +1,6 @@
 ﻿using GoKartUnite.Models;
 using GoKartUnite.Models.Groups;
+using GoKartUnite.Projection;
 using GoKartUnite.ViewModel;
 
 namespace GoKartUnite.Interfaces
@@ -14,6 +15,7 @@ namespace GoKartUnite.Interfaces
         Task<List<GroupView>> ToDTOList(List<Group> group);
         Task<GroupView> ToDTO(Group group);
         Task<Group> GetGroupById(int groupId);
+        Task<List<GroupMember>> GetAllMembersProjection(int groupId);
 
     }
 }
