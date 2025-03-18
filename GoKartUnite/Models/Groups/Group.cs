@@ -11,7 +11,7 @@ namespace GoKartUnite.Models.Groups
         public int HostId { get; set; }
         public virtual Karter HostKarter { get; set; }
         public virtual List<Membership> MemberKarters { get; set; } = new List<Membership>();
-        public virtual List<GroupMessage> GroupPosts { get; set; } = new List<GroupMessage>();
+        public virtual List<GroupMessage> GroupMessages { get; set; } = new List<GroupMessage>();
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
     }
 }

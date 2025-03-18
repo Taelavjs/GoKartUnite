@@ -49,7 +49,7 @@ namespace GoKartUnite.Handlers
         {
             List<ListedGroupView> groups = await _context.Groups
                 .Include(g => g.MemberKarters)
-                .Include(g => g.GroupPosts)
+                .Include(g => g.GroupMessages)
                 .Select(g => new ListedGroupView
                 {
                     Id = g.Id,
@@ -107,10 +107,50 @@ namespace GoKartUnite.Handlers
         public async Task<List<Group>> GetMessagesForGroup(int groupId)
         {
             List<Group> groupsToReturn = _context.Groups.Where(x => x.Id == groupId)
-                .Include(x => x.GroupPosts).ToList();
+                .Include(x => x.GroupMessages).ToList();
             return groupsToReturn;
         }
 
+        public static async Task<GroupView> ToDTO(Group group)
+        {
+            return new GroupView
+            {
+                Id = group.Id,
+                Description = group.Description,
+                Comments = await MessagesToDTO(group.GroupMessages),
+                CreatorName = group.HostKarter.Name,
+                MemberCount = group.MemberKarters?.Count ?? 0,
+                Name = group.Title,
+            };
+        }
 
+        public static async Task<List<GroupView>> ToDTOList(List<Group> group)
+        {
+            List<GroupView> listToReturn = new List<GroupView>();
+            foreach (Group groupView in group)
+            {
+                listToReturn.Add(await ToDTO(groupView));
+            }
+            return listToReturn;
+
+        }
+
+
+        public static async Task<List<GroupMessageView>> MessagesToDTO(List<GroupMessage> comments)
+        {
+            List<GroupMessageView> commentsToReturn = new List<GroupMessageView>();
+
+            foreach (GroupMessage comment in comments)
+            {
+                commentsToReturn.Add(new GroupMessageView
+                {
+                    Id = comment.Id,
+                    AuthorName = comment.Author?.Name ?? "",
+                    MessageContent = comment.MessageContent,
+                    TimeSent = comment.DateTimePosted,
+                });
+            }
+            return commentsToReturn;
+        }
     }
 }
