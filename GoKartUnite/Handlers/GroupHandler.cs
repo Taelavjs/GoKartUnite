@@ -155,7 +155,9 @@ namespace GoKartUnite.Handlers
 
         public async Task<Group> GetGroupById(int groupId)
         {
-            return await _context.Groups.SingleOrDefaultAsync(x => x.Id == groupId);
+            return await _context.Groups
+                .Include(X => X.GroupMessages)
+                .SingleOrDefaultAsync(x => x.Id == groupId);
         }
     }
 }

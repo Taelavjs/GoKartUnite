@@ -6,15 +6,16 @@
 @model GoKartUnite.ViewModel.GroupHomeView
 <div class="d-flex flex-column"> @* 2 Columsn, With 1 Centered, One immediately right*@
     <div class="d-flex flex-column w-75 m-auto">
-        <div class="w-100">Group Name</div>
-        <div class="w-100">Description...</div>
+        <div class="w-100">@Model.Group.Name</div>
+        <div class="w-100">@Model.Group.Description</div>
         <div class="d-flex justify-content-around flex-row w-100">
-            <div>Member Count : 50</div>
-            <div>Owner : John Doe</div>
+            <div>Member Count : @Model.Group.MemberCount</div>
+            <div>Owner : @Model.Group.CreatorName</div>
         </div>
     </div>
-    ndai
     <div class="w-100">
-        @await Html.PartialAsync("~/Views/BlogHome/_Posts.cshtml", Model.Posts)
+        @foreach(var message in Model.Group.Comments){
+            <div>@message.MessageContent</div>
+        }
     </div>
 </div>
