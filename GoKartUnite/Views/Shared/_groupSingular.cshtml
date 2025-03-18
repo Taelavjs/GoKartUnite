@@ -6,7 +6,12 @@
 @model GoKartUnite.ViewModel.ListedGroupView
 
 <div class="card-body mb-1 border-bottom" id="group-@Model.Id">
-    <h5 class="card-title">@Model.Name</h5>
+    <h5 class="card-title">
+
+        <a class="link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover" href="/group/home?groupid=@Model.Id">
+            @Model.Name
+        </a>
+    </h5>
     <p class="card-text">@Model.Description</p>
     <div class="d-flex flex-wrap justify-content-between text-muted mb-2">
         <div><i class="bi bi-person-circle"></i> Leader: @Model.LeaderName</div>
