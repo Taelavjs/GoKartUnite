@@ -111,20 +111,20 @@ namespace GoKartUnite.Handlers
             return groupsToReturn;
         }
 
-        public static async Task<GroupView> ToDTO(Group group)
+        public async Task<GroupView> ToDTO(Group group)
         {
             return new GroupView
             {
                 Id = group.Id,
                 Description = group.Description,
                 Comments = await MessagesToDTO(group.GroupMessages),
-                CreatorName = group.HostKarter.Name,
+                CreatorName = group.HostKarter?.Name ?? "",
                 MemberCount = group.MemberKarters?.Count ?? 0,
                 Name = group.Title,
             };
         }
 
-        public static async Task<List<GroupView>> ToDTOList(List<Group> group)
+        public async Task<List<GroupView>> ToDTOList(List<Group> group)
         {
             List<GroupView> listToReturn = new List<GroupView>();
             foreach (Group groupView in group)
@@ -136,7 +136,7 @@ namespace GoKartUnite.Handlers
         }
 
 
-        public static async Task<List<GroupMessageView>> MessagesToDTO(List<GroupMessage> comments)
+        public async Task<List<GroupMessageView>> MessagesToDTO(List<GroupMessage> comments)
         {
             List<GroupMessageView> commentsToReturn = new List<GroupMessageView>();
 
@@ -151,6 +151,11 @@ namespace GoKartUnite.Handlers
                 });
             }
             return commentsToReturn;
+        }
+
+        public async Task<Group> GetGroupById(int groupId)
+        {
+            return await _context.Groups.SingleOrDefaultAsync(x => x.Id == groupId);
         }
     }
 }

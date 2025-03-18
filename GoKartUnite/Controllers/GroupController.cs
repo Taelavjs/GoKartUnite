@@ -1,5 +1,6 @@
 ﻿using GoKartUnite.Interfaces;
 using GoKartUnite.Models;
+using GoKartUnite.Models.Groups;
 using GoKartUnite.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -76,12 +77,15 @@ namespace GoKartUnite.Controllers
             return RedirectToAction("Index");
         }
 
-        public async Task<IActionResult> Home()
+        public async Task<IActionResult> Home(int GroupId)
         {
+            Group g = await _groups.GetGroupById(GroupId) ?? null;
+            if (g == null) return NotFound();
 
             GroupHomeView returnObj = new GroupHomeView
             {
                 Posts = await _blog.GetModelToView(await _blog.GetAllPosts(new DataFilterOptions.BlogFilterOptions())),
+                Group = await _groups.ToDTO(g),
             };
             return View(returnObj);
         }
