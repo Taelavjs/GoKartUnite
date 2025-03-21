@@ -4,6 +4,7 @@ using GoKartUnite.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GoKartUnite.Migrations
 {
     [DbContext(typeof(GoKartUniteContext))]
-    partial class GoKartUniteContextModelSnapshot : ModelSnapshot
+    [Migration("20250321193631_GroupNotificationsOfStats")]
+    partial class GroupNotificationsOfStats
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -231,7 +234,7 @@ namespace GoKartUnite.Migrations
 
                     b.HasIndex("GroupCommentOnId");
 
-                    b.ToTable("GroupMessages");
+                    b.ToTable("GroupMessage");
                 });
 
             modelBuilder.Entity("GoKartUnite.Models.Groups.GroupNotification", b =>

@@ -117,5 +117,7 @@ namespace GoKartUnite.Data
         public DbSet<GoKartUnite.Models.KarterTrackStats> KarterTrackStats { get; set; } = default!;
         public DbSet<GoKartUnite.Models.Groups.Membership> Memberships { get; set; } = default!;
         public DbSet<Group> Groups { get; set; } = default!;
+        public DbSet<GroupMessage> GroupMessages { get; set; } = default!;
+        public DbSet<GroupNotification> GroupNotifications { get; set; } = default!;
     }
 }

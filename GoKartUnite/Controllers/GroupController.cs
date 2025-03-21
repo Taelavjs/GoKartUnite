@@ -79,7 +79,7 @@ namespace GoKartUnite.Controllers
 
         public async Task<IActionResult> Home(int GroupId)
         {
-            Group g = await _groups.GetGroupById(GroupId) ?? null;
+            Group? g = await _groups.GetGroupById(GroupId);
             if (g == null) return NotFound();
 
             GroupHomeView returnObj = new GroupHomeView
