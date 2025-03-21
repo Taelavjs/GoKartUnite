@@ -16,6 +16,7 @@ namespace GoKartUnite.Interfaces
         Task<GroupView> ToDTO(Group group);
         Task<Group> GetGroupById(int groupId);
         Task<List<GroupMember>> GetAllMembersProjection(int groupId);
+        Task<List<GroupStatDisplay>> GetStatsForGroupGraph(int groupId, string trackTitle);
 
     }
 }

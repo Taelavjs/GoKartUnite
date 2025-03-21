@@ -1,9 +1,11 @@
 ﻿using GoKartUnite.Interfaces;
 using GoKartUnite.Models;
 using GoKartUnite.Models.Groups;
+using GoKartUnite.Projection;
 using GoKartUnite.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Web.Helpers;
 
 namespace GoKartUnite.Controllers
 {
@@ -89,6 +91,17 @@ namespace GoKartUnite.Controllers
                 Members = await _groups.GetAllMembersProjection(GroupId),
             };
             return View(returnObj);
+        }
+
+        public async Task<JsonResult> GroupStats(int GroupId)
+        {
+            List<GroupStatDisplay> statsToClient = await _groups.GetStatsForGroupGraph(GroupId, "newbuckmore");
+
+
+
+
+
+            return Json(statsToClient);
         }
     }
 }

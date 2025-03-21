@@ -1,8 +1,4 @@
 ﻿$(document).ready(function () {
-
-
-
-
     function convertToMilliseconds(timeString) {
         console.log(timeString);
 

@@ -39,6 +39,7 @@
         </div>
     </div>
 
+    <div style="width: 800px;"><canvas id="acquisitions" data-groupId="@Model.Group.Id"></canvas></div>
 
 
 </div>
@@ -47,3 +48,9 @@
     const chatContainer = document.getElementById('chatContainer');
     chatContainer.scrollTop = chatContainer.scrollHeight;
 </script>
+
+@section Scripts
+{
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="~/js/GroupStatPage.js" asp-append-version="true"></script>
+}

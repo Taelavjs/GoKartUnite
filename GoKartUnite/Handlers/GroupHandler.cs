@@ -173,5 +173,40 @@ namespace GoKartUnite.Handlers
                 }))
                 .ToListAsync();
         }
+
+        public async Task<List<GroupStatDisplay>> GetStatsForGroupGraph(int groupId, string trackTitle)
+        {
+            List<int> karterIds = await _context.Groups.Where(x => x.Id == groupId)
+                .SelectMany(x => x.MemberKarters.Select(z => z.KarterId)).ToListAsync();
+
+            karterIds.Add(await _context.Groups.Where(x => x.Id == groupId).Select(x => x.HostId).FirstOrDefaultAsync());
+
+            var t = _context.KarterTrackStats
+                .Include(x => x.ForKarter)
+                .Where(x => karterIds.Contains(x.KarterId) && x.RecordedTrack.Title == trackTitle)
+                .GroupBy(x => x.KarterId);
+
+            List<GroupStatDisplay> stats = new List<GroupStatDisplay>();
+            foreach (var group in t)
+            {
+                var model = group.Select(x => new
+                {
+                    ForKarterName = x.ForKarter.Name,
+                    BestLapTime = x.BestLapTime.TotalMilliseconds
+                }).FirstOrDefault();
+
+                if (model == null) continue;
+
+                stats.Add(new GroupStatDisplay
+                {
+                    KarterName = model.ForKarterName,
+                    BestLapTime = model.BestLapTime
+                });
+            };
+
+
+
+            return stats;
+        }
     }
 }
