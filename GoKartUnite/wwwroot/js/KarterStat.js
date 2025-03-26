@@ -1,152 +1,110 @@
-﻿$(document).ready(function () {
-    function convertToMilliseconds(timeString) {
-        console.log(timeString);
+﻿var loadingElement;
+$(document).ready(function () {
+    loadingElement = document.getElementById("GroupStatGraphLoading");
+    loadingElement.style.visibility = "hidden";
 
-        const parts = timeString.split(':');
-        const minutes = parseInt(parts[0], 10);
-        const seconds = parseInt(parts[1], 10);
-        const milliseconds = parseInt(parts[2], 10);
-        return (minutes * 60 + seconds) * 1000 + milliseconds;
-    }
+    var selector = document.getElementById("GraphTitleSelector");
 
+    GroupMembersStatsRequest(selector.value);
+
+
+    selector.addEventListener("change", function () {
+        loadingElement.style.visibility = "visible";
+
+        GroupMembersStatsRequest(selector.value);
+    });
+});
+
+function convertToMilliseconds(timeString) {
+    const parts = timeString.split(':');
+    const minutes = parseInt(parts[0], 10);
+    const seconds = parseInt(parts[1], 10);
+    const milliseconds = parseInt(parts[2], 10);
+    return (minutes * 60 + seconds) * 1000 + milliseconds;
+}
+
+const GroupMembersStatsRequest = (TrackTitle) => {
     var dateTimeData = [];
+    loadingElement.style.visibility = "visible";
 
-    let threeMonthsAgo = new Date();
-    threeMonthsAgo.setMonth(new Date().getMonth() - 3);
-    var myChart;
     $.ajax({
         type: "GET",
-        url: `${window.location.origin}/KarterHome/GetKartersStats`,
+        url: `${window.location.origin}/KarterHome/GetKartersStats?TrackTitle=${TrackTitle}`,
         contentType: "application/json; charset=utf-8",
         dataType: "json",
-        success: function (response) {
-            let trackToFilterFor;
-            for (let i = 0; i < response.length; i++) {
-                const kartStat = response[i];
-
-                const timeInMs = convertToMilliseconds(kartStat.bestLapTime);
-                if (!trackToFilterFor) trackToFilterFor = kartStat.trackTitle;
-                const date = new Date(kartStat.dateOnlyRecorded);
-                dateTimeData.push({ date: date, time: timeInMs, timeString: kartStat.bestLapTime, trackTitle: kartStat.trackTitle });
+        success: async (retObj) => {
+            console.log(retObj);
+            if (Chart.getChart("acquisitions")) {
+                Chart.getChart("acquisitions")?.destroy()
             }
-            dateTimeData.sort((a, b) => a.date - b.date);
+            retObj.sort((a, b) => {
+                const dateA = new Date(a.dateOnlyRecorded);
+                const dateB = new Date(b.dateOnlyRecorded);
+                return dateA - dateB;
+            });
+            const bestLapTimes = retObj.map(row => {
+                return convertToMilliseconds(row.bestLapTime);
+            });
+            const minLapTime = Math.min(...bestLapTimes);
+            const maxLapTime = Math.max(...bestLapTimes);
+            const stepSize = Math.round((maxLapTime - minLapTime) / 10);
+            const lastDate = retObj[retObj.length - 1].dateOnlyRecorded;
 
-            let filteredDateTimeData = dateTimeData.filter(item => item.trackTitle == trackToFilterFor);
-
-            var dates = filteredDateTimeData.map(item => item.date);
-            var timesInMilliseconds = filteredDateTimeData.map(item => item.time);
-            var lapTimeString = filteredDateTimeData.map(item => item.timeString);
-            const ctx = document.getElementById('myLineChart').getContext('2d');
-            myChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: dates,
-                    datasets: [{
-                        label: trackToFilterFor,
-                        data: timesInMilliseconds,
-                        borderColor: 'rgb(75, 192, 192)',
-                        pointRadius: 4,
-                        fill: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    elements: {
-                        line: {
-                            tension: 0.1
-                        }
-                    },
-                    scales: {
-                        x: {
-                            type: 'time',
-                            time: {
-                                unit: 'month',
-                                tooltipFormat: 'P'
+            const TrackTitle = retObj.length > 0 ? retObj[0].trackTitle : "Unknown Track";
+            new Chart(
+                document.getElementById("acquisitions"),
+                {
+                    type: 'scatter',
+                    options: {
+                        animation: {
+                            x: {
+                                duration: 1500,
+                                easing: 'easeOutQuad',
+                                from: 0
                             },
-                            min: threeMonthsAgo,
-                            max: new Date(),
-                            title: {
-                                display: true,
-                                text: 'Date'
-                            },
-                            ticks: {
-                                maxRotation: 90,
-                            },
+                            y: {
+                                duration: 1500,
+                                easing: 'easeOutQuad',
+                                from: minLapTime
+                            }
                         },
-                        y: {
-                            ticks: {
-                                font: {
-                                    size: window.innerWidth < 600 ? 12 : 18 // Smaller font on mobile
-                                },
-                                beginAtZero: false,
-                                suggestedMin: Math.min(...timesInMilliseconds) - 100000,
-                                callback: function (value) {
-                                    const minutes = Math.floor(value / (60 * 1000));
-                                    const seconds = Math.floor((value % (60 * 1000)) / 1000);
-                                    const milliseconds = value % 1000;
-                                    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                        scales: {
+                            y: {
+                                type: 'linear',
+                                ticks: {
+                                    min: minLapTime,
+                                    max: maxLapTime,
+                                    stepSize: stepSize,
+                                    callback: function (value) {
+                                        const minutes = Math.floor(value / 60000);
+                                        const seconds = ((value % 60000) / 1000).toFixed(0);
+                                        return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+                                    }
                                 }
                             },
-                            title: {
-                                display: false,
-                                text: 'Lap Time'
+                            x: {
+                                type: "category",
+                                offset: true,
+                                min: lastDate
                             }
                         }
                     },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function (tooltipItem) {
-                                    const timeInMilliseconds = tooltipItem.raw;
-
-                                    const minutes = Math.floor(timeInMilliseconds / (60 * 1000));
-                                    const seconds = Math.floor((timeInMilliseconds % (60 * 1000)) / 1000);
-                                    const milliseconds = timeInMilliseconds % 1000;
-
-                                    const formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}:${milliseconds < 100 ? '0' : ''}${milliseconds}`;
-
-                                    return `Lap Time: ${formattedTime}`;
-                                }
+                    data: {
+                        labels: retObj.map(row => row.dateOnlyRecorded),
+                        datasets: [
+                            {
+                                label: `Best Lap Time At ${TrackTitle}`,
+                                data: retObj.map(row => ({
+                                    x: row.dateOnlyRecorded,
+                                    y: convertToMilliseconds(row.bestLapTime)
+                                }))
                             }
-                        }
+                        ]
                     }
                 }
-            });
-        },
-        error: function (xhr, status, error) {
-            console.log("Error: " + error);
+            );
+            loadingElement.style.visibility = "hidden";
+
         }
-
-
-
     });
-
-
-    $('#GraphTitleSelector').change(function () {
-        const newTitle = $(this).val();
-        let filteredData;
-
-        filteredData = dateTimeData.filter(item => item.trackTitle == newTitle);
-        const filteredDates = filteredData.map(item => item.date);
-        const filteredTimesInMilliseconds = filteredData.map(item => item.time);
-
-        myChart.data.labels = filteredDates;
-        myChart.data.datasets[0].data = filteredTimesInMilliseconds;
-        myChart.data.datasets[0].label = newTitle;
-
-        if (filteredData.length > 0) {
-            const mostRecentDate = filteredData[filteredData.length - 1].date;
-
-            let threeMonthsAgo = new Date(mostRecentDate);
-            threeMonthsAgo.setMonth(mostRecentDate.getMonth() - 3);
-
-            myChart.options.scales.x.min = threeMonthsAgo;
-            myChart.options.scales.x.max = mostRecentDate;
-
-            console.log(filteredData);
-        }
-        myChart.update();
-    });
-
-});
+}

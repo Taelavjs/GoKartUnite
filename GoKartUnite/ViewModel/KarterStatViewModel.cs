@@ -23,7 +23,7 @@ namespace GoKartUnite.ViewModel
         public WEATHERSTATUS WEATHERSTATUS { get; set; } = WEATHERSTATUS.None;
         public TEMPERATURE TEMPERATURE { get; set; } = TEMPERATURE.None;
         [NotMapped] // Prevents EF from trying to map this
-        public string BestLapTime { get; set; } = string.Empty;
+        public string BestLapTime { get; set; }
 
 
     }

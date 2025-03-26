@@ -44,10 +44,11 @@ namespace GoKartUnite.Handlers
             await CreateMessageInAllUserGroups(model.KarterId, track.Title, model.BestLapTime);
         }
 
-        public async Task<List<KarterTrackStats>> GetStatsForKarter(int karterId)
+        public async Task<List<KarterTrackStats>> GetStatsForKarter(int karterId, string trackFilter)
         {
             List<KarterTrackStats> stats = await _context.KarterTrackStats.Include(x => x.ForKarter).Include(x => x.RecordedTrack)
-                .Where(x => x.ForKarter.Id == karterId)
+                .Where(x => x.ForKarter.Id == karterId && x.RecordedTrack.Title == trackFilter)
+                .OrderBy(x => x.DateOnlyRecorded)
                 .ToListAsync();
 
             return stats;

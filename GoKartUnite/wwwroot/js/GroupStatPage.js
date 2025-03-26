@@ -16,7 +16,7 @@ const graphElement = document.getElementById('acquisitions');
 })();
 
 
-const GroupMembersStatsRequest = (TrackTitle) => {
+const GroupMembersStatsRequest = async (TrackTitle) => {
     const groupId = document.getElementById('acquisitions').dataset.groupid;
     console.log("Id : ", groupId, " Track : ", TrackTitle
     )

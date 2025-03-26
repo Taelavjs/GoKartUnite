@@ -95,7 +95,14 @@
 	</div>
 
 	<div class="w-100">
-		<canvas class="w-100" id="myLineChart"></canvas>
+		<div style="position: relative;">
+			<div class="w-100 text-center d-flex justify-content-center align-items-center" id="GroupStatGraphLoading" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;">
+				<div class="spinner-border" role="status">
+					<span class="sr-only"></span>
+				</div>
+			</div>
+			<canvas class="w-100" id="acquisitions"></canvas>
+		</div>
 	</div>
 
 	<!-- Collapsible Partial View Container (Slides In/Out) -->
@@ -121,5 +128,5 @@
 
 @section Scripts
 {
-		<script src="~/js/KarterStat.js" asp-append-version="true"></script>
+	<script src="~/js/KarterStat.js" asp-append-version="true"></script>
 }

@@ -320,12 +320,12 @@ namespace GoKartUnite.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<List<KarterStatViewModel>> GetKartersStats()
+        public async Task<List<KarterStatViewModel>> GetKartersStats(string TrackTitle)
         {
             string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var k = await _karters.GetUserByGoogleId(googleId);
 
-            return await ConvertModelToView(await _statHandler.GetStatsForKarter(k.Id));
+            return await ConvertModelToView(await _statHandler.GetStatsForKarter(k.Id, TrackTitle));
 
 
         }
@@ -351,7 +351,7 @@ namespace GoKartUnite.Controllers
                 StatsViewModel.Add(statViewModel);
             }
 
-            return StatsViewModel;
+            return StatsViewModel.OrderByDescending(x => x.DateOnlyRecorded).ToList();
         }
     }
 
