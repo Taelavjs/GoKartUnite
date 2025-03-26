@@ -38,7 +38,12 @@
             }
         </div>
     </div>
-
+    <select class="form-select" id="groupStatTrackSelect">
+        @foreach (var track in Model.TrackTitles)
+        {
+            <option value="@track">@track</option>
+        }
+    </select>
     <div style="width: 800px;"><canvas id="acquisitions" data-groupId="@Model.Group.Id"></canvas></div>
 
 

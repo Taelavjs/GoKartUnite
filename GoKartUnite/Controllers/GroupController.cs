@@ -14,12 +14,14 @@ namespace GoKartUnite.Controllers
         private readonly IGroupHandler _groups;
         private readonly IKarterHandler _karters;
         private readonly IBlogHandler _blog;
+        private readonly ITrackHandler _track;
 
-        public GroupController(IKarterHandler karters, IGroupHandler groups, IBlogHandler blog)
+        public GroupController(ITrackHandler track, IKarterHandler karters, IGroupHandler groups, IBlogHandler blog)
         {
             _groups = groups;
             _karters = karters;
             _blog = blog;
+            _track = track;
         }
 
         public async Task<ActionResult> Index()
@@ -89,13 +91,14 @@ namespace GoKartUnite.Controllers
                 Posts = await _blog.GetModelToView(await _blog.GetAllPosts(new DataFilterOptions.BlogFilterOptions())),
                 Group = await _groups.ToDTO(g),
                 Members = await _groups.GetAllMembersProjection(GroupId),
+                TrackTitles = await _track.GetAllTrackTitles()
             };
             return View(returnObj);
         }
 
-        public async Task<JsonResult> GroupStats(int GroupId)
+        public async Task<JsonResult> GroupStats(int GroupId, string TrackTitle)
         {
-            List<GroupStatDisplay> statsToClient = await _groups.GetStatsForGroupGraph(GroupId, "newbuckmore");
+            List<GroupStatDisplay> statsToClient = await _groups.GetStatsForGroupGraph(GroupId, TrackTitle);
 
 
 
