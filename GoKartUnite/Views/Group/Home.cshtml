@@ -44,7 +44,15 @@
             <option value="@track">@track</option>
         }
     </select>
-    <div style="width: 800px;"><canvas id="acquisitions" data-groupId="@Model.Group.Id"></canvas></div>
+    <div style="position: relative;">
+        <div class="w-100 text-center d-flex justify-content-center align-items-center" id="GroupStatGraphLoading" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;">
+            <div class="spinner-border" role="status">
+                <span class="sr-only"></span>
+            </div>
+        </div>
+        <canvas id="acquisitions" data-groupId="@Model.Group.Id"></canvas>
+    </div>
+
 
 
 </div>
