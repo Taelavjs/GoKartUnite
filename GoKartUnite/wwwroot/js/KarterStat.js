@@ -48,7 +48,7 @@ const GroupMembersStatsRequest = (TrackTitle) => {
             const minLapTime = Math.min(...bestLapTimes);
             const maxLapTime = Math.max(...bestLapTimes);
             const stepSize = Math.round((maxLapTime - minLapTime) / 10);
-            const lastDate = retObj[retObj.length - 1].dateOnlyRecorded;
+            const lastDate = retObj[0].dateOnlyRecorded;
 
             const TrackTitle = retObj.length > 0 ? retObj[0].trackTitle : "Unknown Track";
             new Chart(

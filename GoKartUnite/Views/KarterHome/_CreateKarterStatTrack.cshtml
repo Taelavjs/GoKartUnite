@@ -1,27 +1,28 @@
 ﻿@*
 	For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
+
 @model GoKartUnite.ViewModel.KarterStatCreatePage
 @using GoKartUnite.Models
 
-
-<form asp-action="CreatTrackStat" class="p-3 border rounded shadow-sm">
+<!-- Your Form -->
+<form id="statCreateForm" action="#" class="p-3 border rounded shadow-sm">
 	<div class="row g-2">
 		<!-- Race Name -->
 		<div class="col-md-6">
 			<label asp-for="statToBeCreated.RaceName" class="form-label small">Race Name</label>
-			<input asp-for="statToBeCreated.RaceName" type="text" class="form-control form-control-sm" 
+			<input asp-for="statToBeCreated.RaceName" type="text" class="form-control form-control-sm"
 				   id="RaceName" name="RaceName" required minlength="5" maxlength="10">
 		</div>
 
 		<!-- Track Title -->
 		<div class="col-md-6">
 			<label asp-for="statToBeCreated.TrackTitle" class="form-label small">Track Title</label>
-			<select asp-for="statToBeCreated.TrackTitle" name="TrackTitle" id="TrackTitle" 
+			<select asp-for="statToBeCreated.TrackTitle" name="TrackTitle" id="TrackTitle"
 					class="form-select form-select-sm">
 				@foreach (var status in Model.trackTitle)
 				{
-							<option value="@status">@status</option>
+					<option value="@status">@status</option>
 				}
 			</select>
 		</div>
@@ -29,7 +30,7 @@
 		<!-- Race Length -->
 		<div class="col-md-6">
 			<label asp-for="statToBeCreated.RaceLength" class="form-label small">Race Length (min)</label>
-			<input asp-for="statToBeCreated.RaceLength" type="number" class="form-control form-control-sm" 
+			<input asp-for="statToBeCreated.RaceLength" type="number" class="form-control form-control-sm"
 				   id="RaceLength" name="RaceLength" required min="1" max="1440">
 		</div>
 
@@ -39,13 +40,11 @@
 			<label asp-for="statToBeCreated.isChampionshipRace" class="form-check-label small">Was This For A Championship?</label>
 		</div>
 
-
-
 		<!-- Date Recorded -->
 		<div class="col-md-6">
 			<label asp-for="statToBeCreated.DateOnlyRecorded" class="form-label small">Date Recorded</label>
-			<input asp-for="statToBeCreated.DateOnlyRecorded" type="date" class="form-control form-control-sm" 
-				   id="DateOnlyRecorded" name="DateOnlyRecorded" required value="{{ DateTime.Today }}">
+			<input asp-for="statToBeCreated.DateOnlyRecorded" type="date" class="form-control form-control-sm"
+				   id="DateOnlyRecorded" name="DateOnlyRecorded" required value="{{ DateTime.Today }}" />
 		</div>
 
 		<!-- Weather & Temperature -->
@@ -54,7 +53,7 @@
 			<select asp-for="statToBeCreated.WEATHERSTATUS" class="form-select form-select-sm" id="WEATHERSTATUS" name="WEATHERSTATUS" required>
 				@foreach (var status in Enum.GetValues(typeof(GoKartUnite.Models.WEATHERSTATUS)))
 				{
-						<option value="@status">@status</option>
+					<option value="@status">@status</option>
 				}
 			</select>
 		</div>
@@ -64,7 +63,7 @@
 			<select asp-for="statToBeCreated.TEMPERATURE" class="form-select form-select-sm" id="TEMPERATURE" name="TEMPERATURE" required>
 				@foreach (var status in Enum.GetValues(typeof(GoKartUnite.Models.TEMPERATURE)))
 				{
-						<option value="@status">@status</option>
+					<option value="@status">@status</option>
 				}
 			</select>
 		</div>
@@ -72,29 +71,27 @@
 		<!-- Best Lap Time -->
 		<div class="col-md-6">
 			<label asp-for="statToBeCreated.BestLapTime" class="form-label small">Best Lap Time (mm:ss:ms)</label>
-			<input asp-for="statToBeCreated.BestLapTime" type="time" class="form-control form-control-sm" 
-				   id="BestLapTime" 
-				   pattern="^[0-9]{2}:[0-5][0-9]\.[0-9]{3}$" 
-				   name="BestLapTime" 
-				   required step="1" 
-				   min="00:20" 
+			<input asp-for="statToBeCreated.BestLapTime" type="time" class="form-control form-control-sm"
+				   id="BestLapTime"
+				   pattern="^[0-9]{2}:[0-5][0-9]\.[0-9]{3}$"
+				   name="BestLapTime"
+				   required step="1"
+				   min="00:20"
 				   max="10:00">
 		</div>
-
-
 	</div>
 
 	<!-- Submit Button -->
 	<div class="text-end mt-2">
-		<button type="submit" class="btn btn-primary btn-sm">Submit</button>
+		<button class="btn btn-primary btn-sm">Submit</button>
 	</div>
 </form>
+<div hidden class="alert alert-success" role="alert" id="successStatCreated">
+	Success
+</div>
+<div hidden class="alert alert-danger" role="alert" id="failedStatCreated">
+	Error
+</div>
 
-<script>
-	console.log(@Json.Serialize(Model.statToBeCreated));
-	console.log("rawr")
 
-	document.querySelector("form").addEventListener("submit", function (e) {
-		console.log(new FormData(this));
-	});
-</script>
+

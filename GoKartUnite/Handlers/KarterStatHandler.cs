@@ -15,11 +15,11 @@ namespace GoKartUnite.Handlers
             _context = context;
         }
 
-        public async Task CreateStatRecord(KarterStatViewModel ViewModel, Track track, Karter karter, TimeSpan BestLapFormatted)
+        public async Task<bool> CreateStatRecord(KarterStatViewModel ViewModel, Track track, Karter karter, TimeSpan BestLapFormatted)
         {
             if (track == null)
             {
-                return;
+                return false;
             }
 
             KarterTrackStats model = new KarterTrackStats
@@ -42,6 +42,7 @@ namespace GoKartUnite.Handlers
 
             await CreateGroupNotification(model);
             await CreateMessageInAllUserGroups(model.KarterId, track.Title, model.BestLapTime);
+            return true;
         }
 
         public async Task<List<KarterTrackStats>> GetStatsForKarter(int karterId, string trackFilter)

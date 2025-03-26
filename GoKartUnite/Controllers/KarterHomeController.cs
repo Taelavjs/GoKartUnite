@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using GoKartUnite.Interfaces;
 using GoKartUnite.DataFilterOptions;
 using GoKartUnite.ViewModel;
+using System.Web.Helpers;
 
 namespace GoKartUnite.Controllers
 {
@@ -301,10 +302,7 @@ namespace GoKartUnite.Controllers
         // ======================================
 
         [HttpPost]
-        [Authorize]
-        [AccountConfirmed]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreatTrackStat(KarterStatViewModel model)
+        public async Task<JsonResult> CreatTrackStat(KarterStatViewModel model)
         {
             TimeSpan.TryParseExact(model.BestLapTime, @"mm\:ss\:ff", null, out TimeSpan FormattedBestLapTime);
             var v = await _tracks.GetTrackIdByTitle(model.TrackTitle);
@@ -313,9 +311,10 @@ namespace GoKartUnite.Controllers
             var k = await _karters.GetUserByGoogleId(googleId);
             var track = await _tracks.GetTrackById(v);
 
-            await _statHandler.CreateStatRecord(model, track, k, FormattedBestLapTime);
+            bool res = await _statHandler.CreateStatRecord(model, track, k, FormattedBestLapTime);
 
-            return RedirectToAction("Index", model);
+            if (res) return Json(new { success = true, message = "Operation completed successfully" });
+            return Json(new { success = true, message = "Operation Bad" });
         }
 
         [HttpGet]

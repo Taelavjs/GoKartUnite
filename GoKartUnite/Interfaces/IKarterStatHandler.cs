@@ -6,7 +6,7 @@ namespace GoKartUnite.Interfaces
 {
     public interface IKarterStatHandler
     {
-        Task CreateStatRecord(KarterStatViewModel ViewModel, Track track, Karter karter, TimeSpan BestLapFormatted);
+        Task<bool> CreateStatRecord(KarterStatViewModel ViewModel, Track track, Karter karter, TimeSpan BestLapFormatted);
         Task<List<KarterTrackStats>> GetStatsForKarter(int karterId, string trackFilter);
     }
 }
