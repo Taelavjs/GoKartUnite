@@ -54,18 +54,18 @@ const GroupMembersStatsRequest = (TrackTitle) => {
             new Chart(
                 document.getElementById("acquisitions"),
                 {
-                    type: 'scatter',
+                    type: 'line',
                     options: {
                         animation: {
                             x: {
-                                duration: 1500,
+                                duration: 1000,
                                 easing: 'easeOutQuad',
                                 from: 0
                             },
                             y: {
-                                duration: 1500,
+                                duration: 1000,
                                 easing: 'easeOutQuad',
-                                from: minLapTime
+                                from: 0
                             }
                         },
                         scales: {
