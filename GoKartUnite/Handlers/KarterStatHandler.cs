@@ -70,6 +70,7 @@ namespace GoKartUnite.Handlers
             List<int> groupIds = await _context.Groups
                 .Where(x => x.HostId == userId || x.MemberKarters.Any(x => x.KarterId == userId))
                 .SelectMany(x => x.MemberKarters.Select(x => x.GroupId))
+                .Distinct()
                 .ToListAsync();
 
             var messages = groupIds.Select(groupId => new GroupMessage
