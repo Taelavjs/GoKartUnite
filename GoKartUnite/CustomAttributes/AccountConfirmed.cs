@@ -60,7 +60,10 @@ namespace GoKartUnite.CustomAttributes
 
             if (!isUserInGroup)
             {
-                context.Result = new RedirectResult("/group");
+                context.Result = new JsonResult(new { success = false, message = "You are not authorized to access this group" })
+                {
+                    StatusCode = 403
+                };
             }
         }
     }
