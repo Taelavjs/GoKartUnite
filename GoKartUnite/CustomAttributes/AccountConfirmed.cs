@@ -1,8 +1,11 @@
-﻿using GoKartUnite.Data;
+﻿using Azure.Core;
+using GoKartUnite.Data;
 using GoKartUnite.Handlers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using System.Security.Claims;
 
@@ -31,6 +34,33 @@ namespace GoKartUnite.CustomAttributes
             if (!userExists)
             {
                 context.Result = new RedirectResult("/karterHome/Create");
+            }
+        }
+    }
+
+
+    public class ValidGroupMember : Attribute, IAuthorizationFilter
+    {
+        public void OnAuthorization(AuthorizationFilterContext context)
+        {
+            var dbContext = context.HttpContext
+                .RequestServices
+                .GetService(typeof(GoKartUniteContext)) as GoKartUniteContext;
+
+            var groupId = int.Parse(context.HttpContext.Request.Query["GroupId"]);
+
+            var NameIdentifier = context.HttpContext.User.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+
+            var user = dbContext.Karter
+                    .Where(u => u.NameIdentifier == NameIdentifier.Value).Single();
+
+            var isUserInGroup = dbContext.Groups
+                .Any(g => g.Id == groupId && (g.MemberKarters.Any(k => k.KarterId == user.Id) || g.HostKarter.Id == user.Id));
+
+            if (!isUserInGroup)
+            {
+                context.Result = new RedirectResult("/group");
             }
         }
     }

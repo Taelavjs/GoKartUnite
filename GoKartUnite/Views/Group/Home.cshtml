@@ -31,12 +31,23 @@
             @foreach (var message in Model.Group.Comments)
             {
                 <div class="message-bubble mb-2">
-                    <div class="fw-bold">John</div>
-                    <div class="text-muted small">@message.TimeSent.TimeOfDay</div>
+                    <div class="fw-bold">@message.AuthorName</div>
+                    <div class="text-muted small">@message.TimeSent.TimeOfDay.ToString(@"hh\:mm\:ss")</div>
                     <div class="message-content">@message.MessageContent</div>
                 </div>
             }
         </div>
+    </div>
+    <form id="messageForm">
+        @Html.AntiForgeryToken()
+        <div class="input-group mb-3 mt-2">
+            <input type="text" class="form-control" placeholder="Message --->" id="MessageInput">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" id="MessageInputButton">Button</button>
+            </div>
+        </div>
+    </form>
+    <div hidden class="alert alert-primary" role="alert" id="MessageErrorDiv">
     </div>
     <select class="form-select" id="groupStatTrackSelect">
         @foreach (var track in Model.TrackTitles)
@@ -67,3 +78,10 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <script src="~/js/GroupStatPage.js" asp-append-version="true"></script>
 }
+<template id="messageTemplate">
+    <div class="message-bubble mb-2">
+        <div class="fw-bold message-sender"></div>
+        <div class="text-muted small message-time"></div>
+        <div class="message-content"></div>
+    </div>
+</template>

@@ -146,7 +146,7 @@ namespace GoKartUnite.Handlers
                 commentsToReturn.Add(new GroupMessageView
                 {
                     Id = comment.Id,
-                    AuthorName = comment.Author?.Name ?? "",
+                    AuthorName = await _context.Karter.Where(x => x.Id == comment.AuthorId).Select(x => x.Name).SingleAsync(),
                     MessageContent = comment.MessageContent,
                     TimeSent = comment.DateTimePosted,
                 });
@@ -207,6 +207,29 @@ namespace GoKartUnite.Handlers
 
 
             return stats;
+        }
+
+        public async Task<bool> CreateUserMessageInGroup(int groupId, string messageContent, Karter user)
+        {
+            try
+            {
+                GroupMessage message = new GroupMessage
+                {
+                    Author = user,
+                    AuthorId = user.Id,
+                    GroupCommentedOn = await _context.Groups.FindAsync(groupId),
+                    GroupCommentOnId = groupId,
+                    MessageContent = messageContent
+                };
+
+                await _context.GroupMessages.AddAsync(message);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using GoKartUnite.Interfaces;
+﻿using Azure.Core;
+using GoKartUnite.CustomAttributes;
+using GoKartUnite.Interfaces;
 using GoKartUnite.Models;
 using GoKartUnite.Models.Groups;
 using GoKartUnite.Projection;
@@ -6,6 +8,13 @@ using GoKartUnite.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Web.Helpers;
+using System.Web.Mvc;
+using ActionResult = Microsoft.AspNetCore.Mvc.ActionResult;
+using Controller = Microsoft.AspNetCore.Mvc.Controller;
+using HttpGetAttribute = Microsoft.AspNetCore.Mvc.HttpGetAttribute;
+using HttpPostAttribute = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
+using JsonResult = Microsoft.AspNetCore.Mvc.JsonResult;
+using ValidateAntiForgeryTokenAttribute = Microsoft.AspNetCore.Mvc.ValidateAntiForgeryTokenAttribute;
 
 namespace GoKartUnite.Controllers
 {
@@ -38,8 +47,10 @@ namespace GoKartUnite.Controllers
             };
             return View(groupPage);
         }
-
         [HttpPost]
+        [Authorize]
+        [AccountConfirmed]
+        [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateGroup(GroupPageView model)
         {
             ListedGroupView listedGroup = new ListedGroupView();
@@ -55,6 +66,8 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpPost]
+        [Authorize]
+        [AccountConfirmed]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> JoinGroup(int GroupId)
         {
@@ -69,6 +82,8 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpPost]
+        [Authorize]
+        [AccountConfirmed]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> LeaveGroup(int GroupId)
         {
@@ -81,6 +96,7 @@ namespace GoKartUnite.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpGet]
         public async Task<IActionResult> Home(int GroupId)
         {
             Group? g = await _groups.GetGroupById(GroupId);
@@ -96,14 +112,24 @@ namespace GoKartUnite.Controllers
             return View(returnObj);
         }
 
+        [HttpPost]
+        [Authorize]
+        [AccountConfirmed]
+        [ValidateAntiForgeryToken]
+        [ValidGroupMember]
+        public async Task<JsonResult> Home(int GroupId, [FromBody] string message)
+        {
+            Karter? k = await _karters.GetUserByGoogleId(User.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
+            bool res = await _groups.CreateUserMessageInGroup(GroupId, message, k);
+
+            if (res) return Json(new { success = true, userName = k.Name });
+            return Json(new { success = false });
+        }
+
         public async Task<JsonResult> GroupStats(int GroupId, string TrackTitle)
         {
             List<GroupStatDisplay> statsToClient = await _groups.GetStatsForGroupGraph(GroupId, TrackTitle);
-
-
-
-
-
             return Json(statsToClient);
         }
     }

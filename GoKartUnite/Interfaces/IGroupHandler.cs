@@ -17,6 +17,7 @@ namespace GoKartUnite.Interfaces
         Task<Group> GetGroupById(int groupId);
         Task<List<GroupMember>> GetAllMembersProjection(int groupId);
         Task<List<GroupStatDisplay>> GetStatsForGroupGraph(int groupId, string trackTitle);
+        Task<bool> CreateUserMessageInGroup(int groupId, string messageContent, Karter user);
 
     }
 }
