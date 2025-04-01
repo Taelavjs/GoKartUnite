@@ -364,19 +364,9 @@ th {
         padding: 5px;
     }
 
-.btn {
-    position: relative;
-    top: 50%;
-    width: 74px;
-    height: 36px;
-    margin: -20px auto 0 auto;
-    overflow: hidden;
+.btn.btn-rect {
+    border-radius: 2px;
 }
-
-
-    .btn.btn-rect {
-        border-radius: 2px;
-    }
 
 .checkbox {
     position: relative;

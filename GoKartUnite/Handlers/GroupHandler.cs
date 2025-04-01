@@ -46,7 +46,7 @@ namespace GoKartUnite.Handlers
             _context.SaveChanges();
         }
 
-        public async Task<List<ListedGroupView>> GetAllGroups(Karter k)
+        public async Task<List<ListedGroupView>> GetAllGroups(Karter k, Filters? filter, string groupName)
         {
             List<ListedGroupView> groups = await _context.Groups
                 .Include(g => g.MemberKarters)
@@ -63,17 +63,40 @@ namespace GoKartUnite.Handlers
                     isMember = g.MemberKarters.Any(x => x.KarterId == k.Id) || g.HostKarter == k,
                 })
                 .ToListAsync();
+            if (filter != null)
+            {
+                switch (filter)
+                {
+                    case Filters.NAME:
+                        groups = groups.OrderBy(x => x.Name).ToList();
+                        break;
+                    case Filters.DATE:
+                        groups = groups.OrderBy(x => x.DateCreated).ToList();
+                        break;
+                    case Filters.MEMBERCOUNT:
+                        groups = groups.OrderByDescending(x => x.NumberMembers).ToList();
+                        break;
+                    case Filters.NONE:
+                    default:
+                        break;
+                }
+            }
 
+            if (groupName != string.Empty)
+            {
+                groups = groups.Where(x => x.Name.Contains(groupName, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
             return groups;
+
         }
 
-        public async Task JoinGroup(int groupId, Karter karter)
+        public async Task<bool> JoinGroup(int groupId, Karter karter)
         {
             var group = await _context.Groups.Include(x => x.MemberKarters)
                 .SingleOrDefaultAsync(g => g.Id == groupId);
-            if (group == null) return;
+            if (group == null) return false;
 
-            if (group.MemberKarters.Any(x => x.User == karter && x.Group == group) || group.HostKarter == karter) return;
+            if (group.MemberKarters.Any(x => x.User == karter && x.Group == group) || group.HostKarter == karter) return false;
 
             group.MemberKarters.Add(new Membership
             {
@@ -86,15 +109,16 @@ namespace GoKartUnite.Handlers
 
             _context.Groups.Update(group);
             await _context.SaveChangesAsync();
+            return true;
         }
 
-        public async Task LeaveGroup(int groupId, Karter karter)
+        public async Task<bool> LeaveGroup(int groupId, Karter karter)
         {
-            Group? group = await _context.Groups
+            Group? group = await _context.Groups.Include(x => x.MemberKarters)
                 .SingleOrDefaultAsync(g => g.Id == groupId);
-            if (group == null) return;
+            if (group == null) return false;
 
-            if (!group.MemberKarters.Any(x => x.KarterId == karter.Id)) return;
+            if (!group.MemberKarters.Any(x => x.KarterId == karter.Id)) return false;
             var membershipToRemove = group.MemberKarters
                 .FirstOrDefault(x => x.GroupId == group.Id && x.KarterId == karter.Id);
             if (membershipToRemove != null)
@@ -102,7 +126,9 @@ namespace GoKartUnite.Handlers
                 group.MemberKarters.Remove(membershipToRemove);
                 _context.Memberships.Remove(membershipToRemove);
                 await _context.SaveChangesAsync();
+                return true;
             }
+            return false;
         }
 
         public async Task<List<Group>> GetMessagesForGroup(int groupId)
@@ -146,7 +172,7 @@ namespace GoKartUnite.Handlers
                 commentsToReturn.Add(new GroupMessageView
                 {
                     Id = comment.Id,
-                    AuthorName = comment.Author?.Name ?? "",
+                    AuthorName = await _context.Karter.Where(x => x.Id == comment.AuthorId).Select(x => x.Name).SingleAsync(),
                     MessageContent = comment.MessageContent,
                     TimeSent = comment.DateTimePosted,
                 });
@@ -207,6 +233,29 @@ namespace GoKartUnite.Handlers
 
 
             return stats;
+        }
+
+        public async Task<bool> CreateUserMessageInGroup(int groupId, string messageContent, Karter user)
+        {
+            try
+            {
+                GroupMessage message = new GroupMessage
+                {
+                    Author = user,
+                    AuthorId = user.Id,
+                    GroupCommentedOn = await _context.Groups.FindAsync(groupId),
+                    GroupCommentOnId = groupId,
+                    MessageContent = messageContent
+                };
+
+                await _context.GroupMessages.AddAsync(message);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
     }
 }

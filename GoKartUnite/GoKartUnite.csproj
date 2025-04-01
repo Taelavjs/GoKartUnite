@@ -30,6 +30,6 @@
 	<Folder Include="wwwroot\lib\microsoft\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="wwwroot\js\_InfiniteScroll.js" />
+    <None Include="wwwroot\js\General\_InfiniteScroll.js" />
   </ItemGroup>
 </Project>
