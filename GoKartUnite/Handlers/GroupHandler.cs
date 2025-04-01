@@ -67,13 +67,13 @@ namespace GoKartUnite.Handlers
             return groups;
         }
 
-        public async Task JoinGroup(int groupId, Karter karter)
+        public async Task<bool> JoinGroup(int groupId, Karter karter)
         {
             var group = await _context.Groups.Include(x => x.MemberKarters)
                 .SingleOrDefaultAsync(g => g.Id == groupId);
-            if (group == null) return;
+            if (group == null) return false;
 
-            if (group.MemberKarters.Any(x => x.User == karter && x.Group == group) || group.HostKarter == karter) return;
+            if (group.MemberKarters.Any(x => x.User == karter && x.Group == group) || group.HostKarter == karter) return false;
 
             group.MemberKarters.Add(new Membership
             {
@@ -86,15 +86,16 @@ namespace GoKartUnite.Handlers
 
             _context.Groups.Update(group);
             await _context.SaveChangesAsync();
+            return true;
         }
 
-        public async Task LeaveGroup(int groupId, Karter karter)
+        public async Task<bool> LeaveGroup(int groupId, Karter karter)
         {
-            Group? group = await _context.Groups
+            Group? group = await _context.Groups.Include(x => x.MemberKarters)
                 .SingleOrDefaultAsync(g => g.Id == groupId);
-            if (group == null) return;
+            if (group == null) return false;
 
-            if (!group.MemberKarters.Any(x => x.KarterId == karter.Id)) return;
+            if (!group.MemberKarters.Any(x => x.KarterId == karter.Id)) return false;
             var membershipToRemove = group.MemberKarters
                 .FirstOrDefault(x => x.GroupId == group.Id && x.KarterId == karter.Id);
             if (membershipToRemove != null)
@@ -102,7 +103,9 @@ namespace GoKartUnite.Handlers
                 group.MemberKarters.Remove(membershipToRemove);
                 _context.Memberships.Remove(membershipToRemove);
                 await _context.SaveChangesAsync();
+                return true;
             }
+            return false;
         }
 
         public async Task<List<Group>> GetMessagesForGroup(int groupId)

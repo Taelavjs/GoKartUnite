@@ -74,10 +74,7 @@ namespace GoKartUnite.Controllers
             Karter? k = await _karters.GetUserByGoogleId(User.Claims
                 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
             if (k == null) return RedirectToAction("Index");
-
-
             await _groups.JoinGroup(GroupId, k);
-
             return RedirectToAction("Index");
         }
 
@@ -91,9 +88,12 @@ namespace GoKartUnite.Controllers
                 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
             if (k == null) return RedirectToAction("Index");
 
-            await _groups.LeaveGroup(GroupId, k);
-
-            return RedirectToAction("Index");
+            bool success = await _groups.LeaveGroup(GroupId, k);
+            if (success)
+            {
+                return Ok("Left Group");
+            }
+            return BadRequest("Invalid Group Id For User");
         }
 
         [HttpGet]
