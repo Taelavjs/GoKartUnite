@@ -20,23 +20,20 @@
         </form>
 
         <div class="row mt-5 pt-5 mb-4">
-            <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="Search Groups" aria-label="Search Groups">
-                <button class="btn btn-outline-secondary" type="button">Search</button>
-            </div>
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" id="SearchGroupsInput" placeholder="Search Groups" aria-label="Search Groups">
+            <button class="btn btn-outline-secondary" type="button" id="search-button">Search</button>
+        </div>
             <div class="d-flex justify-content-end mb-3">
-                <select class="form-select w-auto">
-                    <option selected>Sort by</option>
-                    <option value="1">Name</option>
-                    <option value="2">Date Created</option>
-                    <option value="3">Number of Members</option>
+                <select id="GroupListSelector" class="form-select w-auto">
+                    <option value="Name">Name</option>
+                    <option value="Date">Date Created</option>
+                    <option value="MemberCount">Number of Members</option>
                 </select>
             </div>
 
-            <div class="card">
-                @foreach(var group in Model.Groups){
-                    @await Html.PartialAsync("_groupSingular", group);
-                }
+            <div class="card" id="GroupListContent">
+                @await Html.PartialAsync("_groupSingular", Model.Groups);
             </div>
         </div>
     </div>

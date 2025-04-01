@@ -25,7 +25,7 @@
     $(document).on('submit', '.JoinGroupRequest', function (e) {
         var form = $('#__AjaxAntiForgeryForm');
         var token = $('input[name="__RequestVerificationToken"]', form).val();
-        var groupId = $(this).attr('data-groupId'); 
+        var groupId = $(this).attr('data-groupId');
         var groupActionsDiv = $('#group-actions-' + groupId);
 
         $.ajax({
@@ -48,7 +48,7 @@
     $(document).on('submit', '.LeaveGroupRequest', function (e) {
         var form = $('#__AjaxAntiForgeryForm');
         var token = $('input[name="__RequestVerificationToken"]', form).val();
-        var groupId = $(this).attr('data-groupId'); 
+        var groupId = $(this).attr('data-groupId');
         var groupActionsDiv = $('#group-actions-' + groupId);
 
         $.ajax({
@@ -68,4 +68,42 @@
         });
         return false;
     });
+
+
+    var selector = document.getElementById("GroupListSelector");
+
+    selector.addEventListener("change", function () {
+        GetListOfGroupsSorted(selector.value);
+    });
+
+    $('#search-button').on('click', function () {
+        var searchTerm = $('#SearchGroupsInput').val(); 
+        alert(searchTerm);
+        var selectorVal = selector.value;
+        GetListOfGroupsFiltered(searchTerm, selectorVal);
+    });
 });
+
+const GetListOfGroupsSorted = (filterValue) => {
+
+    $.ajax({
+        type: "GET",
+        url: `${window.location.origin}/Group/SortedListOfGroups?SortedBy=${filterValue}`,
+        contentType: "application/json; charset=utf-8",
+        success: async (html) => {
+            $("#GroupListContent").empty();
+            $("#GroupListContent").append(html);
+        }
+    });
+}
+
+const GetListOfGroupsFiltered = (searchTerm, filterTerm) => {
+    $.ajax({
+        type: "GET",
+        url: `${window.location.origin}/Group/SortedListOfGroups?SortedBy=${filterTerm}&query=${searchTerm}`,
+        contentType: "application/json; charset=utf-8",
+        success: function (html) {
+            $("#GroupListContent").empty().append(html);
+        }
+    });
+}

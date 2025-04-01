@@ -8,7 +8,7 @@ namespace GoKartUnite.Interfaces
     public interface IGroupHandler
     {
         Task CreateNewGroup(ListedGroupView group, Karter k);
-        Task<List<ListedGroupView>> GetAllGroups(Karter k);
+        Task<List<ListedGroupView>> GetAllGroups(Karter k, Filters? filter, string groupName);
         Task<bool> JoinGroup(int groupId, Karter karter);
         Task<bool> LeaveGroup(int groupId, Karter karter);
         Task<List<GroupMessageView>> MessagesToDTO(List<GroupMessage> comments);
@@ -19,5 +19,13 @@ namespace GoKartUnite.Interfaces
         Task<List<GroupStatDisplay>> GetStatsForGroupGraph(int groupId, string trackTitle);
         Task<bool> CreateUserMessageInGroup(int groupId, string messageContent, Karter user);
 
+    }
+
+    public enum Filters
+    {
+        NONE,
+        DATE,
+        NAME,
+        MEMBERCOUNT
     }
 }

@@ -46,7 +46,7 @@ namespace GoKartUnite.Handlers
             _context.SaveChanges();
         }
 
-        public async Task<List<ListedGroupView>> GetAllGroups(Karter k)
+        public async Task<List<ListedGroupView>> GetAllGroups(Karter k, Filters? filter, string groupName)
         {
             List<ListedGroupView> groups = await _context.Groups
                 .Include(g => g.MemberKarters)
@@ -63,8 +63,31 @@ namespace GoKartUnite.Handlers
                     isMember = g.MemberKarters.Any(x => x.KarterId == k.Id) || g.HostKarter == k,
                 })
                 .ToListAsync();
+            if (filter != null)
+            {
+                switch (filter)
+                {
+                    case Filters.NAME:
+                        groups = groups.OrderBy(x => x.Name).ToList();
+                        break;
+                    case Filters.DATE:
+                        groups = groups.OrderBy(x => x.DateCreated).ToList();
+                        break;
+                    case Filters.MEMBERCOUNT:
+                        groups = groups.OrderByDescending(x => x.NumberMembers).ToList();
+                        break;
+                    case Filters.NONE:
+                    default:
+                        break;
+                }
+            }
 
+            if (groupName != string.Empty)
+            {
+                groups = groups.Where(x => x.Name.Contains(groupName, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
             return groups;
+
         }
 
         public async Task<bool> JoinGroup(int groupId, Karter karter)

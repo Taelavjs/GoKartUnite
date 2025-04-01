@@ -6,6 +6,7 @@ using GoKartUnite.Models.Groups;
 using GoKartUnite.Projection;
 using GoKartUnite.ViewModel;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections;
 using System.Security.Claims;
 using System.Web.Helpers;
 using System.Web.Mvc;
@@ -38,7 +39,7 @@ namespace GoKartUnite.Controllers
             Karter? k = await _karters.GetUserByGoogleId(User.Claims
                 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
 
-            List<ListedGroupView> groups = await _groups.GetAllGroups(k);
+            List<ListedGroupView> groups = await _groups.GetAllGroups(k, null, "");
 
             var groupPage = new GroupPageView
             {
@@ -47,6 +48,19 @@ namespace GoKartUnite.Controllers
             };
             return View(groupPage);
         }
+
+        public async Task<IActionResult> SortedListOfGroups(string SortedBy, string query)
+        {
+            Karter? k = await _karters.GetUserByGoogleId(User.Claims
+    .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
+            if (Enum.TryParse(SortedBy, true, out Filters filter))
+            {
+                List<ListedGroupView> groups = await _groups.GetAllGroups(k, filter, query);
+                return PartialView("_groupSingular", groups);
+            }
+            return BadRequest();
+        }
+
         [HttpPost]
         [Authorize]
         [AccountConfirmed]
