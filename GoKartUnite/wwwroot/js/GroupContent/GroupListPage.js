@@ -77,8 +77,7 @@
     });
 
     $('#search-button').on('click', function () {
-        var searchTerm = $('#SearchGroupsInput').val(); 
-        alert(searchTerm);
+        var searchTerm = $('#SearchGroupsInput').val();
         var selectorVal = selector.value;
         GetListOfGroupsFiltered(searchTerm, selectorVal);
     });
