@@ -1,7 +1,6 @@
 ﻿@model GoKartUnite.ViewModel.KarterIndex
 
 <div class="container mb-5">
-	<!-- Profile Section -->
 	<div class="profile-section">
 		<div class="profile-header">
 			<div class="profile-image"></div>
@@ -20,9 +19,7 @@
 		</div>
 	</div>
 
-	<!-- Table Section -->
 	<div class="table-section">
-		<!-- Friends Table -->
 		<div class="table-container">
 			<table>
 				<thead>
@@ -105,7 +102,6 @@
 		</div>
 	</div>
 
-	<!-- Collapsible Partial View Container (Slides In/Out) -->
 	<div id="statFormContainer" class="collapse mt-3">
 		<div class="card card-body shadow-sm">
 			@await Html.PartialAsync("_CreateKarterStatTrack", new GoKartUnite.ViewModel.KarterStatCreatePage
@@ -115,7 +111,6 @@
 		</div>
 	</div>
 
-	<!-- Button to Toggle Partial View (Always Visible) -->
 	<div class="d-flex justify-content-start mt-3">
 		<button id="toggleStatForm" class="btn btn-success" type="button" data-bs-toggle="collapse" data-bs-target="#statFormContainer">
 			Add
@@ -130,5 +125,4 @@
 {
 	<script src="~/js/KarterStat.js" asp-append-version="true"></script>
 	<script src="~/js/CreateStatForm.js" asp-append-version="true"></script>
-
 }

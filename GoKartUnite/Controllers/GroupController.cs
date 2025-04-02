@@ -33,7 +33,9 @@ namespace GoKartUnite.Controllers
             _blog = blog;
             _track = track;
         }
-
+        [HttpGet]
+        [Authorize]
+        [AccountConfirmed]
         public async Task<ActionResult> Index()
         {
             Karter? k = await _karters.GetUserByGoogleId(User.Claims

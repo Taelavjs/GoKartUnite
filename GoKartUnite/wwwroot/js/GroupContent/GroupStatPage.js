@@ -67,8 +67,13 @@ const GroupMembersStatsRequest = async (TrackTitle) => {
                             },
                             scales: {
                                 y: {
+                                    grid: {
+                                        color: "rgba(255, 255, 255, 0.2)" // Y-axis grid lines
+                                        text
+                                    },
                                     type: 'linear',
                                     ticks: {
+                                        color: "white",
                                         min: minLapTime,
                                         max: maxLapTime,
                                         stepSize: stepSize,
@@ -80,8 +85,21 @@ const GroupMembersStatsRequest = async (TrackTitle) => {
                                     }
                                 },
                                 x: {
+                                    grid: {
+                                        color: "rgba(255, 255, 255, 0.2)" // Y-axis grid lines
+                                    },
                                     type: "category",
                                     offset: true,
+                                    ticks: {
+                                        color: "white",
+                                    },
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        color: "white"
+                                    }
                                 }
                             }
                         },

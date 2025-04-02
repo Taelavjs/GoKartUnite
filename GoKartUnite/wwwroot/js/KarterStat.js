@@ -70,8 +70,12 @@ const GroupMembersStatsRequest = (TrackTitle) => {
                         },
                         scales: {
                             y: {
+                                grid: {
+                                    color: "rgba(255, 255, 255, 0.2)" // Y-axis grid lines
+                                },
                                 type: 'linear',
                                 ticks: {
+                                    color: "white",
                                     min: minLapTime,
                                     max: maxLapTime,
                                     stepSize: stepSize,
@@ -80,14 +84,28 @@ const GroupMembersStatsRequest = (TrackTitle) => {
                                         const seconds = ((value % 60000) / 1000).toFixed(0);
                                         return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
                                     }
-                                }
+                                },
                             },
                             x: {
+                                grid: {
+                                    color: "rgba(255, 255, 255, 0.2)" // Y-axis grid lines
+                                },
                                 type: "category",
                                 offset: true,
-                                min: lastDate
+                                min: lastDate,
+                                ticks: {
+                                    color: "white",
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: "white" // Legend text color
+                                }
                             }
                         }
+
                     },
                     data: {
                         labels: retObj.map(row => row.dateOnlyRecorded),
