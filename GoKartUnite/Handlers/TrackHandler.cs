@@ -12,20 +12,29 @@ namespace GoKartUnite.Handlers
     public class TrackHandler : ITrackHandler
     {
         private readonly GoKartUniteContext _context;
+
         public TrackHandler(GoKartUniteContext context)
         {
             _context = context;
         }
 
+        private IQueryable<Track> GetVerifiedTracks()
+        {
+            return _context.Track.Where(t => t.IsVerifiedByAdmin);
+        }
+
         public async Task<Track?> GetTrack(int id, bool? getKarters)
         {
+            var query = GetVerifiedTracks();
+
             if (getKarters == true)
             {
-                return await _context.Track
-                .Include(t => t.Karters)
-                .FirstOrDefaultAsync(t => t.Id == id);
+                return await query
+                    .Include(t => t.Karters)
+                    .FirstOrDefaultAsync(t => t.Id == id);
             }
-            return await _context.Track.SingleOrDefaultAsync(t => t.Id == id);
+
+            return await query.SingleOrDefaultAsync(t => t.Id == id);
         }
 
         public async Task<bool> AddTrack(Track track)
@@ -51,13 +60,6 @@ namespace GoKartUnite.Handlers
             return true;
         }
 
-        //public async Task UpdateTrack(int id)
-        //{
-        //    var track = await GetTrack(id, false);
-        //    _context.Track.Remove(track);
-        //    await _context.SaveChangesAsync();
-        //}
-
         public async Task<bool> DeleteTrack(int id)
         {
             var track = await GetTrack(id, true);
@@ -79,43 +81,31 @@ namespace GoKartUnite.Handlers
 
         public async Task<List<Track>> GetAllTracks()
         {
-            return await _context.Track.ToListAsync();
+            return await GetVerifiedTracks().ToListAsync();
         }
 
         public async Task<List<string>> GetAllTrackTitles()
         {
-            var test = await _context.Track.Select(track => track.Title).ToListAsync();
-            return await _context.Track.Select(track => track.Title).ToListAsync();
+            return await GetVerifiedTracks().Select(track => track.Title).ToListAsync();
         }
 
         public async Task<List<Track>> GetTracksByTitle(string title, List<Locations>? location = null)
         {
-            if (title == "" || title == null) return new List<Track>();
-            if (location == null)
+            if (string.IsNullOrEmpty(title)) return new List<Track>();
+
+            var query = GetVerifiedTracks().Where(t => t.Title.ToLower().Contains(title.ToLower()));
+
+            if (location != null)
             {
-                List<Track> tracks2 = _context.Track.Where(t => t.Title.ToLower().Contains(title.ToLower())).ToList();
-                if (tracks2.Count == 0)
-                {
-                    return new List<Track>();
-                }
-
-
-                return tracks2;
+                query = query.Where(t => location.Contains(t.Location));
             }
 
-            List<Track> tracks = _context.Track.Where(t => t.Title.ToLower().Contains(title.ToLower()) && location.Contains(t.Location)).ToList();
-            if (tracks.Count == 0)
-            {
-                return new List<Track>();
-            }
-
-
-            return tracks;
+            return await query.ToListAsync();
         }
 
         public async Task<Track> GetSingleTrackByTitle(string title)
         {
-            return await _context.Track.SingleOrDefaultAsync(t => t.Title == title);
+            return await GetVerifiedTracks().SingleOrDefaultAsync(t => t.Title == title);
         }
 
         public async Task<List<TrackView>> ModelToView(List<Track> tracks)
@@ -126,38 +116,37 @@ namespace GoKartUnite.Handlers
                 int kartersCount = _context.Track.Entry(track).Collection(p => p.Karters).Query().Count();
                 int blogCount = _context.Track.Entry(track).Collection(p => p.BlogPosts).Query().Count();
 
-                TrackView trackView = new TrackView();
-                trackView.Title = track.Title;
-                trackView.Description = track.Description;
-                trackView.karters = kartersCount;
-                trackView.blogPosts = blogCount;
+                TrackView trackView = new TrackView
+                {
+                    Title = track.Title,
+                    Description = track.Description,
+                    karters = kartersCount,
+                    blogPosts = blogCount
+                };
                 trackRet.Add(trackView);
             }
-
 
             return trackRet;
         }
 
         public async Task<TrackView> ModelToView(Track track)
         {
-            TrackView trackView = new TrackView();
-            trackView.Title = track.Title;
-            trackView.Description = track.Description;
-
-
-            return trackView;
+            return new TrackView
+            {
+                Title = track.Title,
+                Description = track.Description
+            };
         }
 
         public async Task<int> GetTrackIdByTitle(string g)
         {
-            Track t = await _context.Track.Where(t => t.Title == g).SingleAsync();
+            Track t = await GetVerifiedTracks().Where(t => t.Title == g).SingleAsync();
             return t.Id;
         }
 
         public async Task<Track> GetTrackById(int id)
         {
-            Track t = await _context.Track.Where(t => t.Id == id).SingleAsync();
-            return t;
+            return await GetVerifiedTracks().Where(t => t.Id == id).SingleAsync();
         }
 
         public async Task<bool> SetTrackToBeVerified(string TrackName, string GooglePlacesId, string FormattedLocation, string Description)
@@ -192,7 +181,5 @@ namespace GoKartUnite.Handlers
                 return false;
             }
         }
-
-
     }
 }
