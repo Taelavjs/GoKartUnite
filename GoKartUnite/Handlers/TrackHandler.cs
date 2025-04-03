@@ -160,5 +160,39 @@ namespace GoKartUnite.Handlers
             return t;
         }
 
+        public async Task<bool> SetTrackToBeVerified(string TrackName, string GooglePlacesId, string FormattedLocation, string Description)
+        {
+            if (await _context.Track.AnyAsync(x => x.GooglePlacesId == GooglePlacesId))
+            {
+                return false;
+            }
+
+            if (await _context.Track.AnyAsync(x => x.Title == TrackName && x.FormattedGoogleLocation == FormattedLocation))
+            {
+                return false;
+            }
+
+            try
+            {
+                Track trackToAddNonVerified = new()
+                {
+                    Title = TrackName,
+                    GooglePlacesId = GooglePlacesId,
+                    FormattedGoogleLocation = FormattedLocation,
+                    Location = Locations.NORTH,
+                    Description = Description,
+                    IsVerifiedByAdmin = false,
+                };
+                await _context.Track.AddAsync(trackToAddNonVerified);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+
     }
 }

@@ -255,23 +255,34 @@ namespace GoKartUnite.Controllers
                 Id = p.Id
             }).ToList();
 
-            TempData["GooglePlacesResponse"] = JsonConvert.SerializeObject(placeDTOs); 
+            TempData["GooglePlacesResponse"] = JsonConvert.SerializeObject(placeDTOs);
             return Content(jsonResponse, "application/json");
         }
         [HttpPost]
         public async Task<IActionResult> SelectSearchedResult(string id)
         {
+            bool res = false;
             try
             {
                 var placesSerialized = TempData["GooglePlacesResponse"] as string;
                 var placeDTOs = JsonConvert.DeserializeObject<List<PlaceDTO>>(placesSerialized);
                 var placeSelected = placeDTOs.FirstOrDefault(p => p.Id == id);
-            } 
+
+                if (placeSelected == null)
+                {
+                    return BadRequest("Data is not recognised in session storage");
+                }
+                res = await _tracks.SetTrackToBeVerified(placeSelected.Name, placeSelected.Id, placeSelected.Location, "Short Description as an example");
+
+            }
             catch (Exception err)
             {
                 return BadRequest("Data is not recognised in session storage");
             }
-            return Ok();
+
+            if (res) return Ok();
+            return BadRequest("Data failed to be added to the db");
+
         }
     }
 

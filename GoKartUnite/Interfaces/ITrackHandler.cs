@@ -17,5 +17,6 @@ namespace GoKartUnite.Interfaces
         Task<TrackView> ModelToView(Track track);
         Task<int> GetTrackIdByTitle(string g);
         Task<Track> GetTrackById(int id);
+        Task<bool> SetTrackToBeVerified(string TrackName, string GooglePlacesId, string FormattedLocation, string Description);
     }
 }
