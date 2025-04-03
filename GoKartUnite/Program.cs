@@ -98,7 +98,7 @@ namespace GoKartUnite
                         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                         options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
                     })
-                    .AddCookie() // Cookie-based authentication for maintaining login session
+                    .AddCookie()
                     .AddGoogle(googleOptions =>
                     {
                         googleOptions.ClientId = configuration["ClientId"];
@@ -129,7 +129,6 @@ namespace GoKartUnite
 
                         };
                     });
-            // Add services to the container.
             builder.Services.AddControllersWithViews();
             var app = builder.Build();
 
@@ -138,16 +137,11 @@ namespace GoKartUnite
                 KeepAliveInterval = TimeSpan.FromMinutes(2)
             };
 
-            // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-            // WEBSOCKETS +_+_+_+_+_+_+_+_+_+_+_+_+_+_
-
-            // +_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+
             app.UseAuthentication();
 
             app.UseHttpsRedirection();

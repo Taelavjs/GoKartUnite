@@ -12,7 +12,13 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using GoKartUnite.Interfaces;
 using GoKartUnite.ViewModel;
-
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Net.Http;
+using System.Text;
 namespace GoKartUnite.Controllers
 {
     public class TrackHomeController : Controller
@@ -189,6 +195,56 @@ namespace GoKartUnite.Controllers
                 .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
             return await _karters.GetUserByGoogleId(GoogleId);
         }
+        [HttpGet]
+        public async Task<IActionResult> GetPlaces(string query)
+        {
+            string filePath = "C:\\Users\\taela\\source\\repos\\NewUnite\\GoKartUnite\\secrets.txt";
 
+            var keyValuePairs = new Dictionary<string, string>();
+            foreach (var line in System.IO.File.ReadLines(filePath))
+            {
+                if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
+                    continue;
+
+                var parts = line.Split('=');
+                if (parts.Length == 2)
+                {
+                    keyValuePairs[parts[0].Trim()] = parts[1].Trim();
+                }
+            }
+
+            string apiKey = "";
+            if (keyValuePairs.ContainsKey("GoogleAPIPlacesKey"))
+            {
+                apiKey = keyValuePairs["GoogleAPIPlacesKey"];
+            }
+            var url = "https://places.googleapis.com/v1/places:searchText";
+
+            // Prepare the JSON body
+            var requestBody = new
+            {
+                textQuery = query
+            };
+
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(requestBody);
+            using HttpClient client = new HttpClient();
+
+            // Create HTTP content with the JSON payload
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            // Add the required headers
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("X-Goog-Api-Key", apiKey);
+            client.DefaultRequestHeaders.Add("X-Goog-FieldMask", "places.displayName,places.formattedAddress,places.priceLevel");
+
+            var response = await client.PostAsync(url, content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return BadRequest(response.StatusCode.ToString());
+            }
+
+            return Content(await response.Content.ReadAsStringAsync(), "application/json");
+        }
     }
 }
