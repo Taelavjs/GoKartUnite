@@ -19,6 +19,9 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Net.Http;
 using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Microsoft.DotNet.MSIdentity.Shared;
 namespace GoKartUnite.Controllers
 {
     public class TrackHomeController : Controller
@@ -220,31 +223,87 @@ namespace GoKartUnite.Controllers
             }
             var url = "https://places.googleapis.com/v1/places:searchText";
 
-            // Prepare the JSON body
             var requestBody = new
             {
-                textQuery = query
+                textQuery = query,
             };
 
             var json = Newtonsoft.Json.JsonConvert.SerializeObject(requestBody);
             using HttpClient client = new HttpClient();
 
-            // Create HTTP content with the JSON payload
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            // Add the required headers
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Add("X-Goog-Api-Key", apiKey);
-            client.DefaultRequestHeaders.Add("X-Goog-FieldMask", "places.displayName,places.formattedAddress,places.priceLevel");
+            client.DefaultRequestHeaders.Add("X-Goog-FieldMask", "places.displayName,places.formattedAddress,places.id");
 
             var response = await client.PostAsync(url, content);
 
-            if (response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
                 return BadRequest(response.StatusCode.ToString());
             }
+            string jsonResponse = await response.Content.ReadAsStringAsync();
+            PlacesApiResponse? placesResponse = JsonConvert.DeserializeObject<PlacesApiResponse>(jsonResponse);
 
-            return Content(await response.Content.ReadAsStringAsync(), "application/json");
+            if (placesResponse == null) return Content(jsonResponse, "application/json");
+
+            var placeDTOs = placesResponse.Places.Select(p => new PlaceDTO
+            {
+                Name = p.DisplayName.Text,  // Or any other logic for the nested property
+                Location = p.FormattedAddress,
+                Id = p.Id
+            }).ToList();
+
+            TempData["GooglePlacesResponse"] = JsonConvert.SerializeObject(placeDTOs); 
+            return Content(jsonResponse, "application/json");
         }
+        [HttpPost]
+        public async Task<IActionResult> SelectSearchedResult(string id)
+        {
+            try
+            {
+                var placesSerialized = TempData["GooglePlacesResponse"] as string;
+                var placeDTOs = JsonConvert.DeserializeObject<List<PlaceDTO>>(placesSerialized);
+                var placeSelected = placeDTOs.FirstOrDefault(p => p.Id == id);
+            } 
+            catch (Exception err)
+            {
+                return BadRequest("Data is not recognised in session storage");
+            }
+            return Ok();
+        }
+    }
+
+    public class PlacesApiResponse
+    {
+        [JsonProperty("places")]
+        public List<Place> Places { get; set; } = new List<Place>();
+    }
+    public class Place
+    {
+        [JsonProperty("displayName")]
+        public required DisplayName DisplayName { get; set; }
+
+        [JsonProperty("formattedAddress")]
+        public required string FormattedAddress { get; set; }
+
+        [JsonProperty("id")]
+        public required string Id { get; set; }
+    }
+    public class DisplayName
+    {
+        [JsonProperty("text")]
+        public required string Text { get; set; }
+
+        [JsonProperty("languageCode")]
+        public required string LanguageCode { get; set; }
+    }
+    [Serializable]
+    public class PlaceDTO
+    {
+        public required string Name { get; set; }
+        public required string Location { get; set; }
+        public required string Id { get; set; }
     }
 }

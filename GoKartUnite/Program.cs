@@ -38,9 +38,22 @@ namespace GoKartUnite
             builder.Services.AddScoped<IRoleHandler, RoleHandler>();
             builder.Services.AddScoped<IKarterStatHandler, KarterStatHandler>();
             builder.Services.AddScoped<IGroupHandler, GroupHandler>();
+            builder.Logging.AddConsole();
             builder.Services.AddControllers().AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             );
+
+            // SESSION STATE +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
+            builder.Services.AddDistributedMemoryCache();
+
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromSeconds(300);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+            // +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+
             builder.Services.AddRateLimiter(_ => _
                 .AddFixedWindowLimiter(policyName: "fixed", options =>
                 {
@@ -148,6 +161,7 @@ namespace GoKartUnite
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseSession();
             app.UseRateLimiter();
             app.UseAuthorization();
             app.MapControllerRoute(

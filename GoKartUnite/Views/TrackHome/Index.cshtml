@@ -41,8 +41,19 @@
 <div>
 	<input id="googleSearchInput" type="text" />
 	<button id="googleSearchSubmit" type="submit">Search</button>
-</div>
+	<ul id="placesList" class="list-group">
 
+	</ul>
+</div>
+<template id="PlacesReturnedResult">
+	<li class="list-group-item d-flex justify-content-between align-items-center">
+		<div>
+			<strong>Title:</strong> <span class="place-title"></span><br>
+			<strong>Location:</strong> <span class="place-location"></span>
+		</div>
+		<button class="btn btn-primary btn-sm">Select</button>
+	</li>
+</template>
 <script>
 	function closeDropdown() {
 		const dropdown = document.getElementById('locationDropdown');
@@ -52,3 +63,4 @@
 	}
 </script>
 <script src="/js//GooglePlacesAPI/TrackSearchAPI.js"></script>
+
