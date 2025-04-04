@@ -31,6 +31,6 @@ namespace GoKartUnite.Interfaces
 
         Task<List<BlogPost>> GetPostsForTrack(string trackTitle, int count = 0);
 
-        Task UpdatePost(BlogPostView post, int id);
+        Task<bool> UpdatePost(BlogPostView post, int id, int karterId);
     }
 }

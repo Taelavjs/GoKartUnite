@@ -102,42 +102,55 @@ namespace GoKartUnite.Controllers
         [Authorize]
         [AccountConfirmed]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(BlogPostView post, int id = -1)
+        public async Task<IActionResult> Create([FromBody] JsonObjectForCreatingPosts post, int id = -1)
         {
-            if (!ModelState.IsValid)
-            {
-                return RedirectToAction("Index");
-            }
 
             string GoogleId = await _karter.GetCurrentUserNameIdentifier(User);
+            Karter k = await _karter.GetUserByGoogleId(GoogleId);
 
             if (id != -1)
             {
                 // EDITING AN ALREADY EXISTING POST
-                await _blog.UpdatePost(post, id);
-                return RedirectToAction("Index");
-
+                var postToSned = new BlogPostView
+                {
+                    Title = post.Title,
+                    TaggedTrackTitle = post.TaggedTrackTitle,
+                    Description = post.Description,
+                };
+                bool success = await _blog.UpdatePost(postToSned, id, k.Id);
+                if(success)return Ok(new { status = "success", message = "Updated Blog post" });
+                return BadRequest(new { status = "fail", message = "Invalid Model State" });
             }
 
-            Karter k = await _karter.GetUserByGoogleId(GoogleId);
             int postId;
             if (post.TaggedTrackTitle != string.Empty)
             {
-                Track taggedT = await _tracks.GetSingleTrackByTitle(post.TaggedTrackTitle);
-                post.authorId = k.Id;
-                post.Author = k;
-                post.TaggedTrack = taggedT;
-                postId = await _blog.AddPost(post);
+                Track taggedTrack = await _tracks.GetSingleTrackByTitle(post.TaggedTrackTitle);
+                var postToSned = new BlogPostView
+                {
+                    Title = post.Title,
+                    TaggedTrackTitle = post.TaggedTrackTitle,
+                    Description = post.Description,
+                    Author = k,
+                    authorId = k.Id,
+                    TaggedTrack = taggedTrack,
+                };
+                postId = await _blog.AddPost(postToSned);
             }
             else
             {
-                post.authorId = k.Id;
-                post.Author = k;
-                postId = await _blog.AddPost(post);
-                return RedirectToAction("Index");
+                var postToSned = new BlogPostView
+                {
+                    Title = post.Title,
+                    Description = post.Description,
+                    Author = k,
+                    authorId = k.Id,
+                };
+                return Ok(new { status = "success", message = "Created Blog Post" });
             }
+            Track taggedT = await _tracks.GetSingleTrackByTitle(post.TaggedTrackTitle);
 
-            List<int> kartersWhoNeedNotif = await _followerHandler.AllUserIdsWhoFollowTrack(post.TaggedTrack.Id);
+            List<int> kartersWhoNeedNotif = await _followerHandler.AllUserIdsWhoFollowTrack(taggedT.Id);
             if (post.TaggedTrackTitle != string.Empty)
             {
                 foreach (int kar in kartersWhoNeedNotif)
@@ -145,7 +158,7 @@ namespace GoKartUnite.Controllers
                     await _notification.CreateBlogNotification(kar, postId);
                 }
             }
-            return RedirectToAction("Index");
+            return Ok(new { status = "success", message = "Created Blog Post With Tagged Track ANd Notifs" });
         }
 
         [HttpGet]
@@ -222,7 +235,7 @@ namespace GoKartUnite.Controllers
         [HttpGet]
         [Authorize]
         [AccountConfirmed]
-        public ActionResult CreateComment(int blogId)
+        public ActionResult CreateComment([FromBody] int blogId)
         {
             CommentView cv = new CommentView();
             cv.blogId = blogId;
@@ -233,28 +246,35 @@ namespace GoKartUnite.Controllers
         [Authorize]
         [AccountConfirmed]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateComment(CommentView cv)
+        public async Task<IActionResult> CreateComment([FromBody] CreateCommentRequest comment)
         {
             string GoogleId = await _karter.GetCurrentUserNameIdentifier(User);
-
-
             Karter k = await _karter.GetUserByGoogleId(GoogleId);
 
-            Comment comment = new Comment
+            Comment commentModel = new Comment
             {
                 AuthorId = k.Id,
-                BlogPostId = cv.blogId ?? 0,
-                Text = cv.Text,
+                BlogPostId = comment.BlogId,
+                Text = comment.Comment,
             };
 
-            await _blog.CreateComment(comment);
-
-            string previousUrl = Request.Headers["Referer"].ToString();
-
-            return Redirect(previousUrl);
+            await _blog.CreateComment(commentModel);
+            return Ok(new { status = "success", message = "Comment Created Successfully" });
         }
 
 
 
+        public class CreateCommentRequest
+        {
+            public int BlogId { get; set; }
+            public string Comment { get; set; }
+        }
+    }
+
+    public class JsonObjectForCreatingPosts
+    {
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public string TaggedTrackTitle { get; set; }
     }
 }

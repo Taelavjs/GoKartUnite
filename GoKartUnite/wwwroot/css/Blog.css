@@ -54,3 +54,15 @@
     margin-left: auto;
     margin-right: 2ch;
 }
+
+.fade {
+    opacity: 0;
+    max-height: 3ch;
+    overflow: hidden;
+}
+
+    .fade.show {
+        opacity: 1;
+        max-height: 30ch;
+        transition: opacity 1s ease-out, max-height 1s ease-in-out;
+    }

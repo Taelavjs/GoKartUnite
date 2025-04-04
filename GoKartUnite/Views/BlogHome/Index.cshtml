@@ -4,7 +4,6 @@
 <div class="container">
     <h1>Blog</h1>
     <div class="p-3">
-        <h3>Create Blog Post</h3>
         @await Html.PartialAsync("Create", Model.editedPost)
     </div>
 
@@ -40,9 +39,7 @@
 </div>
 
 @await Html.PartialAsync("_Pagination", new { Page = ViewBag.Page, TotalPages = ViewBag.TotalPages, QueryString = ViewContext.HttpContext.Request.Query })
-@await Html.PartialAsync("_Modal")
 
 @section Scripts {
-    @await Html.PartialAsync("_Scripts")
     <script src="~/js/Blog/UpvoteBlogPost.js" asp-append-version="true"></script>
 }

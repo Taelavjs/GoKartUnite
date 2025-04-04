@@ -261,19 +261,21 @@ namespace GoKartUnite.Handlers
             return post;
         }
 
-        public async Task UpdatePost(BlogPostView post, int id)
+        public async Task<bool> UpdatePost(BlogPostView post, int id, int karterId)
         {
             BlogPost retrievedPost = _context.BlogPosts.SingleOrDefault(t => t.Id == id);
-            if (retrievedPost == null) return;
-
+            
+            if (retrievedPost == null) return false;
+            if (retrievedPost.AuthorId != karterId) return false;
             retrievedPost.Title = post.Title;
             retrievedPost.Description = post.Description;
 
             Track track = _context.Track.SingleOrDefault(t => t.Title == post.TaggedTrackTitle);
-            if (track == null) return;
+            if (track == null) return false;
 
             retrievedPost.TaggedTrack = track;
             _context.SaveChanges();
+            return true;
         }
 
     }

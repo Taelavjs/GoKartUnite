@@ -1,14 +1,74 @@
 ﻿document.addEventListener("DOMContentLoaded", function () {
     const upvoteButtons = document.querySelectorAll('.upvote-btn');
+    const commentCreateButtons = document.querySelectorAll(".create-comment-btn");
+    const commentFetchButtons = document.querySelectorAll(".commentBtn");
+    // CREATE BLOG POST ==============================
+    $('#createPostBtn').on('click', function (event) {
+        event.preventDefault();
 
+        var formData = {
+            Title: $('#Title').val(),
+            Description: $('#Description').val(),
+            TaggedTrackTitle: $('#TaggedTrackTitle').val()
+        };
+        var token = $('input[name="__RequestVerificationToken"]').val();
+        $.ajax({
+            type: 'POST',
+            url: '/BlogHome/Create',
+            data: JSON.stringify(formData),
+            dataType: 'json',
+            contentType: 'application/json',
+            headers: {
+                'RequestVerificationToken': token
+            },
+            success: function (response) {
+                if (response.status == "success") {
+                    $('#response').html('<div class="alert alert-success">Post created successfully!</div>');
+                } else {
+                    $('#response').html('<div class="alert alert-danger">Error: ' + response.message + '</div>');
+                }
+            },
+            error: function (xhr, status, error) {
+                $('#response').html('<div class="alert alert-danger">Server not responding</div>');
+            }
+        });
+    });
+    // CREATE BLOG POST ==============================
+
+    // COMMENT CREATION ==============================
+    commentCreateButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            const postId = button.getAttribute("data-postid");
+            const commentText = document.getElementById(`CommentInput-${postId}`).value;
+            const baseUrl = `${window.location.origin}/BlogHome/CreateComment`;
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            fetch(baseUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "RequestVerificationToken": token
+                },
+                body: JSON.stringify({ blogId: postId, comment: commentText })
+            }).then((response) => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error("Error creating comment");
+            }).then((responseJson) => {
+                console.log(responseJson);
+            }).catch(err => alert("Error creating comment"));
+        });
+    });
+    // COMMENT CREATION ==============================
+
+    // UPVOTING ======================================
     upvoteButtons.forEach(button => {
         button.addEventListener('click', function () {
             const postId = button.getAttribute('data-id');
             const postUpvotes = button.getAttribute('data-upvoteCount');
 
-
             const baseUrl = `${window.location.origin}/BlogHome/UpvoteBlog?id=${postId}`;
-            console.log(baseUrl);
             fetch(baseUrl, {
                 method: "POST"
             }).then((response) => {
@@ -20,19 +80,21 @@
                 const newUpvotes = parseInt(postUpvotes) + parseInt(responseJson.message);
                 button.setAttribute('data-upvoteCount', newUpvotes);
                 $(`#UpvoteCounter-${postId}`).text(newUpvotes.toString());
-            }).catch(err => alert("error"));
+            }).catch(err => alert("Error upvoting"));
         });
     });
+    // UPVOTING ======================================
 
-    const commentBtns = document.querySelectorAll(".commentBtn");
-
-    commentBtns.forEach(button => {
+    // FETCH COMMENTS ================================
+    commentFetchButtons.forEach(button => {
         button.addEventListener("click", async function () {
             const postElement = button.closest(".post");
             const postId = button.getAttribute("data-postid");
             let lastCommentId = postElement.getAttribute("data-lastcommentid") || "0";
 
             const baseUrl = `${window.location.origin}/BlogHome/GetCommentsForBlog?blogId=${postId}&lastCommentId=${lastCommentId}`;
+
+            button.disabled = true;
 
             try {
                 const response = await fetch(baseUrl, {
@@ -48,16 +110,16 @@
                 const commentSection = document.querySelector(`.comment-section-${postId}`);
                 if (!commentSection) return;
 
-
                 if (data.length === 0) {
-                    commentSection.innerHTML += '<li class="text-danger small">No comments.</li>';
+                    commentSection.innerHTML += '<li class="text-danger small">No More Comments.</li>';
+                    button.disabled = true;
                     return;
                 }
 
                 let newLastCommentId = null;
 
-                data.forEach(comment => {
-                    const commentElement = createCommentElement(comment);
+                data.forEach((comment, index) => {
+                    const commentElement = createCommentElement(comment, index);
                     if (commentElement) {
                         commentSection.appendChild(commentElement);
                     }
@@ -74,11 +136,16 @@
                 if (commentSection) {
                     commentSection.innerHTML = '<li class="text-danger small">Failed to load comments.</li>';
                 }
+            } finally {
+                setTimeout(() => {
+                    button.disabled = false;
+                }, 2000);
             }
         });
     });
+    // FETCH COMMENTS ================================
 
-    function createCommentElement(comment) {
+    function createCommentElement(comment, index) {
         const template = document.getElementById("comment-template");
 
         if (!template) {
@@ -87,11 +154,19 @@
         }
 
         const commentElement = template.content.cloneNode(true);
+        const commentItem = commentElement.querySelector(".comment-item");
 
         commentElement.querySelector(".comment-author").textContent = comment.authorName;
         commentElement.querySelector(".comment-date").textContent = new Date(comment.typedAt).toLocaleDateString();
         commentElement.querySelector(".comment-text").textContent = comment.text;
 
+        commentItem.classList.add('fade');
+        setTimeout(() => {
+            commentItem.classList.add('show');
+        }, index * 200);
+
         return commentElement;
     }
 });
+
+
