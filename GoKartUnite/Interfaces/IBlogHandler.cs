@@ -15,7 +15,7 @@ namespace GoKartUnite.Interfaces
 
         Task<BlogPost> GetPost(int Id, BlogPostFilterOptions? options = null);
 
-        Task UpvotePost(int Id, Upvotes upvoteToAdd);
+        Task<bool> UpvotePost(int Id, Upvotes upvoteToAdd);
         Task DeleteUpvote(Upvotes upvoteToDelete);
 
 

@@ -18,7 +18,7 @@
             <div class="blog-post-description">@Model.TaggedTrack.Title</div>
     }
     <div class="blog-post-upvotes w-100 d-flex justify-content-between align-items-end">
-        <span><i class="bi bi-chevron-up"></i> @Model.Upvotes</span>
+        <span><i class="bi bi-chevron-up"></i> <div id="UpvoteCounter-@Model.Id">@Model.Upvotes</div></span>
         <button
             type="button"
             class="upvote-btn"

@@ -2,18 +2,16 @@
 
 @foreach (var post in Model)
 {
-        <div class="post h-100 p-3 border-bottom d-flex flex-column gap-2" data-postid="@post.Id" data-lastcommentid="0">
+        <div class="post h-100 p-3 border-bottom d-flex flex-column gap-2" style="color: black;" data-postid="@post.Id" data-lastcommentid="0">
         @await Html.PartialAsync("Blog", post)
 
             <div class="d-flex align-items-center gap-2 mt-3">
 
                 
-                <!-- Open Comments -->
                 <button data-postid="@post.Id" class="btn btn-outline-secondary btn-sm commentBtn">
                 <i class="bi bi-chat"></i>
                 </button>
 
-                <!-- Create Comment -->
                 <button data-postid="@post.Id" class="btn btn-outline-primary btn-sm create-comment-btn">
                     <i class="bi bi-plus-square"></i>
                 </button>

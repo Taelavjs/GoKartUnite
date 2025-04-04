@@ -6,19 +6,24 @@
             const postId = button.getAttribute('data-id');
             const postUpvotes = button.getAttribute('data-upvoteCount');
 
-            console.log('ID:', postId);
-            const newUpvotes = parseInt(postUpvotes) + 1;
-            button.setAttribute('data-upvoteCount', newUpvotes);
-            button.parentNode.textContent = newUpvotes.toString();
+
             const baseUrl = `${window.location.origin}/BlogHome/UpvoteBlog?id=${postId}`;
             console.log(baseUrl);
             fetch(baseUrl, {
                 method: "POST"
-            }).catch(err => console.log(err));
+            }).then((response) => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error("Error updating upvote");
+            }).then((responseJson) => {
+                const newUpvotes = parseInt(postUpvotes) + parseInt(responseJson.message);
+                button.setAttribute('data-upvoteCount', newUpvotes);
+                $(`#UpvoteCounter-${postId}`).text(newUpvotes.toString());
+            }).catch(err => alert("error"));
         });
     });
 
-    // Select all comment buttons
     const commentBtns = document.querySelectorAll(".commentBtn");
 
     commentBtns.forEach(button => {
@@ -27,7 +32,6 @@
             const postId = button.getAttribute("data-postid");
             let lastCommentId = postElement.getAttribute("data-lastcommentid") || "0";
 
-            // API URL for fetching comments
             const baseUrl = `${window.location.origin}/BlogHome/GetCommentsForBlog?blogId=${postId}&lastCommentId=${lastCommentId}`;
 
             try {
@@ -41,11 +45,9 @@
                 const data = await response.json();
                 console.log("Fetched Comments:", data);
 
-                // Get the corresponding comment section
                 const commentSection = document.querySelector(`.comment-section-${postId}`);
                 if (!commentSection) return;
 
-                // Clear existing comments before appending new ones
                 commentSection.innerHTML = "";
 
                 if (data.length === 0) {
@@ -63,7 +65,6 @@
                     newLastCommentId = comment.id;
                 });
 
-                // Update last comment ID
                 if (newLastCommentId) {
                     postElement.setAttribute("data-lastcommentid", newLastCommentId);
                 }
@@ -78,7 +79,6 @@
         });
     });
 
-    // Function to create comment elements using the <template>
     function createCommentElement(comment) {
         const template = document.getElementById("comment-template");
 
@@ -87,10 +87,8 @@
             return null;
         }
 
-        // Clone the template
         const commentElement = template.content.cloneNode(true);
 
-        // Populate the template with data
         commentElement.querySelector(".comment-author").textContent = comment.authorName;
         commentElement.querySelector(".comment-date").textContent = new Date(comment.typedAt).toLocaleDateString();
         commentElement.querySelector(".comment-text").textContent = comment.text;

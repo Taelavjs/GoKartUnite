@@ -164,12 +164,19 @@ namespace GoKartUnite.Handlers
             return await query.SingleOrDefaultAsync(k => k.Id == Id);
         }
 
-        public async Task UpvotePost(int Id, Upvotes upvoteToAdd)
+        public async Task<bool> UpvotePost(int Id, Upvotes upvoteToAdd)
         {
-            BlogPost post = await GetPost(Id);
-            post.Upvotes.Add(upvoteToAdd);
-
-            await _context.SaveChangesAsync();
+            try
+            {
+                BlogPost post = await GetPost(Id);
+                post.Upvotes.Add(upvoteToAdd);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+            return true;
         }
 
         public async Task DeleteUpvote(Upvotes upvoteToDelete)

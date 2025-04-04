@@ -184,10 +184,9 @@ namespace GoKartUnite.Controllers
         [HttpPost]
         [Authorize]
         [AccountConfirmed]
-        public async Task UpvoteBlog(int id)
+        public async Task<IActionResult> UpvoteBlog(int id)
         {
             string GoogleId = await _karter.GetCurrentUserNameIdentifier(User);
-
             BlogPost post = await _blog.GetPost(id, new BlogPostFilterOptions { IncludeUpvotes = true });
             Karter karter = await _karter.GetUserByGoogleId(GoogleId);
 
@@ -199,12 +198,15 @@ namespace GoKartUnite.Controllers
             if (alreadyUpvoted)
             {
                 await _blog.DeleteUpvote(upvote);
-                return;
+                return Ok(new { status = "success", message = -1 });
             }
             upvote = new Upvotes();
             upvote.PostId = id;
             upvote.VoterId = karter.Id;
-            await _blog.UpvotePost(id, upvote);
+            bool success = await _blog.UpvotePost(id, upvote);
+
+            if (success) return Ok(new { status = "success", message = 1 });
+            return BadRequest(new { status = "fail", message = "Upvote could not be applied" });
         }
 
 
