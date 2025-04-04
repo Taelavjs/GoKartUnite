@@ -27,19 +27,19 @@ namespace GoKartUnite.Controllers
         [HttpGet]
         [Authorize]
         [AccountConfirmed]
-        public async Task<IActionResult> Index(string track, string fullUrl)
+        public async Task<IActionResult> Index(string track)
         {
             string GoogleId = await _karter.GetCurrentUserNameIdentifier(User);
             Karter k = await _karter.GetUserByGoogleId(GoogleId);
             List<Track> T = await _tracks.GetTracksByTitle(track);
 
-            if (k == null && T.Count == 0)
+            if (k == null || T.Count == 0)
             {
-                return Ok();
+                return NotFound(new { success = false, message = "Bad Inputs" });
             }
-            await _follows.CreateFollow(k.Id, T[0].Id);
-            return Redirect(fullUrl);
-
+            bool success = await _follows.CreateFollow(k.Id, T[0].Id);
+            if (success) return Ok(new { success = true, message = "Successful follow requerst" });
+            return NotFound(new { success = false, message = "Bad Inputs" });
         }
     }
 }

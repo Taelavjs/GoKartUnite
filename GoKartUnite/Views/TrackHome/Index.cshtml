@@ -1,42 +1,37 @@
-﻿
-@{
+﻿@{
 	ViewData["Title"] = "Index";
 }
 
-
-<div class="container">
+<div class="container py-5">
 	<h1>Track Home</h1>
-	<form asp-action="SearchTracks" method="get" class="container mt-4 p-4 bg-light rounded shadow-sm">
+
+	<form asp-action="SearchTracks" method="get" class="p-3">
 		<div class="mb-3">
 			<label for="trackSearched" class="form-label fw-bold">Track Search</label>
 			<input type="text" class="form-control" id="trackSearched" name="trackSearched" placeholder="Enter Track Name">
 		</div>
 
-<div class="mb-3 h-75 w-100">
-	<div class="w-100 h-25 d-flex flex-row justify-content-start align-items-start">
-		<div class="dropdown w-50 h-100 d-flex flex-row justify-content-between align-items-start">
-			<button class="btn btn-secondary dropdown-toggle w-75" type="button" id="locationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-				Locations
-			</button>
-			<ul class="dropdown-menu" aria-labelledby="locationDropdown">
+		<div class="d-flex align-items-center gap-3">
+			<div class="dropdown w-50">
+				<button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="locationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+					Select Locations
+				</button>
+				<ul class="dropdown-menu p-3" aria-labelledby="locationDropdown">
 					@foreach (var location in Enum.GetValues(typeof(GoKartUnite.Models.Locations)))
 					{
-					<li>
-						<label class="dropdown-item">
-							<input type="checkbox" name="Location" value="@location" class="form-check-input" checked /> @location
-						</label>
-					</li>
+						<li class="form-check">
+							<input class="form-check-input" type="checkbox" name="Location" value="@location" id="location_@location" checked>
+							<label class="form-check-label" for="location_@location">@location</label>
+						</li>
 					}
-			</ul>
+				</ul>
+			</div>
+			<button type="submit" class="btn btn-primary px-4">Filter</button>
 		</div>
-		<button type="submit" class="btn btn-primary w-25">Filter</button>
-	</div>
-</div>
-
-
-
 	</form>
 </div>
+
+
 
 
 <script>

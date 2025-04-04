@@ -4,43 +4,6 @@
 @{
 	ViewData["Title"] = "Details";
 }
-
-@* <div> *@
-@*     <table class="table"> *@
-
-@*     <thead> *@
-@*         <th scope="col">#Id</th> *@
-@*         <th scope="col">Title</th> *@
-@*         <th scope="col">Desc.</th> *@
-@*         <th scope="col">Location</th> *@
-@*         <th scope="col">Options</th> *@
-@*         <th scope="col"></th> *@
-@*     </thead> *@
-@*     <tbody> *@
-@*     @{ *@
-@*         foreach(var track in Model){ *@
-@*             <tr> *@
-@*                 <th scope="row">@track.Id</th> *@
-@*                 <td>@track.Title</td> *@
-@*                 <td>@track.Description</td> *@
-@*                 <td>@track.Location</td> *@
-@*                 <td><a asp-action="Create" asp-route-id="@track.Id">Edit</a></td> *@
-@*                 <td> *@
-@*                         <form asp-action="Delete" asp-route-id="@track.Id" method="post" style="display:inline;"> *@
-@*                                 @Html.AntiForgeryToken() *@
-@*                         <input type="submit" value="Delete" class="btn btn-danger" /> *@
-@*                     </form>    *@
-@*                 </td> *@
-@*             </tr> *@
-@*         } *@
-@*     } *@
-@*     </tbody> *@
-@* </table> *@
-@* </div> *@
-
-@*
-	For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
 @using GoKartUnite.ViewModel
 
 @model IEnumerable<TrackView>
@@ -48,44 +11,61 @@
 
 <div class="container">
 	<H1>Blog</H1>
-	@foreach (var track in Model)
-	{
-		@await Html.PartialAsync("Track", track);
+	@if(Model.Count() <= 0){
+		<h2>No Tracks Found...</h2>
+	} else {
+		@foreach (var track in Model)
+		{
+			@await Html.PartialAsync("Track", track)
+			;
+		}
 	}
+
+	<div id="AddTrackDiv" class="border-top pt-4 mb-5 pb-5">
+		<h2 class="text-center mb-4">Can't find your track? Submit it below for verification</h2>
+
+		<div class="d-flex justify-content-center align-items-center gap-3">
+			<input id="googleSearchInput" type="text" class="form-control w-50" placeholder="Enter track name" />
+			<button id="googleSearchSubmit" type="submit" class="btn btn-primary">
+				Search
+			</button>
+		</div>
+		<ul id="placesList" class="list-group">
+		</ul>
+		<div class="w-100 text-center d-flex justify-content-center align-items-center" id="GroupStatGraphLoading" hidden>
+			<div class="spinner-border" role="status">
+				<span class="sr-only"></span>
+			</div>
+		</div>
+		<div class="alert alert-success" id="Success" role="alert" hidden>
+			Success
+		</div>
+		<div class="alert alert-info" id="TrackNotFound" role="alert" hidden>
+			Track Not Found
+		</div>
+		<div class="alert alert-info" id="ServerErr" role="alert" hidden>
+			Failed To Submit Track To Server
+		</div>
+	</div>
 </div>
 
 @* Add Track To Database API Request *@
-<div>
-	<h2>Can't find your track? Submit it below for verification</h2>
-	<input id="googleSearchInput" type="text" />
-	<button id="googleSearchSubmit" type="submit">Search</button>
-	<ul id="placesList" class="list-group">
-	</ul>
-	<div class="w-100 text-center d-flex justify-content-center align-items-center" id="GroupStatGraphLoading" hidden>
-		<div class="spinner-border" role="status">
-			<span class="sr-only"></span>
-		</div>
-	</div>
-	<div class="alert alert-success" id="Success" role="alert" hidden>
-		Success
-	</div>
-	<div class="alert alert-info" id="TrackNotFound" role="alert" hidden>
-		Track Not Found
-	</div>
-	<div class="alert alert-info" id="ServerErr" role="alert" hidden>
-		Failed To Submit Track To Server
-	</div>
-</div>
+
 <template id="PlacesReturnedResult">
-	<li class="list-group-item d-flex justify-content-between align-items-center">
+	<li class="list-group-item d-flex justify-content-between align-items-center pb-2 pt-2 mt-1">
 		<div>
 			<strong>Title:</strong> <span class="place-title"></span><br>
 			<strong>Location:</strong> <span class="place-location"></span>
 		</div>
-		<button class="btn btn-primary btn-sm">Select</button>
+		<button class="btn btn-primary btn-sm ms-2">Select</button>
 	</li>
 </template>
+
 @* ================================== *@
 
-<script src="~/js/Track.js" asp-append-version="true"></script>
-<script src="/js//GooglePlacesAPI/TrackSearchAPI.js"></script>
+
+@section scripts {
+	<script src="/js//GooglePlacesAPI/TrackSearchAPI.js"></script>
+	<script src="/js/TrackDetails/FollowRequest.js"></script>
+}
+
