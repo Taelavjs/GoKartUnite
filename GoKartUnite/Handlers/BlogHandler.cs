@@ -201,7 +201,11 @@ namespace GoKartUnite.Handlers
             {
                 return post.Comments.Take(10).ToList();
             }
-            return post.Comments.SkipWhile(t => t.Id != lastIdSent).Take(10).ToList();
+            return post.Comments
+                .SkipWhile(t => t.Id != lastIdSent)
+                .Skip(1)
+                .Take(10)
+                .ToList();
         }
 
         public async Task<List<CommentView>> CommentModelToView(List<Comment> comments)

@@ -48,10 +48,9 @@
                 const commentSection = document.querySelector(`.comment-section-${postId}`);
                 if (!commentSection) return;
 
-                commentSection.innerHTML = "";
 
                 if (data.length === 0) {
-                    commentSection.innerHTML = '<li class="text-danger small">No comments.</li>';
+                    commentSection.innerHTML += '<li class="text-danger small">No comments.</li>';
                     return;
                 }
 
