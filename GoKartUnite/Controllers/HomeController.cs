@@ -26,14 +26,14 @@ namespace GoKartUnite.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IRelationshipHandler _friends;
         private readonly IBlogHandler _blog;
-        private readonly IKarterHandler _karters;
+        private readonly IKarterHandler _karter;
 
         public HomeController(ILogger<HomeController> logger, IKarterHandler karters, IRelationshipHandler friends, IBlogHandler blog)
         {
             _logger = logger;
             _friends = friends;
             _blog = blog;
-            _karters = karters;
+            _karter = karters;
         }
         [AllowAnonymous]
         public async Task<IActionResult> Index()
@@ -42,8 +42,7 @@ namespace GoKartUnite.Controllers
             {
                 return View();
             }
-            Karter k = await _karters.GetUserByGoogleId(User.Claims
-.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
+            Karter k = await _karter.GetUserByGoogleId(await _karter.GetCurrentUserNameIdentifier(User), withTrack: true);
             List<Karter> friends = await _friends.GetAllFriends(k.Id);
             List<BlogPost> blogPosts = new List<BlogPost>();
 
@@ -71,8 +70,7 @@ namespace GoKartUnite.Controllers
         [EnableRateLimiting("slidingPolicy")]
         public async Task<IActionResult> InfiniteScroll(int pagesScrolled = 0)
         {
-            Karter k = await _karters.GetUserByGoogleId(User.Claims
-.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
+            Karter k = await _karter.GetUserByGoogleId(await _karter.GetCurrentUserNameIdentifier(User), withTrack: true);
             List<Karter> friends = await _friends.GetAllFriends(k.Id);
             List<BlogPost> blogPosts = new List<BlogPost>();
 

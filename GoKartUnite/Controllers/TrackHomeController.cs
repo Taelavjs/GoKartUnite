@@ -28,7 +28,7 @@ namespace GoKartUnite.Controllers
     {
         private readonly GoKartUniteContext _context;
         private readonly ITrackHandler _tracks;
-        private readonly IKarterHandler _karters;
+        private readonly IKarterHandler _karter;
         private readonly IFollowerHandler _follows;
         private readonly IBlogHandler _blog;
         private readonly IRoleHandler _role;
@@ -38,7 +38,7 @@ namespace GoKartUnite.Controllers
             _role = role;
             _context = context;
             _tracks = tracks;
-            _karters = karters;
+            _karter = karters;
             _follows = follows;
             _blog = blog;
         }
@@ -118,7 +118,7 @@ namespace GoKartUnite.Controllers
             var tracksRender = _tracks.ModelToView(await _tracks.GetAllTracks());
             if (id == null) return View(await tracksRender);
 
-            return View("KartersLocalTrack", await _karters.GetAllUsersByTrackId(id.Value));
+            return View("KartersLocalTrack", await _karter.GetAllUsersByTrackId(id.Value));
         }
 
         [HttpGet]
@@ -126,9 +126,8 @@ namespace GoKartUnite.Controllers
         [AccountConfirmed]
         public async Task<IActionResult> SearchTracks(string trackSearched, List<Locations> location)
         {
-            string GoogleId = User.Claims
-    .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            Karter usr = await _karters.GetUserByGoogleId(GoogleId);
+            string GoogleId = await _karter.GetCurrentUserNameIdentifier(User);
+            Karter usr = await _karter.GetUserByGoogleId(GoogleId);
 
             List<TrackView> tracks = await _tracks.ModelToView(await _tracks.GetTracksByTitle(trackSearched, location));
             foreach (TrackView track in tracks)
@@ -176,10 +175,9 @@ namespace GoKartUnite.Controllers
             List<BlogPost> posts = await _blog.GetPostsForTrack(track, 10);
 
             List<BlogPostView> postViews = await _blog.GetModelToView(posts);
-            string userClaimsId = User.Claims
-                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            string userClaimsId = await _karter.GetCurrentUserNameIdentifier(User);
 
-            Karter userId = await _karters.GetUserByGoogleId(userClaimsId);
+            Karter userId = await _karter.GetUserByGoogleId(userClaimsId);
             bool isAdminAtTrack = await _role.IsAdminAtTrack(track, userId.Id);
 
             TrackProfile trackProfile = new TrackProfile
@@ -194,9 +192,8 @@ namespace GoKartUnite.Controllers
 
         private async Task<Karter> GetKarterFromUUID()
         {
-            string GoogleId = User.Claims
-                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            return await _karters.GetUserByGoogleId(GoogleId);
+            string GoogleId = await _karter.GetCurrentUserNameIdentifier(User);
+            return await _karter.GetUserByGoogleId(GoogleId);
         }
         [HttpGet]
         public async Task<IActionResult> GetPlaces(string query)

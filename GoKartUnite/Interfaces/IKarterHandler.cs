@@ -1,6 +1,7 @@
 ﻿using GoKartUnite.DataFilterOptions;
 using GoKartUnite.Models;
 using GoKartUnite.ViewModel;
+using System.Security.Claims;
 
 namespace GoKartUnite.Interfaces
 {
@@ -19,5 +20,7 @@ namespace GoKartUnite.Interfaces
         Task<List<KarterView>> KarterModelToView(List<Karter> karters);
         Task<KarterView> KarterModelToView(Karter karter);
         Task UpdateUser(string nameIdentifier, KarterView kv);
+        Task<string> GetCurrentUserNameIdentifier(ClaimsPrincipal User);
+
     }
 }

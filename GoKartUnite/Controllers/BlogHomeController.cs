@@ -42,8 +42,7 @@ namespace GoKartUnite.Controllers
 
             ViewBag.TotalPages = await _blog.GetTotalPageCount();
             page = Math.Max(0, Math.Min(page, ViewBag.TotalPages));
-            string GoogleId = User.Claims
-                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            string GoogleId = await _karter.GetCurrentUserNameIdentifier(User);
 
             Karter k = await _karter.GetUserByGoogleId(GoogleId);
             List<BlogNotifications> notifications = await _notification.GetUserBlogNotifications(k.Id);
@@ -110,8 +109,7 @@ namespace GoKartUnite.Controllers
                 return RedirectToAction("Index");
             }
 
-            string GoogleId = User.Claims
-                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            string GoogleId = await _karter.GetCurrentUserNameIdentifier(User);
 
             if (id != -1)
             {
@@ -170,8 +168,7 @@ namespace GoKartUnite.Controllers
                 return View();
             }
 
-            string GoogleId = User.Claims
-                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            string GoogleId = await _karter.GetCurrentUserNameIdentifier(User);
             Karter k = await _karter.GetUserByGoogleId(GoogleId);
             int trackAdminIds = await _roles.GetTrackUserTrackId(k.Id);
             Track taggedT = await _tracks.GetTrackById(trackAdminIds);
@@ -189,8 +186,8 @@ namespace GoKartUnite.Controllers
         [AccountConfirmed]
         public async Task UpvoteBlog(int id)
         {
-            string GoogleId = User.Claims
-    .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            string GoogleId = await _karter.GetCurrentUserNameIdentifier(User);
+
             BlogPost post = await _blog.GetPost(id, new BlogPostFilterOptions { IncludeUpvotes = true });
             Karter karter = await _karter.GetUserByGoogleId(GoogleId);
 
@@ -236,8 +233,8 @@ namespace GoKartUnite.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateComment(CommentView cv)
         {
-            string GoogleId = User.Claims
-                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            string GoogleId = await _karter.GetCurrentUserNameIdentifier(User);
+
 
             Karter k = await _karter.GetUserByGoogleId(GoogleId);
 

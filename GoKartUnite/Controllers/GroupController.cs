@@ -22,14 +22,14 @@ namespace GoKartUnite.Controllers
     public class GroupController : Controller
     {
         private readonly IGroupHandler _groups;
-        private readonly IKarterHandler _karters;
+        private readonly IKarterHandler _karter;
         private readonly IBlogHandler _blog;
         private readonly ITrackHandler _track;
 
         public GroupController(ITrackHandler track, IKarterHandler karters, IGroupHandler groups, IBlogHandler blog)
         {
             _groups = groups;
-            _karters = karters;
+            _karter = karters;
             _blog = blog;
             _track = track;
         }
@@ -38,8 +38,10 @@ namespace GoKartUnite.Controllers
         [AccountConfirmed]
         public async Task<ActionResult> Index()
         {
-            Karter? k = await _karters.GetUserByGoogleId(User.Claims
-                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
+            Karter? k = await _karter.GetUserByGoogleId(
+                await _karter.GetCurrentUserNameIdentifier(User),
+                withTrack: true
+            );
 
             List<ListedGroupView> groups = await _groups.GetAllGroups(k, null, "");
 
@@ -53,8 +55,10 @@ namespace GoKartUnite.Controllers
 
         public async Task<IActionResult> SortedListOfGroups(string SortedBy, string query)
         {
-            Karter? k = await _karters.GetUserByGoogleId(User.Claims
-    .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
+            Karter? k = await _karter.GetUserByGoogleId(
+                await _karter.GetCurrentUserNameIdentifier(User),
+                withTrack: true
+            );
             if (Enum.TryParse(SortedBy, true, out Filters filter))
             {
                 List<ListedGroupView> groups = await _groups.GetAllGroups(k, filter, query);
@@ -74,8 +78,10 @@ namespace GoKartUnite.Controllers
             {
                 listedGroup = model.PostageGroup;  // This refers to ListedGroupView within GroupPageView
             }
-            Karter k = await _karters.GetUserByGoogleId(User.Claims
-                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
+            Karter k = await _karter.GetUserByGoogleId(
+                await _karter.GetCurrentUserNameIdentifier(User),
+                withTrack: true
+            );
             await _groups.CreateNewGroup(listedGroup, k);
 
             return RedirectToAction("Index");
@@ -87,8 +93,10 @@ namespace GoKartUnite.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> JoinGroup(int GroupId)
         {
-            Karter? k = await _karters.GetUserByGoogleId(User.Claims
-                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
+            Karter? k = await _karter.GetUserByGoogleId(
+                await _karter.GetCurrentUserNameIdentifier(User),
+                withTrack: true
+            );
             if (k == null) return RedirectToAction("Index");
             await _groups.JoinGroup(GroupId, k);
             return RedirectToAction("Index");
@@ -100,8 +108,7 @@ namespace GoKartUnite.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> LeaveGroup(int GroupId)
         {
-            Karter? k = await _karters.GetUserByGoogleId(User.Claims
-                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
+            Karter? k = await _karter.GetUserByGoogleId(await _karter.GetCurrentUserNameIdentifier(User), withTrack: true);
             if (k == null) return RedirectToAction("Index");
 
             bool success = await _groups.LeaveGroup(GroupId, k);
@@ -135,8 +142,7 @@ namespace GoKartUnite.Controllers
         [ValidGroupMember]
         public async Task<JsonResult> Home(int GroupId, [FromBody] string message)
         {
-            Karter? k = await _karters.GetUserByGoogleId(User.Claims
-                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
+            Karter? k = await _karter.GetUserByGoogleId(await _karter.GetCurrentUserNameIdentifier(User));
             bool res = await _groups.CreateUserMessageInGroup(GroupId, message, k);
 
             if (res) return Json(new { success = true, userName = k.Name });

@@ -48,6 +48,7 @@ const GroupMembersStatsRequest = (TrackTitle) => {
             const minLapTime = Math.min(...bestLapTimes);
             const maxLapTime = Math.max(...bestLapTimes);
             const stepSize = Math.round((maxLapTime - minLapTime) / 10);
+
             const lastDate = retObj[0].dateOnlyRecorded;
 
             const TrackTitle = retObj.length > 0 ? retObj[0].trackTitle : "Unknown Track";
@@ -71,7 +72,7 @@ const GroupMembersStatsRequest = (TrackTitle) => {
                         scales: {
                             y: {
                                 grid: {
-                                    color: "rgba(255, 255, 255, 0.2)" // Y-axis grid lines
+                                    color: "rgba(255, 255, 255, 0.2)"
                                 },
                                 type: 'linear',
                                 ticks: {
@@ -88,7 +89,7 @@ const GroupMembersStatsRequest = (TrackTitle) => {
                             },
                             x: {
                                 grid: {
-                                    color: "rgba(255, 255, 255, 0.2)" // Y-axis grid lines
+                                    color: "rgba(255, 255, 255, 0.2)"
                                 },
                                 type: "category",
                                 offset: true,
@@ -101,7 +102,7 @@ const GroupMembersStatsRequest = (TrackTitle) => {
                         plugins: {
                             legend: {
                                 labels: {
-                                    color: "white" // Legend text color
+                                    color: "white"
                                 }
                             }
                         }

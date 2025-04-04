@@ -19,7 +19,7 @@ namespace GoKartUnite.Controllers
 {
     public class KarterHomeController : Controller
     {
-        private readonly IKarterHandler _karters;
+        private readonly IKarterHandler _karter;
         private readonly ITrackHandler _tracks;
         private readonly IRoleHandler _roles;
         private readonly IRelationshipHandler _friendships;
@@ -27,7 +27,7 @@ namespace GoKartUnite.Controllers
 
         public KarterHomeController(IKarterStatHandler statHandler, IRelationshipHandler friendships, IKarterHandler karters, ITrackHandler tracks, IRoleHandler roles)
         {
-            _karters = karters;
+            _karter = karters;
             _tracks = tracks;
             _roles = roles;
             _friendships = friendships;
@@ -40,19 +40,18 @@ namespace GoKartUnite.Controllers
         {
             if (!String.IsNullOrEmpty(kartersName))
             {
-                var karters = await _karters.GetUser(kartersName);
+                var karters = await _karter.GetUser(kartersName);
                 return View("Details", new List<Karter> { karters });
             }
 
-            Karter k = await _karters.GetUserByGoogleId(User.Claims
-    .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
+            Karter k = await _karter.GetUserByGoogleId(await _karter.GetCurrentUserNameIdentifier(User), withTrack: true);
 
             KarterIndex store = new KarterIndex
             {
                 karter = k,
-                karterFriends = await _karters.KarterModelToView(await _friendships.GetAllFriends(k.Id)),
-                karterFriendRequests = await _karters.KarterModelToView(await _friendships.GetAllFriendRequests(k.Id)),
-                sentFriendRequests = await _karters.KarterModelToView(await _friendships.GetAllSentRequests(k.Id)),
+                karterFriends = await _karter.KarterModelToView(await _friendships.GetAllFriends(k.Id)),
+                karterFriendRequests = await _karter.KarterModelToView(await _friendships.GetAllFriendRequests(k.Id)),
+                sentFriendRequests = await _karter.KarterModelToView(await _friendships.GetAllSentRequests(k.Id)),
                 trackTitles = await _tracks.GetAllTrackTitles(),
             };
 
@@ -82,17 +81,17 @@ namespace GoKartUnite.Controllers
         public async Task<IActionResult> Details(int? id)
         {
 
-            string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            string googleId = await _karter.GetCurrentUserNameIdentifier(User);
 
-            Karter k = await _karters.GetUserByGoogleId(googleId);
+            Karter k = await _karter.GetUserByGoogleId(googleId);
 
 
             KarterGetAllUsersFilter filter = new KarterGetAllUsersFilter
             {
                 IncludeTrack = true,
             };
-            List<Karter> karters = await _karters.GetAllUsers(filter);
-            List<KarterView> karterViews = await _karters.KarterModelToView(karters);
+            List<Karter> karters = await _karter.GetAllUsers(filter);
+            List<KarterView> karterViews = await _karter.KarterModelToView(karters);
 
             karterViews = await _friendships.AddStatusToKarters(karterViews, k.Id);
             return View(karterViews);
@@ -104,9 +103,9 @@ namespace GoKartUnite.Controllers
         [AccountConfirmed]
         public async Task<IActionResult> DetailsByTrack(string? track, int page = 0, SortKartersBy sortby = SortKartersBy.Alphabetically)
         {
-            string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            Karter k = await _karters.GetUserByGoogleId(googleId);
-            ViewBag.TotalPages = await _karters.GetNumberOfUserPages(track);
+            string googleId = await _karter.GetCurrentUserNameIdentifier(User);
+            Karter k = await _karter.GetUserByGoogleId(googleId);
+            ViewBag.TotalPages = await _karter.GetNumberOfUserPages(track);
             page = Math.Max(0, Math.Min(page, ViewBag.TotalPages));
 
             KarterGetAllUsersFilter filter = new KarterGetAllUsersFilter
@@ -117,8 +116,8 @@ namespace GoKartUnite.Controllers
                 IncludeTrack = true,
             };
 
-            List<Karter> karters = await _karters.GetAllUsers(filter);
-            List<KarterView> karterViews = await _karters.KarterModelToView(karters);
+            List<Karter> karters = await _karter.GetAllUsers(filter);
+            List<KarterView> karterViews = await _karter.KarterModelToView(karters);
 
             karterViews = await _friendships.AddStatusToKarters(karterViews, k.Id);
 
@@ -148,14 +147,14 @@ namespace GoKartUnite.Controllers
         [AccountConfirmed]
         public async Task<ActionResult> EditUserDetails()
         {
-            string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            string googleId = await _karter.GetCurrentUserNameIdentifier(User);
 
-            Karter k = await _karters.GetUserByGoogleId(googleId);
+            Karter k = await _karter.GetUserByGoogleId(googleId);
             ViewData["Title"] = "Editing Karter Details";
             ViewData["ButtonValue"] = "UpdateUser";
             ViewBag.TrackTitles = await _tracks.GetAllTracks();
 
-            return View("Create", await _karters.KarterModelToView(k));
+            return View("Create", await _karter.KarterModelToView(k));
         }
         [HttpPost]
         [Authorize]
@@ -167,9 +166,9 @@ namespace GoKartUnite.Controllers
                 ViewBag.TrackTitles = await _tracks.GetAllTracks();
                 return View("Create");
             }
-            string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            string googleId = await _karter.GetCurrentUserNameIdentifier(User);
 
-            await _karters.UpdateUser(googleId, kv);
+            await _karter.UpdateUser(googleId, kv);
             return RedirectToAction("Index");
         }
 
@@ -199,7 +198,7 @@ namespace GoKartUnite.Controllers
 
 
 
-            await _karters.CreateUser(karter,
+            await _karter.CreateUser(karter,
                 User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email).Value);
             await _roles.AddRoleToUser(karter.Id, "User");
 
@@ -217,11 +216,11 @@ namespace GoKartUnite.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Delete(int id)
         {
-            var karter = await _karters.GetUser(id);
+            var karter = await _karter.GetUser(id);
 
             if (karter != null)
             {
-                await _karters.DeleteUser(karter.Id);
+                await _karter.DeleteUser(karter.Id);
             }
 
             return RedirectToAction("DetailsByTrack");
@@ -237,10 +236,10 @@ namespace GoKartUnite.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SendFriendRequestById(int friendId)
         {
-            string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            Karter sentBy = await _karters.GetUserByGoogleId(googleId);
-            Karter sendTo = await _karters.GetUser(friendId);
-            if (!await _karters.SendFriendRequest(sentBy, sendTo))
+            string googleId = await _karter.GetCurrentUserNameIdentifier(User);
+            Karter sentBy = await _karter.GetUserByGoogleId(googleId);
+            Karter sendTo = await _karter.GetUser(friendId);
+            if (!await _karter.SendFriendRequest(sentBy, sendTo))
             {
                 return View("Index");
             }
@@ -279,9 +278,9 @@ namespace GoKartUnite.Controllers
         [ValidateAntiForgeryToken]
         private async Task AcceptFriendRequest(int friendId)
         {
-            string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            string googleId = await _karter.GetCurrentUserNameIdentifier(User);
 
-            Karter k = await _karters.GetUserByGoogleId(googleId);
+            Karter k = await _karter.GetUserByGoogleId(googleId);
 
             await _friendships.AcceptFriendRequest(k.Id, friendId);
         }
@@ -291,9 +290,9 @@ namespace GoKartUnite.Controllers
         [ValidateAntiForgeryToken]
         public async Task RemoveFriendRequest(int friendId)
         {
-            string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            string googleId = await _karter.GetCurrentUserNameIdentifier(User);
 
-            Karter k = await _karters.GetUserByGoogleId(googleId);
+            Karter k = await _karter.GetUserByGoogleId(googleId);
 
             await _friendships.RemoveFriendShip(k.Id, friendId);
         }
@@ -307,8 +306,8 @@ namespace GoKartUnite.Controllers
             TimeSpan.TryParseExact(model.BestLapTime, @"mm\:ss\:ff", null, out TimeSpan FormattedBestLapTime);
             var v = await _tracks.GetTrackIdByTitle(model.TrackTitle);
 
-            string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var k = await _karters.GetUserByGoogleId(googleId);
+            string googleId = await _karter.GetCurrentUserNameIdentifier(User);
+            var k = await _karter.GetUserByGoogleId(googleId);
             var track = await _tracks.GetTrackById(v);
 
             bool res = await _statHandler.CreateStatRecord(model, track, k, FormattedBestLapTime);
@@ -321,12 +320,10 @@ namespace GoKartUnite.Controllers
         [Authorize]
         public async Task<List<KarterStatViewModel>> GetKartersStats(string TrackTitle)
         {
-            string googleId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var k = await _karters.GetUserByGoogleId(googleId);
+            string googleId = await _karter.GetCurrentUserNameIdentifier(User);
+            var k = await _karter.GetUserByGoogleId(googleId);
 
             return await ConvertModelToView(await _statHandler.GetStatsForKarter(k.Id, TrackTitle));
-
-
         }
 
         private async Task<List<KarterStatViewModel>> ConvertModelToView(List<KarterTrackStats> stats)

@@ -12,14 +12,14 @@ namespace GoKartUnite.Controllers
     public class FollowTrackController : Controller
     {
         private readonly IFollowerHandler _follows;
-        private readonly IKarterHandler _karters;
+        private readonly IKarterHandler _karter;
         private readonly ITrackHandler _tracks;
         private readonly IBlogHandler _blogs;
 
         public FollowTrackController(IFollowerHandler follows, IBlogHandler blogs, IKarterHandler karters, ITrackHandler tracks)
         {
             _follows = follows;
-            _karters = karters;
+            _karter = karters;
             _tracks = tracks;
             _blogs = blogs;
         }
@@ -29,9 +29,8 @@ namespace GoKartUnite.Controllers
         [AccountConfirmed]
         public async Task<IActionResult> Index(string track, string fullUrl)
         {
-            string GoogleId = User.Claims
-    .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            Karter k = await _karters.GetUserByGoogleId(GoogleId);
+            string GoogleId = await _karter.GetCurrentUserNameIdentifier(User);
+            Karter k = await _karter.GetUserByGoogleId(GoogleId);
             List<Track> T = await _tracks.GetTracksByTitle(track);
 
             if (k == null && T.Count == 0)

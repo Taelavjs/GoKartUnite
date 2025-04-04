@@ -256,5 +256,13 @@ namespace GoKartUnite.Handlers
 
             return query;
         }
+
+
+        public async Task<string> GetCurrentUserNameIdentifier(ClaimsPrincipal User)
+        {
+            var retStr = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (retStr == null) return String.Empty;
+            return retStr.Value;
+        }
     }
 }
