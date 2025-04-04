@@ -1,8 +1,8 @@
 ﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+	For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
-    ViewData["Title"] = "Details";
+	ViewData["Title"] = "Details";
 }
 
 @* <div> *@
@@ -39,7 +39,7 @@
 @* </div> *@
 
 @*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+	For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @using GoKartUnite.ViewModel
 
@@ -47,10 +47,45 @@
 <link rel="stylesheet" href="~/css/Blog.css" asp-append-version="true" />
 
 <div class="container">
-    <H1>Blog</H1>
-    @foreach (var track in Model)
-    {
-        @await Html.PartialAsync("Track", track);
-    }
+	<H1>Blog</H1>
+	@foreach (var track in Model)
+	{
+		@await Html.PartialAsync("Track", track);
+	}
 </div>
-    <script src="~/js/Track.js" asp-append-version="true"></script>
+
+@* Add Track To Database API Request *@
+<div>
+	<h2>Can't find your track? Submit it below for verification</h2>
+	<input id="googleSearchInput" type="text" />
+	<button id="googleSearchSubmit" type="submit">Search</button>
+	<ul id="placesList" class="list-group">
+	</ul>
+	<div class="w-100 text-center d-flex justify-content-center align-items-center" id="GroupStatGraphLoading" hidden>
+		<div class="spinner-border" role="status">
+			<span class="sr-only"></span>
+		</div>
+	</div>
+	<div class="alert alert-success" id="Success" role="alert" hidden>
+		Success
+	</div>
+	<div class="alert alert-info" id="TrackNotFound" role="alert" hidden>
+		Track Not Found
+	</div>
+	<div class="alert alert-info" id="ServerErr" role="alert" hidden>
+		Failed To Submit Track To Server
+	</div>
+</div>
+<template id="PlacesReturnedResult">
+	<li class="list-group-item d-flex justify-content-between align-items-center">
+		<div>
+			<strong>Title:</strong> <span class="place-title"></span><br>
+			<strong>Location:</strong> <span class="place-location"></span>
+		</div>
+		<button class="btn btn-primary btn-sm">Select</button>
+	</li>
+</template>
+@* ================================== *@
+
+<script src="~/js/Track.js" asp-append-version="true"></script>
+<script src="/js//GooglePlacesAPI/TrackSearchAPI.js"></script>

@@ -68,8 +68,7 @@ const GroupMembersStatsRequest = async (TrackTitle) => {
                             scales: {
                                 y: {
                                     grid: {
-                                        color: "rgba(255, 255, 255, 0.2)" // Y-axis grid lines
-                                        text
+                                        color: "rgba(255, 255, 255, 0.2)"
                                     },
                                     type: 'linear',
                                     ticks: {

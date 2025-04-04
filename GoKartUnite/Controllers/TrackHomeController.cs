@@ -83,17 +83,6 @@ namespace GoKartUnite.Controllers
             return View();
         }
 
-
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //[Authorize(Roles = "Track, Admin")]
-        //[AccountConfirmed]
-        //public async Task<IActionResult> Edit(int id)
-        //{
-        //    _tracks.UpdateTrack(id);
-        //    return View("Details");
-        //}
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
@@ -267,7 +256,7 @@ namespace GoKartUnite.Controllers
 
                 if (placeSelected == null)
                 {
-                    return BadRequest("Data is not recognised in session storage");
+                    return BadRequest(new { success = false, message = "Track ID is not recognised in session storage" });
                 }
                 res = await _tracks.SetTrackToBeVerified(placeSelected.Name, placeSelected.Id, placeSelected.Location, "Short Description as an example");
 
@@ -277,8 +266,8 @@ namespace GoKartUnite.Controllers
                 return BadRequest("Data is not recognised in session storage");
             }
 
-            if (res) return Ok();
-            return BadRequest("Data failed to be added to the db");
+            if (res) return Ok(new { success = true });
+            return BadRequest(new { success = false, message = "Data failed to be added to the db" });
 
         }
     }
