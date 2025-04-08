@@ -118,7 +118,7 @@ namespace GoKartUnite.Controllers
                     Description = post.Description,
                 };
                 bool success = await _blog.UpdatePost(postToSned, id, k.Id);
-                if(success)return Ok(new { status = "success", message = "Updated Blog post" });
+                if (success) return Ok(new { status = "success", message = "Updated Blog post" });
                 return BadRequest(new { status = "fail", message = "Invalid Model State" });
             }
 
@@ -228,7 +228,7 @@ namespace GoKartUnite.Controllers
         [AccountConfirmed]
         public async Task<ActionResult<IEnumerable<Comment>>> GetCommentsForBlog(int blogId, int lastCommentId)
         {
-            List<Comment> comments = await _blog.GetAllCommentsForPost(blogId, lastCommentId);
+            List<Comment> comments = await _blog.GetAllCommentsForPostAfterId(blogId, lastCommentId);
             return Ok(await _blog.CommentModelToView(comments));
         }
 

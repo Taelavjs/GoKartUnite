@@ -558,6 +558,7 @@ namespace UnitTesting
             _context.SaveChanges();
 
             List<BlogPost> posts = _context.BlogPosts.ToList();
+            int lastIdSent = 3;
 
             foreach (var post in posts)
             {
@@ -565,10 +566,10 @@ namespace UnitTesting
                 Assert.True(post.Comments.Count > 0);
                 Assert.True(post.Comments.Count <= numComments);
 
-                List<Comment> commentsFetched = await _blogHandler.GetAllCommentsForPost(post.Id, 3);
+                List<Comment> commentsFetched = await _blogHandler.GetAllCommentsForPostAfterId(post.Id, lastIdSent);
 
                 Assert.True(commentsFetched.Count == 10);
-                Assert.True(commentsFetched[0].Id == 3);
+                Assert.True(commentsFetched[0].Id == lastIdSent + 1);
             }
         }
 
@@ -612,7 +613,7 @@ namespace UnitTesting
                 Assert.True(post.Comments.Count >= 0);
                 Assert.True(post.Comments.Count <= numComments);
 
-                List<Comment> commentsFetched = await _blogHandler.GetAllCommentsForPost(post.Id, 3);
+                List<Comment> commentsFetched = await _blogHandler.GetAllCommentsForPostAfterId(post.Id, 3);
 
                 Assert.True(commentsFetched.Count == 0);
             }
@@ -658,7 +659,7 @@ namespace UnitTesting
                 Assert.True(post.Comments.Count > 0);
                 Assert.True(post.Comments.Count <= numComments);
 
-                List<Comment> commentsFetched = await _blogHandler.GetAllCommentsForPost(100, 3);
+                List<Comment> commentsFetched = await _blogHandler.GetAllCommentsForPostAfterId(100, 3);
 
                 Assert.True(commentsFetched.Count == 0);
             }

@@ -59,6 +59,19 @@ namespace UnitTesting
             _context.TrackAdmin.Add(new TrackAdmins { KarterId = 1, ManagedTrack = _context.Track.Single(x => x.Title == "Buckmore"), TrackId = 1 });
             _context.SaveChanges();
         }
+        private async Task CreateUnverifiedTracks(int count = 5)
+        {
+            var dummyTracks = Enumerable.Range(1, count).Select(i => new Track
+            {
+                Title = $"TestTrack_{i}",
+                Location = (Locations)(i % Enum.GetValues(typeof(Locations)).Length),
+                IsVerifiedByAdmin = false
+            }).ToList();
+
+            await _context.Track.AddRangeAsync(dummyTracks);
+            await _context.SaveChangesAsync();
+        }
+
 
         [Fact]
         public async Task AddRoleToUser_ValidRoleAndUser()
@@ -181,5 +194,27 @@ namespace UnitTesting
 
             Assert.False(result);
         }
+
+
+        //                                                                  METHOD NOT CREATED YET
+        //[Fact]
+        //public async Task VerifyTrack_ById_ValidIdGiven()
+        //{
+        //    await ResetSetupScenario();
+        //    await CreateUnverifiedTracks();
+        //    int id = 1;
+        //    bool success = await _trackHandler.VerifyTrack(id);
+        //
+        //    List<Track> tracksInDb = await _context.Track.ToListAsync();
+        //
+        //    Assert.True(success);
+        //    Assert.True(tracksInDb.Where(x => x.Id == id).First().IsVerifiedByAdmin == true);
+        //    var otherTrack = tracksInDb.FirstOrDefault(x => x.Id != id);
+        //    Assert.NotNull(otherTrack);
+        //    Assert.True(otherTrack.IsVerifiedByAdmin, "Expected other tracks to be not verified.");
+        //}
+        //
+        //                                                                  METHOD NOT CREATED YET
+
     }
 }

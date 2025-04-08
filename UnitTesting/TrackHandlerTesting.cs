@@ -89,9 +89,9 @@ namespace UnitTesting
         public async Task DeleteTrack_ValidTrackToBeDeleted()
         {
             await ResetEnvironment();
-            var result = _trackHandler.DeleteTrack(1);
+            var result = await _trackHandler.DeleteTrack(1);
 
-            Assert.True(await result);
+            Assert.True(result);
             Assert.Equal(_context.Track.Count(), TracksToCreateInitially - 1);
             foreach (var track in _context.Track.ToList())
             {
@@ -214,6 +214,5 @@ namespace UnitTesting
             Assert.Equal(2, trackView.karters);
             Assert.Equal(2, trackView.blogPosts);
         }
-
     }
 }

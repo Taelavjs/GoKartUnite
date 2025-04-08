@@ -21,7 +21,7 @@ namespace GoKartUnite.Interfaces
 
         Task<int> GetTotalPageCount(int pageSize = 10);
 
-        Task<List<Comment>> GetAllCommentsForPost(int blogPostId, int lastIdSent);
+        Task<List<Comment>> GetAllCommentsForPostAfterId(int blogPostId, int lastIdSent);
 
         Task<List<CommentView>> CommentModelToView(List<Comment> comments);
 

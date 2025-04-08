@@ -130,7 +130,7 @@ namespace GoKartUnite.Handlers
 
         public async Task<BlogPostView> GetModelToView(BlogPost posts)
         {
-            if (posts == null) return new BlogPostView();
+            if (posts == null) return null;
 
             BlogPostView post = new BlogPostView();
             post.Id = posts.Id;
@@ -193,7 +193,7 @@ namespace GoKartUnite.Handlers
             return totalPages;
         }
 
-        public async Task<List<Comment>> GetAllCommentsForPost(int blogPostId, int lastIdSent)
+        public async Task<List<Comment>> GetAllCommentsForPostAfterId(int blogPostId, int lastIdSent)
         {
             BlogPost post = await GetPost(blogPostId, new BlogPostFilterOptions { IncludeComments = true, IncludeUpvotes = true, IncludeAuthor = true });
             if (post == null) return new List<Comment>();
@@ -264,7 +264,7 @@ namespace GoKartUnite.Handlers
         public async Task<bool> UpdatePost(BlogPostView post, int id, int karterId)
         {
             BlogPost retrievedPost = _context.BlogPosts.SingleOrDefault(t => t.Id == id);
-            
+
             if (retrievedPost == null) return false;
             if (retrievedPost.AuthorId != karterId) return false;
             retrievedPost.Title = post.Title;
