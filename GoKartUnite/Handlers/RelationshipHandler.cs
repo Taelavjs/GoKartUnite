@@ -87,21 +87,24 @@ namespace GoKartUnite.Handlers
             return result;
         }
 
-        public async Task AcceptFriendRequest(int acceptorsId, int senderId)
+        public async Task<bool> AcceptFriendRequest(int acceptorsId, int senderId)
         {
             Friendships? friendReq = await _context.Friendships
+                .Where(x => x.requestedByInt == senderId)
+                .Where(x => x.accepted == false)
                 .SingleOrDefaultAsync(k =>
                     (k.KarterFirstId == acceptorsId && k.KarterSecondId == senderId) ||
                     (k.KarterFirstId == senderId && k.KarterSecondId == acceptorsId));
 
             if (friendReq == null)
             {
-                return;
+                return false;
             }
 
             friendReq.accepted = true;
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+            return true;
         }
 
         public async Task RemoveFriendShip(int sentbyId, int friendId)
@@ -152,11 +155,11 @@ namespace GoKartUnite.Handlers
                 {
                     if (f.requestedByInt == userId)
                     {
-                        karter.FriendStatus = FriendshipStatus.Received;
+                        karter.FriendStatus = FriendshipStatus.Requested;
                     }
                     else
                     {
-                        karter.FriendStatus = FriendshipStatus.Requested;
+                        karter.FriendStatus = FriendshipStatus.Received;
                     }
                 }
             }

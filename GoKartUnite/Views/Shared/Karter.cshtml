@@ -15,13 +15,13 @@
             @Html.AntiForgeryToken()
             @switch (Model.FriendStatus)
             {
-                case FriendshipStatus.Requested:
+                case FriendshipStatus.Received:
                         <button type="submit" name="action" value="Accept" class="btn-sm btn-success">Accept</button>
                     break;
                 case FriendshipStatus.Friend:
                         <button type="submit" name="action" value="Remove" class="btn-sm btn-danger">Remove</button>
                     break;
-                case FriendshipStatus.Received:
+                case FriendshipStatus.Requested:
                         <button type="submit" name="action" value="Cancel" class="btn-sm btn-secondary">Cancel</button>
                     break;
                 default:
