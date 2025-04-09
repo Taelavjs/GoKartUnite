@@ -13,8 +13,12 @@
 <div class="blog-post TrackContainer">
     <div class="blog-post-title"><a asp-action="profile" asp-controller="TrackHome" asp-route-track="@Model.Title">@Model.Title</a></div>
     <div class="blog-post-description">@Model.Description</div>
-    <div class="blog-post-description right">@Model.karters <a asp-controller="TrackHome" asp-action="FilteredKarterIndex" asp-route-track="@Model.Title">Local Karters</a></div>
-    <div class="blog-post-description right">@Model.blogPosts <a asp-controller="TrackHome" asp-action="FilteredIndex" asp-route-track="@Model.Title">Posts</a> </div>
+    <div class="blog-post-description right">@Model.karters 
+        <a asp-controller="TrackHome" asp-action="FilteredKarterIndex" asp-route-track="@Model.Title">Local Karters</a>
+    </div>
+    <div class="blog-post-description right">@Model.blogPosts 
+        <a asp-controller="TrackHome" asp-action="FilteredIndex" asp-route-track="@Model.Title">Posts</a> 
+    </div>
     <div class="blog-post-description right">
         <a href="#" class="followTrackLink" data-track="@Model.Title" data-fullUrl="@ViewContext.HttpContext.Request.GetDisplayUrl()">@(Model.isFollowed ? "Unfollow" : "Follow")
         </a>

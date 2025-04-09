@@ -14,6 +14,7 @@ using GoKartUnite.Interfaces;
 using GoKartUnite.DataFilterOptions;
 using GoKartUnite.ViewModel;
 using System.Web.Helpers;
+using System.Globalization;
 
 namespace GoKartUnite.Controllers
 {
@@ -49,28 +50,12 @@ namespace GoKartUnite.Controllers
             KarterIndex store = new KarterIndex
             {
                 karter = k,
-                karterFriends = await _karter.KarterModelToView(await _friendships.GetAllFriends(k.Id)),
-                karterFriendRequests = await _karter.KarterModelToView(await _friendships.GetAllFriendRequests(k.Id)),
-                sentFriendRequests = await _karter.KarterModelToView(await _friendships.GetAllSentRequests(k.Id)),
+                karterFriends = await _karter.KarterModelToView(await _friendships.GetAllFriends(k.Id), FriendshipStatus.Friend),
+                karterFriendRequests = await _karter.KarterModelToView(await _friendships.GetAllFriendRequests(k.Id), FriendshipStatus.Received),
+                sentFriendRequests = await _karter.KarterModelToView(await _friendships.GetAllSentRequests(k.Id), FriendshipStatus.Requested),
                 trackTitles = await _tracks.GetAllTrackTitles(),
             };
 
-            // Adds Status to KarterView Lists
-
-            foreach (var kar in store.karterFriendRequests)
-            {
-                kar.FriendStatus = FriendshipStatus.Requested;
-            }
-
-            foreach (var kar in store.karterFriends)
-            {
-                kar.FriendStatus = FriendshipStatus.Friend;
-            }
-
-            foreach (var kar in store.sentFriendRequests)
-            {
-                kar.FriendStatus = FriendshipStatus.Received;
-            }
             return View(store);
         }
 
@@ -91,7 +76,7 @@ namespace GoKartUnite.Controllers
                 IncludeTrack = true,
             };
             List<Karter> karters = await _karter.GetAllUsers(filter);
-            List<KarterView> karterViews = await _karter.KarterModelToView(karters);
+            List<KarterView> karterViews = await _karter.KarterModelToView(karters, FriendshipStatus.User);
 
             karterViews = await _friendships.AddStatusToKarters(karterViews, k.Id);
             return View(karterViews);
@@ -99,33 +84,34 @@ namespace GoKartUnite.Controllers
 
 
         [HttpGet]
-        [Authorize]
-        [AccountConfirmed]
-        public async Task<IActionResult> DetailsByTrack(string? track, int page = 0, SortKartersBy sortby = SortKartersBy.Alphabetically)
+        public async Task<IActionResult> DetailsByTrack(string? track, int page = 1)
+        {
+            ViewBag.page = page;
+            ViewBag.TotalPages = await _karter.GetNumberOfUserPages(track);
+
+            return View("Details");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetKartersPartialViews(string? track, SortKartersBy sortby = SortKartersBy.Alphabetically)
         {
             string googleId = await _karter.GetCurrentUserNameIdentifier(User);
             Karter k = await _karter.GetUserByGoogleId(googleId);
-            ViewBag.TotalPages = await _karter.GetNumberOfUserPages(track);
-            page = Math.Max(0, Math.Min(page, ViewBag.TotalPages));
 
             KarterGetAllUsersFilter filter = new KarterGetAllUsersFilter
             {
-                pageNo = page <= 0 ? 0 : page - 1,
                 sort = sortby,
                 TrackToFetchFor = track,
                 IncludeTrack = true,
             };
 
             List<Karter> karters = await _karter.GetAllUsers(filter);
-            List<KarterView> karterViews = await _karter.KarterModelToView(karters);
+            List<KarterView> karterViews = await _karter.KarterModelToView(karters, FriendshipStatus.User);
 
             karterViews = await _friendships.AddStatusToKarters(karterViews, k.Id);
 
-
-            ViewBag.page = page;
-
             ViewBag.CurrentSort = sortby;
-            return View("Details", karterViews);
+            return PartialView("Karter", karterViews);
         }
 
         // ======================================
@@ -154,7 +140,7 @@ namespace GoKartUnite.Controllers
             ViewData["ButtonValue"] = "UpdateUser";
             ViewBag.TrackTitles = await _tracks.GetAllTracks();
 
-            return View("Create", await _karter.KarterModelToView(k));
+            return View("Create", await _karter.KarterModelToView(k, FriendshipStatus.User));
         }
         [HttpPost]
         [Authorize]
@@ -350,8 +336,5 @@ namespace GoKartUnite.Controllers
             return StatsViewModel.OrderByDescending(x => x.DateOnlyRecorded).ToList();
         }
     }
-
-
-
 
 }

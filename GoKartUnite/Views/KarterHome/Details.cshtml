@@ -14,23 +14,21 @@
     @{
         SortKartersBy nameSort = ViewBag.CurrentSort == SortKartersBy.Alphabetically ? SortKartersBy.ReverseAlphabetically : SortKartersBy.Alphabetically;
         SortKartersBy yearsSort = ViewBag.CurrentSort == SortKartersBy.YearsExperience ? SortKartersBy.ReverseYearsExperience : SortKartersBy.YearsExperience;
-
-
-        }
+    }
 
 <div class="table-container">
     <table >
 
         <thead>
             <th scope="col">Name
-                <a class="page-link" href="?sortby=@(nameSort)&page=@(ViewBag.Page)@ViewContext.HttpContext.Request.Query">
+                <button type="button" id="NameSortButton" data-sortValue="@(nameSort)">
                     Name
-                </a>
+                </button> 
             </th>
             <th scope="col">
-                <a class="page-link" href="?sortby=@(yearsSort)&page=@(ViewBag.Page)@ViewContext.HttpContext.Request.Query">
-                    Years Experience
-                </a>
+                <button type="button" id="YearsSortButton" data-sortValue="@(yearsSort)">
+                    YoE
+                </button>
             </th>
             <th scope="col">Local Track</th>
             @if(User.IsInRole("Admin")){
@@ -38,13 +36,12 @@
                 <th scope="col"></th>
             }
         </thead>
-        <tbody>
-            @foreach (var karterDb in Model)
-            {
-                @await Html.PartialAsync("karter", karterDb)
-            }
+        <tbody id="ListKarterPartialViews">
+            
         </tbody>
     </table>
-</div></div>
 
-@await Html.PartialAsync("~/Views/BlogHome/_Pagination.cshtml", new { Page = ViewBag.Page, TotalPages = ViewBag.TotalPages, QueryString = ViewContext.HttpContext.Request.Query })
+</div>
+@section Scripts {
+    <script src="~/js/KarterHome/KarterDetailsByTrack.js" asp-append-version="true"></script>
+}

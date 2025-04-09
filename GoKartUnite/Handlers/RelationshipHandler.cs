@@ -67,6 +67,7 @@ namespace GoKartUnite.Handlers
 
         public async Task<List<Karter>> GetAllSentRequests(int id)
         {
+
             List<Friendships> friends = _context.Friendships
                 .Include(k => k.KarterFirst.Track)
                 .Include(k => k.KarterSecond.Track)

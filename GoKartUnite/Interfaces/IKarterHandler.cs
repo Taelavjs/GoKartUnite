@@ -17,8 +17,8 @@ namespace GoKartUnite.Interfaces
         Task<List<Karter>> GetAllUsersByTrackId(int id, KarterGetAllUsersFilter? options = null);
         Task CreateUser(Karter karter, string email);
         Task<Karter> GetUserByGoogleId(string GoogleId, bool withTrack = false);
-        Task<List<KarterView>> KarterModelToView(List<Karter> karters);
-        Task<KarterView> KarterModelToView(Karter karter);
+        Task<List<KarterView>> KarterModelToView(List<Karter> karters, FriendshipStatus status);
+        Task<KarterView> KarterModelToView(Karter karter, FriendshipStatus status);
         Task UpdateUser(string nameIdentifier, KarterView kv);
         Task<string> GetCurrentUserNameIdentifier(ClaimsPrincipal User);
 

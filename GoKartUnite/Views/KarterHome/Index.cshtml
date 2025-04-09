@@ -32,10 +32,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					@foreach (var friend in Model.karterFriends)
-					{
-						@await Html.PartialAsync("karter", friend)
-					}
+					@await Html.PartialAsync("karter", Model.karterFriends)
 				</tbody>
 			</table>
 		</div>
@@ -52,10 +49,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					@foreach (var friend in Model.karterFriendRequests)
-					{
-						@await Html.PartialAsync("karter", friend)
-					}
+					@await Html.PartialAsync("karter", Model.karterFriendRequests)
 				</tbody>
 			</table>
 		</div>
@@ -73,10 +67,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				@foreach (var friend in Model.sentFriendRequests)
-				{
-					@await Html.PartialAsync("karter", friend)
-				}
+				@await Html.PartialAsync("karter", Model.sentFriendRequests)
 			</tbody>
 		</table>
 	</div>

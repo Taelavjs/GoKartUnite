@@ -117,9 +117,7 @@ namespace GoKartUnite.Handlers
                 case SortKartersBy.ReverseYearsExperience:
                     query = query.OrderByDescending(k => k.YearsExperience);
                     break;
-            }
-
-            query = query.Skip(options.pageNo * options.pageSize).Take(options.pageSize);
+            };
             return await query.ToListAsync();
 
         }
@@ -180,7 +178,7 @@ namespace GoKartUnite.Handlers
             return karterInDb;
         }
 
-        public async Task<List<KarterView>> KarterModelToView(List<Karter> karters)
+        public async Task<List<KarterView>> KarterModelToView(List<Karter> karters, FriendshipStatus status)
         {
             List<KarterView> kvs = new List<KarterView>();
             foreach (var karter in karters)
@@ -191,7 +189,7 @@ namespace GoKartUnite.Handlers
                 kv.YearsExperience = karter.YearsExperience;
                 kv.Name = karter.Name;
                 kv.LocalTrack = karter.Track;
-
+                kv.FriendStatus = status;
 
                 kvs.Add(kv);
             }
@@ -199,13 +197,16 @@ namespace GoKartUnite.Handlers
             return kvs;
         }
 
-        public async Task<KarterView> KarterModelToView(Karter karter)
+        public async Task<KarterView> KarterModelToView(Karter karter, FriendshipStatus status)
         {
 
             KarterView kv = new KarterView();
+            kv.Id = karter.Id;
             kv.YearsExperience = karter.YearsExperience;
             kv.Name = karter.Name;
             kv.LocalTrack = karter.Track;
+            kv.FriendStatus = status;
+
             return kv;
         }
 
