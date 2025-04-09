@@ -2,6 +2,7 @@
 
 let reverseName = false;
 let reverseYoe = false;
+
 document.addEventListener("DOMContentLoaded", () => {
     const nameSortBtn = document.getElementById("NameSortButton");
     let sortValue = nameSortBtn.getAttribute("data-sortValue");

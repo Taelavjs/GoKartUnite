@@ -84,6 +84,8 @@ namespace GoKartUnite.Controllers
 
 
         [HttpGet]
+        [Authorize]
+        [AccountConfirmed]
         public async Task<IActionResult> DetailsByTrack(string? track, int page = 1)
         {
             ViewBag.page = page;
@@ -93,6 +95,9 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        [AccountConfirmed]
         public async Task<IActionResult> GetKartersPartialViews(string? track, SortKartersBy sortby = SortKartersBy.Alphabetically)
         {
             string googleId = await _karter.GetCurrentUserNameIdentifier(User);

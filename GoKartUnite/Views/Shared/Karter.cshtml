@@ -14,7 +14,6 @@
         <td class="text-center align-middle">
             <form asp-controller="KarterHome" asp-action="HandleFriendRequest" asp-route-friendId="@karter.Id" method="post"
             class="w-100 h-100 text-center align-middle">
-                @Html.AntiForgeryToken()
                 @switch (@karter.FriendStatus)
                 {
                     case FriendshipStatus.Received:
