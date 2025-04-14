@@ -6,8 +6,6 @@
     $('#blogPostForm').on('submit', function (event) {
         event.preventDefault();
 
-        $.validat
-
         var token = $('input[name="__RequestVerificationToken"]').val();
         if (!$("#blogPostForm").valid()) {
             alert("invalid");
