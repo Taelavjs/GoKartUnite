@@ -7,15 +7,16 @@ namespace GoKartUnite.ViewModel
     {
         public int? Id { get; set; }
         [Required(ErrorMessage = "Title is required.")]
-        [MinLength(5, ErrorMessage = "Description cannot exceed 500 characters.")]
+        [MinLength(3, ErrorMessage = "Description cannot be less than 3 characters.")]
+        [MaxLength(30, ErrorMessage = "Description cannot exceed 30 characters.")]
         public string Title { get; set; } = string.Empty;
-        [StringLength(40, ErrorMessage = "Description cannot exceed 500 characters.")]
-        [MinLength(5, ErrorMessage = "Description cannot exceed 500 characters.")]
+        [MinLength(5, ErrorMessage = "Description cannot be less than 5 characters.")]
+        [MaxLength(255, ErrorMessage = "Description cannot exceed 255 characters.")]
         public string Description { get; set; } = string.Empty;
         public Karter? Author { get; set; }
         public int? authorId { get; set; }
         public int Upvotes { get; set; } = 0;
-        public string TaggedTrackTitle { get; set; } = string.Empty;
+        public string? TaggedTrackTitle { get; set; } = string.Empty;
         public Track? TaggedTrack { get; set; }
         public BlogType blogType { get; set; } = BlogType.Post;
 

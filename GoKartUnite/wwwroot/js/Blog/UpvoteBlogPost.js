@@ -3,21 +3,22 @@
     const commentCreateButtons = document.querySelectorAll(".create-comment-btn");
     const commentFetchButtons = document.querySelectorAll(".commentBtn");
     // CREATE BLOG POST ==============================
-    $('#createPostBtn').on('click', function (event) {
+    $('#blogPostForm').on('submit', function (event) {
         event.preventDefault();
 
-        var formData = {
-            Title: $('#Title').val(),
-            Description: $('#Description').val(),
-            TaggedTrackTitle: $('#TaggedTrackTitle').val()
-        };
+        $.validat
+
         var token = $('input[name="__RequestVerificationToken"]').val();
+        if (!$("#blogPostForm").valid()) {
+            alert("invalid");
+            return;
+        }
         $.ajax({
             type: 'POST',
             url: '/BlogHome/Create',
-            data: JSON.stringify(formData),
+            data: $("#blogPostForm").serialize(),
             dataType: 'json',
-            contentType: 'application/json',
+            contentType: 'application/x-www-form-urlencoded', // FIXED
             headers: {
                 'RequestVerificationToken': token
             },
@@ -29,9 +30,15 @@
                 }
             },
             error: function (xhr, status, error) {
-                $('#response').html('<div class="alert alert-danger">Server not responding</div>');
+                console.log(error);
+                var response = JSON.parse(xhr.responseText);
+                if (response.message && Array.isArray(response.message)) {
+                    $('#response').html('<div class="alert alert-danger">Error: ' + response.message[0] + '</div>');
+                }
             }
         });
+
+
     });
     // CREATE BLOG POST ==============================
 

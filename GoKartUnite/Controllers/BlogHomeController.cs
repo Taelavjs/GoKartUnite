@@ -13,6 +13,8 @@ using GoKartUnite.DataFilterOptions;
 using System.Drawing.Printing;
 using GoKartUnite.Interfaces;
 using GoKartUnite.ViewModel;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.IdentityModel.Tokens;
 
 namespace GoKartUnite.Controllers
 {
@@ -102,22 +104,23 @@ namespace GoKartUnite.Controllers
         [Authorize]
         [AccountConfirmed]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([FromBody] JsonObjectForCreatingPosts post, int id = -1)
+        public async Task<IActionResult> Create(BlogPostView post, int id = -1)
         {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.SelectMany(kv => kv.Value.Errors)
+                                       .Select(e => e.ErrorMessage)
+                                       .ToList();
 
+                return BadRequest(new { status = "error", message = errors });
+            }
             string GoogleId = await _karter.GetCurrentUserNameIdentifier(User);
             Karter k = await _karter.GetUserByGoogleId(GoogleId);
 
             if (id != -1)
             {
                 // EDITING AN ALREADY EXISTING POST
-                var postToSned = new BlogPostView
-                {
-                    Title = post.Title,
-                    TaggedTrackTitle = post.TaggedTrackTitle,
-                    Description = post.Description,
-                };
-                bool success = await _blog.UpdatePost(postToSned, id, k.Id);
+                bool success = await _blog.UpdatePost(post, id, k.Id);
                 if (success) return Ok(new { status = "success", message = "Updated Blog post" });
                 return BadRequest(new { status = "fail", message = "Invalid Model State" });
             }
@@ -126,27 +129,21 @@ namespace GoKartUnite.Controllers
             if (post.TaggedTrackTitle != string.Empty)
             {
                 Track taggedTrack = await _tracks.GetSingleTrackByTitle(post.TaggedTrackTitle);
-                var postToSned = new BlogPostView
-                {
-                    Title = post.Title,
-                    TaggedTrackTitle = post.TaggedTrackTitle,
-                    Description = post.Description,
-                    Author = k,
-                    authorId = k.Id,
-                    TaggedTrack = taggedTrack,
-                };
-                postId = await _blog.AddPost(postToSned);
+                post.Author = k;
+                post.authorId = k.Id;
+                post.TaggedTrack = taggedTrack;
+                postId = await _blog.AddPost(post);
             }
             else
             {
-                var postToSned = new BlogPostView
-                {
-                    Title = post.Title,
-                    Description = post.Description,
-                    Author = k,
-                    authorId = k.Id,
-                };
+                post.Author = k;
+                post.authorId = k.Id;
                 return Ok(new { status = "success", message = "Created Blog Post" });
+            }
+
+            if (post.TaggedTrackTitle.IsNullOrEmpty())
+            {
+                return Ok(new { status = "success", message = "Created Blog Post With Tagged Track ANd Notifs" });
             }
             Track taggedT = await _tracks.GetSingleTrackByTitle(post.TaggedTrackTitle);
 
