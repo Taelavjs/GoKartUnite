@@ -77,9 +77,9 @@ https://github.com/user-attachments/assets/f2fc2261-263b-4fe1-9e4d-5a69c1297b44
 ---
 
 ### Tech Stack
-- **Frontend:** ASP.NET Core MVC (Razor Views), Bootstrap
+- **Frontend:** ASP.NET Core MVC (Razor Views), Bootstrap, JavasScript
 - **Backend:** ASP.NET Core 8 MVC
-- **Database:** SQL Server (or another relational DB)
+- **Database:** SQL Server 
 - **APIs:** Google Places API for track location fetching
 
 
