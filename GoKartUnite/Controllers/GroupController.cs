@@ -19,6 +19,8 @@ using ValidateAntiForgeryTokenAttribute = Microsoft.AspNetCore.Mvc.ValidateAntiF
 
 namespace GoKartUnite.Controllers
 {
+    [Authorize]
+    [AccountConfirmed]
     public class GroupController : Controller
     {
         private readonly IGroupHandler _groups;
@@ -34,8 +36,6 @@ namespace GoKartUnite.Controllers
             _track = track;
         }
         [HttpGet]
-        [Authorize]
-        [AccountConfirmed]
         public async Task<ActionResult> Index()
         {
             Karter? k = await _karter.GetUserByGoogleId(
@@ -68,8 +68,6 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpPost]
-        [Authorize]
-        [AccountConfirmed]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateGroup(GroupPageView model)
         {
@@ -88,8 +86,6 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpPost]
-        [Authorize]
-        [AccountConfirmed]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> JoinGroup(int GroupId)
         {
@@ -103,8 +99,6 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpPost]
-        [Authorize]
-        [AccountConfirmed]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> LeaveGroup(int GroupId)
         {

@@ -9,6 +9,8 @@ using GoKartUnite.Interfaces;
 
 namespace GoKartUnite.Controllers
 {
+    [Authorize]
+    [AccountConfirmed]
     public class FollowTrackController : Controller
     {
         private readonly IFollowerHandler _follows;
@@ -25,8 +27,7 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpGet]
-        [Authorize]
-        [AccountConfirmed]
+
         public async Task<IActionResult> Index(string track)
         {
             string GoogleId = await _karter.GetCurrentUserNameIdentifier(User);

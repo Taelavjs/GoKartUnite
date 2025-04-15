@@ -8,6 +8,8 @@ using GoKartUnite.Interfaces;
 
 namespace GoKartUnite.Controllers
 {
+    [Authorize]
+    [AccountConfirmed]
     public class NotificationController : Controller
     {
         private readonly IKarterHandler _karter;
@@ -20,8 +22,6 @@ namespace GoKartUnite.Controllers
 
 
         [HttpGet]
-        [Authorize]
-        [AccountConfirmed]
         public async Task<int> getNotifCount()
         {
             string GoogleId = await _karter.GetCurrentUserNameIdentifier(User);

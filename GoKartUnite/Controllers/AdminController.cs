@@ -1,12 +1,16 @@
-﻿using GoKartUnite.DataFilterOptions;
+﻿using GoKartUnite.CustomAttributes;
+using GoKartUnite.DataFilterOptions;
 using GoKartUnite.Handlers;
 using GoKartUnite.Interfaces;
 using GoKartUnite.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Web.Mvc;
 
 namespace GoKartUnite.Controllers
 {
-    public class AdminController : Controller
+    [Authorize(Roles = "Admin")]
+    [AccountConfirmed]
+    public class AdminController : Microsoft.AspNetCore.Mvc.Controller
     {
         private readonly IKarterHandler _karter;
 

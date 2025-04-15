@@ -24,6 +24,8 @@ using Newtonsoft.Json.Linq;
 using Microsoft.DotNet.MSIdentity.Shared;
 namespace GoKartUnite.Controllers
 {
+    [AccountConfirmed]
+    [Authorize]
     public class TrackHomeController : Controller
     {
         private readonly GoKartUniteContext _context;
@@ -43,11 +45,7 @@ namespace GoKartUnite.Controllers
             _blog = blog;
         }
 
-        // GET: TrackHomeController
-
         [HttpGet]
-        [AccountConfirmed]
-        [Authorize]
         public async Task<ActionResult> Index()
         {
             return View();
@@ -55,7 +53,6 @@ namespace GoKartUnite.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Track, Admin")]
-        [AccountConfirmed]
         public async Task<IActionResult> Create(Track track)
         {
             if (!ModelState.IsValid)

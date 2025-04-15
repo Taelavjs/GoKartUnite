@@ -18,6 +18,8 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace GoKartUnite.Controllers
 {
+    [Authorize]
+    [AccountConfirmed]
     public class BlogHomeController : Controller
     {
         private readonly IBlogHandler _blog;
@@ -37,8 +39,7 @@ namespace GoKartUnite.Controllers
             _roles = roles;
         }
         [HttpGet]
-        [Authorize]
-        [AccountConfirmed]
+
         public async Task<IActionResult> Index(int page = 1, string track = null, string filterBy = "Recent")
         {
 
@@ -82,8 +83,7 @@ namespace GoKartUnite.Controllers
 
 
         [HttpGet]
-        [Authorize]
-        [AccountConfirmed]
+
         public async Task<IActionResult> Create(int id = -1)
         {
             ViewBag.AllTracks = await _tracks.ModelToView(await _tracks.GetAllTracks());
@@ -101,8 +101,6 @@ namespace GoKartUnite.Controllers
 
 
         [HttpPost]
-        [Authorize]
-        [AccountConfirmed]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BlogPostView post, int id = -1)
         {
@@ -159,8 +157,7 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpGet]
-        [Authorize]
-        [AccountConfirmed]
+
         public async Task<IActionResult> CreateAdminPost(string trackTitle)
         {
             ViewBag.TrackTitle = trackTitle;
@@ -168,8 +165,6 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpPost]
-        [Authorize]
-        [AccountConfirmed]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateAdminPost(BlogPostView post)
         {
@@ -192,8 +187,6 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpPost]
-        [Authorize]
-        [AccountConfirmed]
         public async Task<IActionResult> UpvoteBlog(int id)
         {
             string GoogleId = await _karter.GetCurrentUserNameIdentifier(User);
@@ -221,8 +214,6 @@ namespace GoKartUnite.Controllers
 
 
         [HttpGet]
-        [Authorize]
-        [AccountConfirmed]
         public async Task<ActionResult<IEnumerable<Comment>>> GetCommentsForBlog(int blogId, int lastCommentId)
         {
             List<Comment> comments = await _blog.GetAllCommentsForPostAfterId(blogId, lastCommentId);
@@ -230,8 +221,6 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpGet]
-        [Authorize]
-        [AccountConfirmed]
         public ActionResult CreateComment([FromBody] int blogId)
         {
             CommentView cv = new CommentView();
@@ -240,8 +229,6 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpPost]
-        [Authorize]
-        [AccountConfirmed]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateComment([FromBody] CreateCommentRequest comment)
         {
