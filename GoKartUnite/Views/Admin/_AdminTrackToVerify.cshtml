@@ -1,0 +1,45 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@model GoKartUnite.Models.Track
+
+<tr style="color:white;" id="@Model.Id">
+    <td>
+        @Model.Id
+    </td>
+    <td>
+        @Model.Title
+    </td>
+    <td>
+        @Model.FormattedGoogleLocation
+    </td>
+    <td>
+        @Model.Description
+    </td>
+    <td>
+        @Model.GooglePlacesId
+    </td>
+    <td style="color: white;">
+        <i class="bi p-2 bi-check VerifyTrackBtn" data-TrackId="@Model.Id"></i>
+        <i class="bi p-2 bi-backspace-reverse RemoveVerifyTrack" data-TrackId="@Model.Id"></i>
+    </td>
+</tr>
+
+<div class="floating-alerts position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
+    <div id="successAlert" class="alert alert-success d-none shadow" role="alert">
+        ✅ Track deleted successfully!
+    </div>
+    <div id="errorAlert" class="alert alert-danger d-none shadow" role="alert">
+        ❌ Failed to delete the track. Please try again.
+    </div>
+
+    <div id="VerifySuccesAlert" class="alert alert-success d-none shadow" role="alert">
+        ✅ Track Verified!
+    </div>
+    <div id="VerifyFailAlert" class="alert alert-danger d-none shadow" role="alert">
+        ❌ Failed to delete the track.
+    </div>
+</div>

@@ -41,12 +41,21 @@ namespace GoKartUnite.Controllers
         [HttpGet]
         public async Task<IActionResult> VerifyTracks()
         {
-            return View(await _track.ModelToView(await _track.GetUnverifiedTracksAdmin()));
+            return View(await _track.GetUnverifiedTracksAdmin());
         }
         [HttpPost]
         public async Task<IActionResult> VerifyTracks(int id)
         {
             bool res = await _track.VerifyTrack(id);
+
+            if (res) return Ok("Successfully verified");
+            return BadRequest("ID not found");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeVerifyTracks(int id)
+        {
+            bool res = await _track.DeleteTrack(id);
 
             if (res) return Ok("Successfully verified");
             return BadRequest("ID not found");

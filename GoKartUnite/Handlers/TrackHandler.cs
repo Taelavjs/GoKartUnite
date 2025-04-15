@@ -25,7 +25,7 @@ namespace GoKartUnite.Handlers
 
         public async Task<Track?> GetTrack(int id, bool? getKarters)
         {
-            var query = GetVerifiedTracks();
+            var query = _context.Track;
 
             if (getKarters == true)
             {
@@ -75,7 +75,7 @@ namespace GoKartUnite.Handlers
                 karter.TrackId = null;
             }
             _context.Track.Remove(track);
-            await _context.SaveChangesAsync();
+             _context.SaveChanges();
             return true;
         }
 
