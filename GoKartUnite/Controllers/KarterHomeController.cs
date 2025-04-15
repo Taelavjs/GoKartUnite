@@ -340,6 +340,14 @@ namespace GoKartUnite.Controllers
 
             return StatsViewModel.OrderByDescending(x => x.DateOnlyRecorded).ToList();
         }
-    }
 
+        [HttpGet]
+        public async Task<PartialViewResult> ProfileCard(string username)
+        {
+            var ret = await _karter.GetUserProfileCard(username);
+
+
+            return PartialView("_ProfilePreview", ret);
+        }
+    }
 }

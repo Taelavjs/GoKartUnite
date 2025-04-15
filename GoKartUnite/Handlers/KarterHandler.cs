@@ -265,5 +265,22 @@ namespace GoKartUnite.Handlers
             if (retStr == null) return String.Empty;
             return retStr.Value;
         }
+
+        public async Task<KarterProfilePreview> GetUserProfileCard(string username)
+        {
+            if (username == "") return new KarterProfilePreview();
+
+            var res = _context.Karter.Where(x => x.Name == username)
+                .Select(x => new KarterProfilePreview
+                {
+                    Name = x.Name,
+                    YearsExperience = "" + x.YearsExperience,
+                    LocalTrack = x.Track.Title ?? "Freelancer",
+                }).FirstOrDefault();
+
+            if (res == null) return new KarterProfilePreview();
+            return res;
+
+        }
     }
 }

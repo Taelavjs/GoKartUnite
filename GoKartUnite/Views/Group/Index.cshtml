@@ -6,6 +6,7 @@
 @model GoKartUnite.ViewModel.GroupPageView
 
 <div class="container d-flex flex-col">
+
         <form id="createGroupForm" asp-action="CreateGroup" method="post">
             @Html.AntiForgeryToken()
 
@@ -37,9 +38,9 @@
             </div>
         </div>
     </div>
-</div>
 
 @section Scripts{
     <script src="~/js/GroupContent/GroupListPage.js" asp-append-version="true"></script>
+    <script src="~/js/ProfileHover.js" asp-append-version="true"></script>
 }
 

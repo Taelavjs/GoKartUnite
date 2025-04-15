@@ -21,6 +21,7 @@ namespace GoKartUnite.Interfaces
         Task<KarterView> KarterModelToView(Karter karter, FriendshipStatus status);
         Task UpdateUser(string nameIdentifier, KarterView kv);
         Task<string> GetCurrentUserNameIdentifier(ClaimsPrincipal User);
+        Task<KarterProfilePreview> GetUserProfileCard(string username);
 
     }
 }

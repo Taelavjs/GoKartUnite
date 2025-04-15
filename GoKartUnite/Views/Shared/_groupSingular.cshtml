@@ -14,7 +14,9 @@
         </h5>
         <p class="card-text">@content.Description</p>
         <div class="d-flex flex-wrap justify-content-between text-muted mb-2">
-            <div><i class="bi bi-person-circle"></i> Leader: @content.LeaderName</div>
+            <div>
+                <i class="bi bi-person-circle"></i> Leader: @await Html.PartialAsync("_UserProfileNameWithPreview", @content.LeaderName);
+            </div>
             <div><i class="bi bi-calendar"></i> Created: @content.DateCreated.ToString("yyyy-MM-dd")</div>
             <div><i class="bi bi-people"></i> Members: <span id="members-count-@content.Id">@content.NumberMembers</span></div>
 
