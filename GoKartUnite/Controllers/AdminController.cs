@@ -48,6 +48,8 @@ namespace GoKartUnite.Controllers
         {
             bool res = await _track.VerifyTrack(id);
 
+
+
             if (res) return Ok("Successfully verified");
             return BadRequest("ID not found");
         }

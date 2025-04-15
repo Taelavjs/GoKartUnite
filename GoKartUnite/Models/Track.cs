@@ -17,6 +17,8 @@ namespace GoKartUnite.Models
         public virtual ICollection<Karter> Karters { get; set; } = new List<Karter>();
         public virtual ICollection<BlogPost> BlogPosts { get; set; } = new List<BlogPost>();
         public virtual ICollection<KarterTrackStats> KarterStats { get; set; } = new List<KarterTrackStats>();
+        public virtual ICollection<FollowTrack> Followers { get; set; } = new List<FollowTrack>();
+
     }
 
     public enum Locations

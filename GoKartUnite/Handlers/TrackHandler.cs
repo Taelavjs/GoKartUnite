@@ -74,8 +74,14 @@ namespace GoKartUnite.Handlers
                 karter.Track = null;
                 karter.TrackId = null;
             }
+            var blogPosts = _context.BlogPosts.Where(bp => bp.TaggedTrackId == track.Id);
+            foreach (var post in blogPosts)
+            {
+                post.TaggedTrackId = null;
+                post.TaggedTrack = null;
+            }
             _context.Track.Remove(track);
-             _context.SaveChanges();
+            _context.SaveChanges();
             return true;
         }
 
