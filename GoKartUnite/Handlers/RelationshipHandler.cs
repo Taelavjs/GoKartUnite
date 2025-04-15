@@ -167,5 +167,30 @@ namespace GoKartUnite.Handlers
 
             return karters;
         }
+
+        public async Task<FriendshipStatus> GetFriendshipStatus(int id1, int id2)
+        {
+            Friendships f = await GetFriendshipByIds(id2, id1);
+            if (f == null)
+            {
+                return FriendshipStatus.User;
+            }
+
+            if (f.accepted)
+            {
+                return FriendshipStatus.Friend;
+            }
+            else
+            {
+                if (f.requestedByInt == id1)
+                {
+                    return FriendshipStatus.Requested;
+                }
+                else
+                {
+                    return FriendshipStatus.Received;
+                }
+            }
+        }
     }
 }

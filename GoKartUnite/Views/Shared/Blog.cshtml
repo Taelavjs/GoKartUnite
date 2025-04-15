@@ -11,7 +11,7 @@
             <a asp-action="Create" asp-route-id="@Model.Id"><i class="bi bi-pencil-square fs-4"></i></a>
         }
     </div>
-    <div class="blog-post-author">By: @Model.Author?.Name</div>
+    <div class="blog-post-author">By: @await Html.PartialAsync("_UserProfileNameWithPreview", @Model.Author?.Name)</div>
     <div class="blog-post-description">@Model.Description</div>
     @if (!string.IsNullOrWhiteSpace(@Model.TaggedTrack?.Title))
     {

@@ -273,6 +273,7 @@ namespace GoKartUnite.Handlers
             var res = _context.Karter.Where(x => x.Name == username)
                 .Select(x => new KarterProfilePreview
                 {
+                    Id = x.Id,
                     Name = x.Name,
                     YearsExperience = "" + x.YearsExperience,
                     LocalTrack = x.Track.Title ?? "Freelancer",

@@ -31,7 +31,9 @@
             @foreach (var message in Model.Group.Comments)
             {
                 <div class="message-bubble mb-2">
-                    <div class="fw-bold">@message.AuthorName</div>
+                    <div class="fw-bold">
+                        @await Html.PartialAsync("_UserProfileNameWithPreview", @message.AuthorName)
+                        </div>
                     <div class="text-muted small">@message.TimeSent.TimeOfDay.ToString(@"hh\:mm\:ss")</div>
                     <div class="message-content">@message.MessageContent</div>
                 </div>

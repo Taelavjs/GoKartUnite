@@ -13,5 +13,6 @@ namespace GoKartUnite.Interfaces
         Task RemoveFriendShip(int sentbyId, int friendId);
         Task<Friendships> GetFriendshipByIds(int id1, int id2);
         Task<List<KarterView>> AddStatusToKarters(List<KarterView> karters, int userId);
+        Task<FriendshipStatus> GetFriendshipStatus(int id1, int id2);
     }
 }

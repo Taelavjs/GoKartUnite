@@ -344,8 +344,10 @@ namespace GoKartUnite.Controllers
         [HttpGet]
         public async Task<PartialViewResult> ProfileCard(string username)
         {
+            string googleId = await _karter.GetCurrentUserNameIdentifier(User);
+            var k = await _karter.GetUserByGoogleId(googleId);
             var ret = await _karter.GetUserProfileCard(username);
-
+            ret.isFriend = await _friendships.GetFriendshipStatus(k.Id, ret.Id);
 
             return PartialView("_ProfilePreview", ret);
         }

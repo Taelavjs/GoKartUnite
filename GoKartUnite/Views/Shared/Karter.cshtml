@@ -12,24 +12,29 @@
         <td>@karter.YearsExperience</td>
                 <td>@(karter.LocalTrack == null ? "MISSING" : @karter.LocalTrack.Title)</td>
         <td class="text-center align-middle">
-            <form asp-controller="KarterHome" asp-action="HandleFriendRequest" asp-route-friendId="@karter.Id" method="post"
-            class="w-100 h-100 text-center align-middle">
-                @switch (@karter.FriendStatus)
-                {
-                    case FriendshipStatus.Received:
-                                    <button type="submit" name="action" value="Accept" class="btn-sm btn-success">Accept</button>
-                        break;
-                    case FriendshipStatus.Friend:
-                                    <button type="submit" name="action" value="Remove" class="btn-sm btn-danger">Remove</button>
-                        break;
-                    case FriendshipStatus.Requested:
-                                    <button type="submit" name="action" value="Cancel" class="btn-sm btn-secondary">Cancel</button>
-                        break;
-                    default:
-                                    <button type="submit" name="action" value="Add" class="btn-sm btn-info">Add</button>
-                        break;
-                }
-            </form>
+
+            @await Html.PartialAsync("_KarterFriendshipButton", new GoKartUnite.ViewModel.KarterFriendshipButtonView{
+                friendId = karter.Id,
+                Status = karter.FriendStatus
+            })
+            @* <form asp-controller="KarterHome" asp-action="HandleFriendRequest" asp-route-friendId="@karter.Id" method="post" *@
+            @* class="w-100 h-100 text-center align-middle"> *@
+            @*     @switch (@karter.FriendStatus) *@
+            @*     { *@
+            @*         case FriendshipStatus.Received: *@
+            @*                         <button type="submit" name="action" value="Accept" class="btn-sm btn-success">Accept</button> *@
+            @*             break; *@
+            @*         case FriendshipStatus.Friend: *@
+            @*                         <button type="submit" name="action" value="Remove" class="btn-sm btn-danger">Remove</button> *@
+            @*             break; *@
+            @*         case FriendshipStatus.Requested: *@
+            @*                         <button type="submit" name="action" value="Cancel" class="btn-sm btn-secondary">Cancel</button> *@
+            @*             break; *@
+            @*         default: *@
+            @*                         <button type="submit" name="action" value="Add" class="btn-sm btn-info">Add</button> *@
+            @*             break; *@
+            @*     } *@
+            @* </form> *@
         </td>
         @*
         @if (User.IsInRole("Admin"))
