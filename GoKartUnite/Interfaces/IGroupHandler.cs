@@ -19,6 +19,8 @@ namespace GoKartUnite.Interfaces
         Task<List<GroupStatDisplay>> GetStatsForGroupGraph(int groupId, string trackTitle);
         Task<bool> CreateUserMessageInGroup(int groupId, string messageContent, Karter user);
 
+        Task<List<int>> GetAllUserGroupIds(int kId);
+
     }
 
     public enum Filters

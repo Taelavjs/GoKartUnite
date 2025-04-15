@@ -17,6 +17,7 @@ using System.Diagnostics;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
 using GoKartUnite.Interfaces;
+using GoKartUnite.Hubs;
 
 
 namespace GoKartUnite
@@ -164,6 +165,8 @@ namespace GoKartUnite
             app.UseSession();
             app.UseRateLimiter();
             app.UseAuthorization();
+            app.MapHub<ChatHub>("/chatHub");
+
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
@@ -174,6 +177,7 @@ namespace GoKartUnite
                 //dummyDbData(context);
                 //dummyDbComments(context);
             }
+
             app.Run();
         }
 

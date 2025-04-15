@@ -342,6 +342,7 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpGet]
+        [AccountConfirmed]
         public async Task<PartialViewResult> ProfileCard(string username)
         {
             string googleId = await _karter.GetCurrentUserNameIdentifier(User);

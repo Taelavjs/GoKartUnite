@@ -257,5 +257,14 @@ namespace GoKartUnite.Handlers
                 return false;
             }
         }
+
+        public async Task<List<int>> GetAllUserGroupIds(int kId)
+        {
+            return await _context.Groups
+                .Where(g => g.MemberKarters.Any(mk => mk.KarterId == kId) || g.HostKarter.Id == kId)
+                .Select(g => g.Id)
+                .ToListAsync();
+        }
+
     }
 }

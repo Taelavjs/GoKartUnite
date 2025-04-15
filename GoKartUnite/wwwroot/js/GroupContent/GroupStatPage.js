@@ -14,10 +14,10 @@ const MessageError = document.getElementById('MessageErrorDiv');
         GroupMembersStatsRequest(selectItem.value);
     });
 
-    MessageSubmitButton.addEventListener("click", () => {
-        console.log("message sent");
-        CreateMessage();
-    })
+    //MessageSubmitButton.addEventListener("click", () => {
+    //    console.log("message sent");
+    //    CreateMessage();
+    //})
 
     document.addEventListener("DOMContentLoaded", function () {
         console.log(selectItem);
