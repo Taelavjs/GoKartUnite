@@ -144,6 +144,8 @@ namespace GoKartUnite.Handlers
                 Friendships f = await GetFriendshipByIds(karter.Id, userId);
                 if (f == null)
                 {
+                    if (karter.Id == userId) karter.FriendStatus = FriendshipStatus.UserSelf;
+
                     karter.FriendStatus = FriendshipStatus.User;
                     continue;
                 }
@@ -173,6 +175,7 @@ namespace GoKartUnite.Handlers
             Friendships f = await GetFriendshipByIds(id2, id1);
             if (f == null)
             {
+                if (id2 == id1) return FriendshipStatus.UserSelf;
                 return FriendshipStatus.User;
             }
 

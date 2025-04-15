@@ -43,7 +43,8 @@ namespace GoKartUnite.Models
         User,
         Requested,
         Received,
-        Friend
+        Friend,
+        UserSelf
     }
 
     public enum SortKartersBy
