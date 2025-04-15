@@ -81,25 +81,6 @@ namespace GoKartUnite.Controllers
             return View(blogPage);
         }
 
-
-        [HttpGet]
-
-        public async Task<IActionResult> Create(int id = -1)
-        {
-            ViewBag.AllTracks = await _tracks.ModelToView(await _tracks.GetAllTracks());
-            if (id != -1)
-            {
-                BlogPostView retrievedPost = await _blog.GetModelToView(await _blog.GetPostById(id));
-
-                return View(retrievedPost);
-            }
-
-
-            return View();
-        }
-
-
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BlogPostView post, int id = -1)

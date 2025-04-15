@@ -41,8 +41,18 @@ namespace GoKartUnite.Controllers
         {
             if (!String.IsNullOrEmpty(kartersName))
             {
-                var karters = await _karter.GetUser(kartersName);
-                return View("Details", new List<Karter> { karters });
+                var karter = await _karter.GetUser(kartersName);
+                KarterIndex store2 = new KarterIndex
+                {
+                    karter = karter,
+                    karterFriends = new List<KarterView>(),
+                    karterFriendRequests = new List<KarterView>(),
+                    sentFriendRequests = new List<KarterView>(),
+                    trackTitles = await _tracks.GetAllTrackTitles(),
+                    isUser = false
+                };
+                if (karter == null) return NotFound("No User Exists");
+                return View(store2);
             }
 
             Karter k = await _karter.GetUserByGoogleId(await _karter.GetCurrentUserNameIdentifier(User), withTrack: true);
@@ -54,6 +64,7 @@ namespace GoKartUnite.Controllers
                 karterFriendRequests = await _karter.KarterModelToView(await _friendships.GetAllFriendRequests(k.Id), FriendshipStatus.Received),
                 sentFriendRequests = await _karter.KarterModelToView(await _friendships.GetAllSentRequests(k.Id), FriendshipStatus.Requested),
                 trackTitles = await _tracks.GetAllTrackTitles(),
+                isUser = true
             };
 
             return View(store);

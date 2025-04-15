@@ -10,6 +10,7 @@ namespace GoKartUnite.ViewModel
         public List<KarterView> karterFriendRequests { get; set; } = new List<KarterView>();
         public List<KarterView> sentFriendRequests { get; set; } = new List<KarterView>();
         public List<string> tracks { get; set; } = new List<string>();
+        public bool isUser = false;
 
     }
 }

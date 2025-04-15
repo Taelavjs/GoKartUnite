@@ -10,7 +10,9 @@
         <div class="profile-image"></div>
         <div class="profile-details">
             <div class="profile-name">
-                @Model.Name
+                <a asp-controller="KarterHome" asp-action="Index" asp-route-kartersName="@Model.Name">
+                    @Model.Name
+                </a>
             </div>
             <div class="profile-info">
                 <div><label>Local Track:</label> @Model.LocalTrack</div>
