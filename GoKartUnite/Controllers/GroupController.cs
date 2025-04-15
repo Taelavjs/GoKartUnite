@@ -135,19 +135,19 @@ namespace GoKartUnite.Controllers
             return View(returnObj);
         }
 
-        [HttpPost]
-        [Authorize]
-        [AccountConfirmed]
-        [ValidateAntiForgeryToken]
-        [ValidGroupMember]
-        public async Task<JsonResult> Home(int GroupId, [FromBody] string message)
-        {
-            Karter? k = await _karter.GetUserByGoogleId(await _karter.GetCurrentUserNameIdentifier(User));
-            bool res = await _groups.CreateUserMessageInGroup(GroupId, message, k);
+        //[HttpPost]
+        //[Authorize]
+        //[AccountConfirmed]
+        //[ValidateAntiForgeryToken]
+        //[ValidGroupMember]
+        //public async Task<JsonResult> Home(int GroupId, [FromBody] string message)
+        //{
+        //    Karter? k = await _karter.GetUserByGoogleId(await _karter.GetCurrentUserNameIdentifier(User));
+        //    bool res = await _groups.CreateUserMessageInGroup(GroupId, message, k);
 
-            if (res) return Json(new { success = true, userName = k.Name });
-            return Json(new { success = false });
-        }
+        //    if (res) return Json(new { success = true, userName = k.Name });
+        //    return Json(new { success = false });
+        //}
 
         public async Task<JsonResult> GroupStats(int GroupId, string TrackTitle)
         {
