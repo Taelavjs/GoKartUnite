@@ -181,5 +181,25 @@ namespace GoKartUnite.Handlers
                 return false;
             }
         }
+        public async Task<List<Track>> GetUnverifiedTracksAdmin()
+        {
+            return await _context.Track.Where(x => x.IsVerifiedByAdmin == false).ToListAsync();
+        }
+
+        public async Task<bool> VerifyTrack(int trackId)
+        {
+            var trackToBeUpdated = await _context.Track.FirstOrDefaultAsync(t => t.Id == trackId);
+            if (trackToBeUpdated == null)
+            {
+                return false;
+
+            }
+
+            trackToBeUpdated.IsVerifiedByAdmin = true;
+            _context.Update(trackToBeUpdated);
+            return true;
+        }
+
+
     }
 }
