@@ -72,6 +72,32 @@ namespace GoKartUnite.Controllers
             return View(AllKarters);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ManageUser(int id)
+        {
+            var getKarter = await _karter.GetUser(id);
+            return View(getKarter);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetKartersBlogPosts(int karterId)
+        {
+            return PartialView("_KarterBlogPosts", await _karter.GetAllUserPostsAdmin(karterId));
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetKartersComments(int karterId)
+        {
+            return PartialView("_KarterComments", await _karter.GetAllUsersCommentsAdmin(karterId));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetKartersGroups(int karterId)
+        {
+            return PartialView("_KarterGroups", await _karter.GetAllUsersGroupsAdmin(karterId));
+        }
+
         private async Task<List<KarterAdminView>> KarterModelToAdminView(List<Karter> kartersList)
         {
             List<KarterAdminView> toReturn = new List<KarterAdminView>();

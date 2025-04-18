@@ -8,6 +8,9 @@ using GoKartUnite.Interfaces;
 using GoKartUnite.DataFilterOptions;
 using Microsoft.Extensions.Options;
 using GoKartUnite.ViewModel;
+using System.Xml.Linq;
+using System.Text.RegularExpressions;
+using GoKartUnite.Models.Groups;
 
 namespace GoKartUnite.Handlers
 {
@@ -252,6 +255,10 @@ namespace GoKartUnite.Handlers
             {
                 query = query.Include(k => k.UserRoles);
             }
+            if (options.IncludeComments)
+            {
+                query = query.Include(k => k.Comments);
+            }
 
             if (!string.IsNullOrEmpty(options.TrackToFetchFor))
             {
@@ -312,6 +319,21 @@ namespace GoKartUnite.Handlers
                     Stats = k.Stats.Count,
                 })
                 .ToListAsync();
+        }
+
+        public async Task<List<BlogPost>> GetAllUserPostsAdmin(int id)
+        {
+            return await _context.BlogPosts.Where(k => k.KarterId == id).ToListAsync();
+        }
+
+        public async Task<List<Comment>> GetAllUsersCommentsAdmin(int id)
+        {
+            return await _context.Comments.Where(k => k.AuthorId == id).ToListAsync();
+        }
+
+        public async Task<List<Models.Groups.Group>> GetAllUsersGroupsAdmin(int id)
+        {
+            return await _context.Groups.Where(k => k.HostKarter.Id == id).ToListAsync();
         }
     }
 }

@@ -10,7 +10,9 @@ namespace GoKartUnite.DataFilterOptions
         public bool IncludeFriendships { get; set; } = false;
         public bool IncludeBlogPosts { get; set; } = false;
         public bool IncludeNotification { get; set; } = false;
+        public bool IncludeComments { get; set; } = false;
         public string TrackToFetchFor { get; set; } = "";
+
         public int pageNo { get; set; } = 0;
         public int pageSize { get; set; } = 5;
         public SortKartersBy sort { get; set; } = Models.SortKartersBy.Alphabetically;

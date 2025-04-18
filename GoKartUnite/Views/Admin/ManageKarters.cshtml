@@ -29,7 +29,7 @@
                     <td>@item.Id</td>
                     <td>@item.Email</td>
                     <td>@item.NameIdentifier</td>
-                    <td>@item.Name</td>
+                    <td><a asp-action="ManageUser" asp-route-id="@item.Id">@item.Name</a>        </td>
                     <td>@item.YearsExperience</td>
                     <td>@item.TrackId</td>
                     <td>@item.Track?.Title</td>

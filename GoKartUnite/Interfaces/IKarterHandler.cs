@@ -24,5 +24,11 @@ namespace GoKartUnite.Interfaces
         Task<KarterProfilePreview> GetUserProfileCard(string username);
         Task<List<KarterAdminView>> GetAllUsersAdmin();
 
+        Task<List<BlogPost>> GetAllUserPostsAdmin(int id);
+
+        Task<List<Comment>> GetAllUsersCommentsAdmin(int id);
+
+        Task<List<Models.Groups.Group>> GetAllUsersGroupsAdmin(int id);
+
     }
 }

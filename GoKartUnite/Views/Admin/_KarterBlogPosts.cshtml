@@ -1,0 +1,36 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@model List<GoKartUnite.Models.BlogPost>
+
+@foreach(BlogPost post in Model){
+    <table class="table table-sm table-striped table-bordered align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Title</th>
+                <th>Karter</th>
+                <th>Posted</th>
+                <th>Post Type</th>
+                <th>Upvotes</th>
+                <th>Comments</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var Postie in Model)
+            {
+                <tr class="text-white">
+                    <td>@Postie.Title</td>
+                    <td>@Postie.Karter?.Name</td>
+                    <td>@Postie.DateTimePosted.ToShortDateString()</td>
+                    <td>@Postie.PostType</td>
+                    <td>@Postie.Upvotes.Count()</td>
+                    <td>@Postie.Comments.Count()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
