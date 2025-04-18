@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Reflection;
 
 namespace GoKartUnite.Models
 {
@@ -7,8 +8,9 @@ namespace GoKartUnite.Models
 
         public int Id { get; set; }
 
-        public int AuthorId { get; set; }
-        public virtual Karter? Author { get; set; }
+        public int KarterId { get; set; }
+        [ForeignKey("KarterId")]
+        public virtual Karter Karter { get; set; }
 
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;

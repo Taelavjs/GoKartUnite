@@ -46,13 +46,13 @@ namespace GoKartUnite.Handlers
 
             if (filterOptions.IncludeAuthor)
             {
-                query = query.Include(k => k.Author);
+                query = query.Include(k => k.Karter);
             }
 
 
             if (filterOptions.UserIdFilter != null)
             {
-                query = query.Where(x => x.AuthorId == filterOptions.UserIdFilter);
+                query = query.Where(x => x.KarterId == filterOptions.UserIdFilter);
             }
 
             if (filterOptions.SortByAscending)
@@ -95,9 +95,9 @@ namespace GoKartUnite.Handlers
 
             BlogPost dbPost = new BlogPost();
 
-            dbPost.Author = post.Author;
+            dbPost.Karter = post.Author;
             dbPost.Title = post.Title;
-            dbPost.AuthorId = post.Author.Id;
+            dbPost.KarterId = post.Author.Id;
             dbPost.Description = post.Description;
             dbPost.TaggedTrack = post.TaggedTrack ?? null;
 
@@ -118,10 +118,10 @@ namespace GoKartUnite.Handlers
                 post.Id = bp.Id;
                 post.Title = bp.Title;
                 post.Description = bp.Description;
-                post.Author = bp.Author;
+                post.Author = bp.Karter;
                 post.Upvotes = bp.Upvotes.Count;
                 post.TaggedTrack = bp.TaggedTrack;
-                post.authorId = bp.AuthorId;
+                post.authorId = bp.KarterId;
                 retPosts.Add(post);
             }
 
@@ -136,10 +136,10 @@ namespace GoKartUnite.Handlers
             post.Id = posts.Id;
             post.Title = posts.Title;
             post.Description = posts.Description;
-            post.Author = posts.Author;
+            post.Author = posts.Karter;
             post.Upvotes = posts.Upvotes.Count;
             post.TaggedTrack = posts.TaggedTrack;
-            post.authorId = posts.AuthorId;
+            post.authorId = posts.KarterId;
 
             return post;
         }
@@ -266,7 +266,7 @@ namespace GoKartUnite.Handlers
             BlogPost retrievedPost = _context.BlogPosts.SingleOrDefault(t => t.Id == id);
 
             if (retrievedPost == null) return false;
-            if (retrievedPost.AuthorId != karterId) return false;
+            if (retrievedPost.KarterId != karterId) return false;
             retrievedPost.Title = post.Title;
             retrievedPost.Description = post.Description;
 

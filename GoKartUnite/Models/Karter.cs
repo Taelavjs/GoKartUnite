@@ -1,5 +1,4 @@
 ﻿using GoKartUnite.Data;
-using GoKartUnite.Migrations;
 using Humanizer.Localisation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;

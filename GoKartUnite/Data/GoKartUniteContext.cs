@@ -29,11 +29,7 @@ namespace GoKartUnite.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             // ---------- BlogPost ----------
-            modelBuilder.Entity<BlogPost>()
-                .HasOne(bp => bp.Author)
-                .WithMany()
-                .HasForeignKey(bp => bp.AuthorId)
-                .OnDelete(DeleteBehavior.Cascade);
+
 
             // ---------- Comment ----------
             modelBuilder.Entity<Comment>()
@@ -120,7 +116,6 @@ namespace GoKartUnite.Data
         }
 
         // ---------- DbSet Properties ----------
-
         public DbSet<Karter> Karter { get; set; } = default!;
         public DbSet<Track> Track { get; set; } = default!;
         public DbSet<Friendships> Friendships { get; set; } = default!;

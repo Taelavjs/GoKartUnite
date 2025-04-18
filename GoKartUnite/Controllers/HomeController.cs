@@ -42,21 +42,26 @@ namespace GoKartUnite.Controllers
             {
                 return View();
             }
-            Karter k = await _karter.GetUserByGoogleId(await _karter.GetCurrentUserNameIdentifier(User), withTrack: true);
-            List<Karter> friends = await _friends.GetAllFriends(k.Id);
             List<BlogPost> blogPosts = new List<BlogPost>();
 
-            foreach (var friend in friends)
+            Karter k = await _karter.GetUserByGoogleId(await _karter.GetCurrentUserNameIdentifier(User), withTrack: true);
+            if (k != null)
             {
-                BlogFilterOptions filter = new BlogFilterOptions
+                List<Karter> friends = await _friends.GetAllFriends(k.Id);
+                foreach (var friend in friends)
                 {
-                    UserIdFilter = friend.Id,
-                    IncludeUpvotes = true
+                    BlogFilterOptions filter = new BlogFilterOptions
+                    {
+                        UserIdFilter = friend.Id,
+                        IncludeUpvotes = true
 
-                };
-                blogPosts.AddRange(await _blog.GetAllPosts(filter));
+                    };
+                    blogPosts.AddRange(await _blog.GetAllPosts(filter));
+                }
+                blogPosts = blogPosts.OrderByDescending(x => x.DateTimePosted).ToList();
             }
-            blogPosts = blogPosts.OrderByDescending(x => x.DateTimePosted).ToList();
+
+
 
 
 

@@ -64,9 +64,6 @@ namespace GoKartUnite.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AuthorId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("DateTimePosted")
                         .HasColumnType("datetime2");
 
@@ -74,7 +71,7 @@ namespace GoKartUnite.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("KarterId")
+                    b.Property<int>("KarterId")
                         .HasColumnType("int");
 
                     b.Property<int>("PostType")
@@ -88,8 +85,6 @@ namespace GoKartUnite.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AuthorId");
 
                     b.HasIndex("KarterId");
 
@@ -493,21 +488,17 @@ namespace GoKartUnite.Migrations
 
             modelBuilder.Entity("GoKartUnite.Models.BlogPost", b =>
                 {
-                    b.HasOne("GoKartUnite.Models.Karter", "Author")
-                        .WithMany()
-                        .HasForeignKey("AuthorId")
+                    b.HasOne("GoKartUnite.Models.Karter", "Karter")
+                        .WithMany("BlogPosts")
+                        .HasForeignKey("KarterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("GoKartUnite.Models.Karter", null)
-                        .WithMany("BlogPosts")
-                        .HasForeignKey("KarterId");
 
                     b.HasOne("GoKartUnite.Models.Track", "TaggedTrack")
                         .WithMany("BlogPosts")
                         .HasForeignKey("TaggedTrackId");
 
-                    b.Navigation("Author");
+                    b.Navigation("Karter");
 
                     b.Navigation("TaggedTrack");
                 });

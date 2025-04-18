@@ -184,7 +184,7 @@ namespace GoKartUnite.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.tracks = await _tracks.GetAllTracks();
+                ViewBag.TrackTitles = await _tracks.GetAllTracks();
                 return View("Create");
             }
 

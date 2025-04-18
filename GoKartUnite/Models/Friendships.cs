@@ -21,10 +21,8 @@ namespace GoKartUnite.Models
 
         public bool accepted { get; set; } = false;
 
-        // Parameterless constructor for EF Core to use
         public Friendships() { }
 
-        // Existing parameterized constructor for custom initialization
         public Friendships(int SentByKarterId, int ToKarterId)
         {
             requestedByInt = SentByKarterId;
