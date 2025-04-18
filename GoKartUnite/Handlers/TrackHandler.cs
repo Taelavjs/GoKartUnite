@@ -203,6 +203,7 @@ namespace GoKartUnite.Handlers
 
             trackToBeUpdated.IsVerifiedByAdmin = true;
             _context.Update(trackToBeUpdated);
+            await _context.SaveChangesAsync();
             return true;
         }
 
