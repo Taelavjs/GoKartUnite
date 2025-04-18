@@ -3,7 +3,9 @@ using GoKartUnite.DataFilterOptions;
 using GoKartUnite.Handlers;
 using GoKartUnite.Interfaces;
 using GoKartUnite.Models;
+using GoKartUnite.ViewModel;
 using Microsoft.AspNetCore.Mvc;
+using SendGrid.Helpers.Mail;
 using System.Web.Mvc;
 using HttpGetAttribute = Microsoft.AspNetCore.Mvc.HttpGetAttribute;
 using HttpPostAttribute = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
@@ -61,6 +63,37 @@ namespace GoKartUnite.Controllers
 
             if (res) return Ok("Successfully verified");
             return BadRequest("ID not found");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ManageKarters()
+        {
+            var AllKarters = await _karter.GetAllUsersAdmin();
+            return View(AllKarters);
+        }
+
+        private async Task<List<KarterAdminView>> KarterModelToAdminView(List<Karter> kartersList)
+        {
+            List<KarterAdminView> toReturn = new List<KarterAdminView>();
+            foreach (Karter k in kartersList)
+            {
+                toReturn.Add(new KarterAdminView
+                {
+                    Name = k.Name,
+                    Email = k.Email,
+                    Id = k.Id,
+                    Track = k.Track,
+                    TrackId = k.TrackId,
+                    BlogPosts = k.BlogPosts.Count,
+                    NameIdentifier = k.NameIdentifier,
+                    Friendships = k.Friendships.Count,
+                    Notification = k.Notification.Count,
+                    YearsExperience = k.YearsExperience,
+                });
+
+            }
+            return toReturn;
+
         }
     }
 }

@@ -103,20 +103,20 @@ namespace GoKartUnite.Data
                 .HasOne(k => k.Track)
                 .WithMany(t => t.Karters)
                 .HasForeignKey(k => k.TrackId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             // ---------- FollowTrack ----------
             modelBuilder.Entity<FollowTrack>()
                 .HasOne(ft => ft.track)
                 .WithMany(t => t.Followers) // matches the property added in Track
                 .HasForeignKey(ft => ft.TrackId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<FollowTrack>()
                 .HasOne(ft => ft.karter)
                 .WithMany()
                 .HasForeignKey(ft => ft.KarterId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
         // ---------- DbSet Properties ----------

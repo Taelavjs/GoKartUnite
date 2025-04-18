@@ -27,9 +27,9 @@ namespace GoKartUnite.Handlers
                 options = new KarterGetAllUsersFilter();
             }
             var query = _context.Karter.AsQueryable();
-            query = await QueryFilterIncludeOptions(options, query);
+            var newQuery = QueryFilterIncludeOptions(options, query);
 
-            var karterInDb = await query.SingleOrDefaultAsync(x => x.Id == id);
+            var karterInDb = await newQuery.SingleOrDefaultAsync(x => x.Id == id);
             return karterInDb;
         }
 
@@ -40,9 +40,9 @@ namespace GoKartUnite.Handlers
                 options = new KarterGetAllUsersFilter();
             }
             var query = _context.Karter.AsQueryable();
-            query = await QueryFilterIncludeOptions(options, query);
+            var newQuery = QueryFilterIncludeOptions(options, query);
 
-            var karterInDb = await query.SingleOrDefaultAsync(k => k.Name.ToLower() == name.ToLower());
+            var karterInDb = await newQuery.SingleOrDefaultAsync(k => k.Name.ToLower() == name.ToLower());
             return karterInDb;
         }
 
@@ -101,24 +101,24 @@ namespace GoKartUnite.Handlers
                 options = new KarterGetAllUsersFilter();
             }
             var query = _context.Karter.AsQueryable();
-            query = await QueryFilterIncludeOptions(options, query);
+            var newQuery = QueryFilterIncludeOptions(options, query);
 
             switch (options.sort)
             {
                 case SortKartersBy.Alphabetically:
-                    query = query.OrderBy(k => k.Name);
+                    newQuery = newQuery.OrderBy(k => k.Name);
                     break;
                 case SortKartersBy.ReverseAlphabetically:
-                    query = query.OrderByDescending(k => k.Name);
+                    newQuery = newQuery.OrderByDescending(k => k.Name);
                     break;
                 case SortKartersBy.YearsExperience:
-                    query = query.OrderBy(k => k.YearsExperience);
+                    newQuery = newQuery.OrderBy(k => k.YearsExperience);
                     break;
                 case SortKartersBy.ReverseYearsExperience:
-                    query = query.OrderByDescending(k => k.YearsExperience);
+                    newQuery = newQuery.OrderByDescending(k => k.YearsExperience);
                     break;
             };
-            return await query.ToListAsync();
+            return await newQuery.ToListAsync();
 
         }
 
@@ -130,7 +130,7 @@ namespace GoKartUnite.Handlers
         public async Task<List<Karter>> GetAllUsersByTrackId(int id, KarterGetAllUsersFilter? options = null)
         {
             var query = _context.Karter.AsQueryable();
-            query = await QueryFilterIncludeOptions(options, query);
+            query = QueryFilterIncludeOptions(options, query);
 
 
             var karters = await query
@@ -221,7 +221,7 @@ namespace GoKartUnite.Handlers
             _context.SaveChanges();
         }
 
-        private async Task<IQueryable<Karter>> QueryFilterIncludeOptions(KarterGetAllUsersFilter options, IQueryable<Karter> query)
+        private IQueryable<Karter> QueryFilterIncludeOptions(KarterGetAllUsersFilter options, IQueryable<Karter> query)
         {
             if (options == null)
             {
@@ -237,14 +237,17 @@ namespace GoKartUnite.Handlers
             {
                 query = query.Include(k => k.Notification);
             }
+
             if (options.IncludeBlogPosts)
             {
                 query = query.Include(k => k.BlogPosts);
             }
+
             if (options.IncludeFriendships)
             {
                 query = query.Include(k => k.Friendships);
             }
+
             if (options.IncludeUserRoles)
             {
                 query = query.Include(k => k.UserRoles);
@@ -282,6 +285,33 @@ namespace GoKartUnite.Handlers
             if (res == null) return new KarterProfilePreview();
             return res;
 
+        }
+
+        public async Task<List<KarterAdminView>> GetAllUsersAdmin()
+        {
+            return await _context.Karter
+                .Include(k => k.Track)
+                .Include(k => k.UserRoles)
+                .Include(k => k.Friendships)
+                .Include(k => k.BlogPosts)
+                .Include(k => k.Notification)
+                .Include(k => k.Stats)
+                .Select(k => new KarterAdminView
+                {
+                    Id = k.Id,
+                    Email = k.Email,
+                    NameIdentifier = k.NameIdentifier,
+                    Name = k.Name,
+                    YearsExperience = k.YearsExperience,
+                    TrackId = k.TrackId,
+                    Track = k.Track,
+                    UserRoles = k.UserRoles.Count,
+                    Friendships = k.Friendships.Count,
+                    BlogPosts = k.BlogPosts.Count,
+                    Notification = k.Notification.Count,
+                    Stats = k.Stats.Count,
+                })
+                .ToListAsync();
         }
     }
 }

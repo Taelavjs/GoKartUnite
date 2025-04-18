@@ -22,6 +22,7 @@ namespace GoKartUnite.Interfaces
         Task UpdateUser(string nameIdentifier, KarterView kv);
         Task<string> GetCurrentUserNameIdentifier(ClaimsPrincipal User);
         Task<KarterProfilePreview> GetUserProfileCard(string username);
+        Task<List<KarterAdminView>> GetAllUsersAdmin();
 
     }
 }
