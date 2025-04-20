@@ -305,10 +305,10 @@ namespace UnitTesting
             int result = await _blogHandler.AddPost(blogPostsView);
             Assert.True(result > -1);
             Assert.True(_context.BlogPosts.Count() == 1, "More than 1 Record Created");
-            BlogPost post = _context.BlogPosts.Include(x => x.Author).Include(x => x.TaggedTrack).Single(x => x.Id >= -1);
+            BlogPost post = _context.BlogPosts.Include(x => x.Karter).Include(x => x.TaggedTrack).Single(x => x.Id >= -1);
             Assert.True(result == post.Id);
             Assert.True(post.Title == blogPostsView.Title, "Post Title and PostsViewTitle Mismatch");
-            Assert.True(post.Author == karter, "Karter created and set as author mismatch");
+            Assert.True(post.Karter == karter, "Karter created and set as author mismatch");
             Assert.True(post.TaggedTrack == track, "TaggedTrack created and set as TaggedTrack mismatch");
         }
 
@@ -349,11 +349,11 @@ namespace UnitTesting
             Assert.True(result > -1);
             Assert.True(_context.BlogPosts.Count() == 1, "More than 1 Record Created");
 
-            BlogPost post = _context.BlogPosts.Include(x => x.Author).Single(x => x.Id >= -1);
+            BlogPost post = _context.BlogPosts.Include(x => x.Karter).Single(x => x.Id >= -1);
 
             Assert.True(result == post.Id);
             Assert.True(post.Title == blogPostsView.Title, "Title added and created mismatch");
-            Assert.True(post.Author == karter, "Karter added and created mismatch");
+            Assert.True(post.Karter == karter, "Karter added and created mismatch");
         }
 
         [Fact]
@@ -407,7 +407,7 @@ namespace UnitTesting
             var blogPosts = Enumerable.Range(1, 4)
                 .Select(i => new BlogPost
                 {
-                    Author = karter,
+                    Karter = karter,
                     DateTimePosted = DateTime.Now.AddDays(-i),
                     TaggedTrack = new Track
                     {

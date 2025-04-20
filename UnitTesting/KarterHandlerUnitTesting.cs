@@ -180,7 +180,7 @@ namespace UnitTesting
         public async Task KarterModelToView_SingleKarter()
         {
             Karter k = Helpers.GenerateValidKarters("TestDummy", 1);
-            KarterView kv = await _karterHandler.KarterModelToView(k);
+            KarterView kv = await _karterHandler.KarterModelToView(k, FriendshipStatus.User);
 
             Assert.NotNull(kv);
             Assert.Equal(k.Name, kv.Name);
@@ -197,7 +197,7 @@ namespace UnitTesting
                 Helpers.GenerateValidKarters("TestDummy3", 3)
             };
 
-            List<KarterView> kvs = await _karterHandler.KarterModelToView(karters);
+            List<KarterView> kvs = await _karterHandler.KarterModelToView(karters, FriendshipStatus.User);
 
             Assert.NotNull(kvs);
             Assert.Equal(karters.Count, kvs.Count);
