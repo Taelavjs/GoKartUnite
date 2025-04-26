@@ -11,6 +11,7 @@ using GoKartUnite.ViewModel;
 using System.Xml.Linq;
 using System.Text.RegularExpressions;
 using GoKartUnite.Models.Groups;
+using X.PagedList;
 
 namespace GoKartUnite.Handlers
 {
@@ -335,5 +336,22 @@ namespace GoKartUnite.Handlers
         {
             return await _context.Groups.Where(k => k.HostKarter.Id == id).ToListAsync();
         }
+
+        public async Task<List<GroupMessage>> GetUsersMessagesByGroup(int id, int groupId)
+        {
+            var group = await _context.Groups
+                .Include(g => g.GroupMessages)
+                .SingleOrDefaultAsync(x => x.Id == groupId);
+            return group.GroupMessages.Where(x => x.AuthorId == id).ToList();
+        }
+
+        public async Task<Dictionary<int, string>> GetUserGroupsList(int id)
+        {
+            return await _context.Groups
+                .Where(x => x.MemberKarters.Any(mk => mk.KarterId == id) || x.HostId == id)
+                .Select(x => new { x.Id, x.Title })
+                .ToDictionaryAsync(x => x.Id, x => x.Title);
+        }
+
     }
 }

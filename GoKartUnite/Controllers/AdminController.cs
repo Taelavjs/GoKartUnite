@@ -98,6 +98,20 @@ namespace GoKartUnite.Controllers
             return PartialView("_KarterGroups", await _karter.GetAllUsersGroupsAdmin(karterId));
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetKarterMessagesInGroup(int karterId, int groupId)
+        {
+            return PartialView("_KarterMessagesByGroup", await _karter.GetUsersMessagesByGroup(karterId, groupId));
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetListKartersGroups(int karterId, int groupId)
+        {
+            return Json(new { succes = true, message = await _karter.GetUserGroupsList(karterId) });
+        }
+
+
         private async Task<List<KarterAdminView>> KarterModelToAdminView(List<Karter> kartersList)
         {
             List<KarterAdminView> toReturn = new List<KarterAdminView>();

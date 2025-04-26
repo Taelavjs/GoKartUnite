@@ -15,12 +15,23 @@
     <div>@Model.YearsExperience</div>
 </div>
 
-<button type="button" id="ShowUsersPosts" data-karterId="@Model.Id">ShowUsersPosts</button>
-<button type="button" id="CommentsShow" data-karterId="@Model.Id">ShowUsersPosts</button>
+<button type="button" id="ShowUsersPosts" data-karterId="@Model.Id">Show User Blog Posts</button>
+<button type="button" id="CommentsShow" data-karterId="@Model.Id">Show User Blog Comments</button>
+<button type="button" id="GetListKartersGroups" data-karterId="@Model.Id">GetListKartersGroups</button>
 
 <div id="showPosts">
 
 </div>
+
+<div id="subgroup">
+    <div id="groupsContainer">
+        <div id="buttonContainer">
+        </div>
+        <div id="groupMessages">
+        </div>
+    </div>
+</div>
+
 
 @section Scripts {
     <script src="~/js/Admin/FetchKarterReferencedDetails.js"></script>
