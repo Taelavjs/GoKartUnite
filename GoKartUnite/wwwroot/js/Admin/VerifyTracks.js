@@ -1,14 +1,5 @@
 ﻿
 document.addEventListener("DOMContentLoaded", () => {
-    const eleteSuccess = $('#successAlert');
-    const DeleteError = $('#errorAlert');
-    eleteSuccess.addClass('d-none');
-    DeleteError.addClass('d-none');
-
-    const VerifySuccess = $('#VerifySuccesAlert');
-    const VerifyError = $('#VerifyFailAlert');
-    VerifySuccess.addClass('d-none');
-    VerifyError.addClass('d-none');
     $(document).on('click', '.VerifyTrackBtn', function () {
         const $this = $(this);
         const trackId = $this.data('trackid');
@@ -21,15 +12,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (row) {
                     row.remove();
                 }
-                VerifySuccess.removeClass('d-none');
-
-                setTimeout(() => VerifySuccess.addClass('d-none'), 3000);
+                ShowSuccessMessage("Verified Track Successfully");
 
             },
             error: function (xhr, status, error) {
-                VerifyError.removeClass('d-none');
+                ShowErrorMessage("Unable To Verified Track");
 
-                setTimeout(() => VerifyError.addClass('d-none'), 3000);
             }
         });
 
@@ -48,16 +36,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (row) {
                     row.remove();
                 }
-                eleteSuccess.removeClass('d-none');
+                ShowSuccessMessage("Removed Track Verification Request");
 
-                setTimeout(() => eleteSuccess.addClass('d-none'), 3000);
 
             },
             error: function (xhr, status) {
-                DeleteError.removeClass('d-none');
-
-                setTimeout(() => DeleteError.addClass('d-none'), 3000);
-
+                ShowErrorMessage("Unable To Delete Track Verification Request");
             }
         });
 

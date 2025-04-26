@@ -39,12 +39,22 @@
             @RenderBody()
         </main>
     </div>
+    <div class="floating-alerts position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
+        <div id="VerifySuccesAlert" class="alert alert-success d-none shadow" role="alert">
+            ✅ Track verified successfully!
+        </div>
+        <div id="VerifyFailAlert" class="alert alert-danger d-none shadow" role="alert">
+            ❌ Failed to verify the track. Please try again.
+        </div>
+    </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.19.0/jquery.validate.min.js"></script>
     <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate.unobtrusive/3.2.5/jquery.validate.unobtrusive.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" integrity="sha512-ZwR1/gSZM3ai6vCdI+LVF1zSq/5HznD3ZSTk7kajkaj4D292NLuduDCO1c/NT8Id+jE58KYLKT7hXnbtryGmMg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" integrity="sha512-ZwR1/gSZM3ai6vCdI+LVF1zSq/5HznD3ZSTk7kajkaj4D292NLuduDCO1c/NT8Id+jE58KYLKT7hXnbtryGmMg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="~/js/General/SuccessFailAlert.js" asp-append-version="true"></script>
+
     <script src="~/js/signalr/dist/browser/signalr.js"></script>
     <script src="~/js/General/NotifBar.js" asp-append-version="true"></script>
     <script src="~/js/Site.js"></script>
@@ -62,6 +72,7 @@
             <span class="sr-only"></span>
         </div>
     </div>
+
 
 </body>
 
