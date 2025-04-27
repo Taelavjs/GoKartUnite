@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GoKartUnite.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -38,7 +38,9 @@ namespace GoKartUnite.Migrations
                     Location = table.Column<int>(type: "int", nullable: false),
                     IsVerifiedByAdmin = table.Column<bool>(type: "bit", nullable: false),
                     FormattedGoogleLocation = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    GooglePlacesId = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    GooglePlacesId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Latitude = table.Column<double>(type: "float", nullable: false),
+                    Longitude = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {

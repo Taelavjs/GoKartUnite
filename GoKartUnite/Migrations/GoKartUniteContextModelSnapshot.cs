@@ -110,9 +110,6 @@ namespace GoKartUnite.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("KarterId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -122,8 +119,6 @@ namespace GoKartUnite.Migrations
                     b.HasIndex("AuthorId");
 
                     b.HasIndex("BlogPostId");
-
-                    b.HasIndex("KarterId");
 
                     b.ToTable("Comments");
                 });
@@ -517,7 +512,7 @@ namespace GoKartUnite.Migrations
             modelBuilder.Entity("GoKartUnite.Models.Comment", b =>
                 {
                     b.HasOne("GoKartUnite.Models.Karter", "Author")
-                        .WithMany()
+                        .WithMany("Comments")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -527,10 +522,6 @@ namespace GoKartUnite.Migrations
                         .HasForeignKey("BlogPostId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("GoKartUnite.Models.Karter", null)
-                        .WithMany("Comments")
-                        .HasForeignKey("KarterId");
 
                     b.Navigation("Author");
 

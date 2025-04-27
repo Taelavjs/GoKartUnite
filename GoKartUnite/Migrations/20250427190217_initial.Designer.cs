@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GoKartUnite.Migrations
 {
     [DbContext(typeof(GoKartUniteContext))]
-    [Migration("20250418172712_init")]
-    partial class init
+    [Migration("20250427190217_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -387,8 +387,14 @@ namespace GoKartUnite.Migrations
                     b.Property<bool>("IsVerifiedByAdmin")
                         .HasColumnType("bit");
 
+                    b.Property<double>("Latitude")
+                        .HasColumnType("float");
+
                     b.Property<int>("Location")
                         .HasColumnType("int");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -509,7 +515,7 @@ namespace GoKartUnite.Migrations
             modelBuilder.Entity("GoKartUnite.Models.Comment", b =>
                 {
                     b.HasOne("GoKartUnite.Models.Karter", "Author")
-                        .WithMany()
+                        .WithMany("Comments")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -722,6 +728,8 @@ namespace GoKartUnite.Migrations
             modelBuilder.Entity("GoKartUnite.Models.Karter", b =>
                 {
                     b.Navigation("BlogPosts");
+
+                    b.Navigation("Comments");
 
                     b.Navigation("Friendships");
 
