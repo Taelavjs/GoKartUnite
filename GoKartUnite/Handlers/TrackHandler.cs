@@ -210,9 +210,99 @@ namespace GoKartUnite.Handlers
             return true;
         }
 
-        public async Task CalculateRecommendedTracksForUser(int uid)
+        public async Task CalculateRecommendedTracksForUser(int userId)
         {
+            await GetCloseFriendsScore(userId);
+            await GetClosenessScore(userId);
+        }
+        public static double DistanceBetween(double lat1, double lon1, double lat2, double lon2)
+        {
+            var R = 6371;
+            var dLat = (lat2 - lat1) * Math.PI / 180.0;
+            var dLon = (lon2 - lon1) * Math.PI / 180.0;
+
+            var a =
+                Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                Math.Cos(lat1 * Math.PI / 180.0) * Math.Cos(lat2 * Math.PI / 180.0) *
+                Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+
+            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            return R * c;
+        }
+        private async Task GetCloseFriendsScore(int userId)
+        {
+            double nearbyRadiusKm = 50;
+            var friendInfos = await _context.Friendships
+                .Where(f => f.KarterFirstId == userId || f.KarterSecondId == userId)
+                .Select(f => new
+                {
+                    KarterId = f.KarterFirstId != userId ? f.KarterFirstId : f.KarterSecondId,
+                    LocalTrackCoordinates = new
+                    {
+                        Longitude = f.KarterFirstId != userId
+                ? (f.KarterFirst.Track != null ? f.KarterFirst.Track.Longitude : 0)
+                : (f.KarterSecond.Track != null ? f.KarterSecond.Track.Longitude : 0),
+                        Latitude = f.KarterFirstId != userId
+                ? (f.KarterFirst.Track != null ? f.KarterFirst.Track.Latitude : 0)
+                : (f.KarterSecond.Track != null ? f.KarterSecond.Track.Latitude : 0),
+                    }
+                })
+                .ToListAsync();
+            var tracks = await _context.Track.AsNoTracking().ToListAsync();
+
+            var tracksWithFriendCounts = tracks
+                .Select(t => new
+                {
+                    Track = t,
+                    FriendsNearby = friendInfos
+                        .Where(friend => DistanceBetween(
+                            t.Latitude, t.Longitude,
+                            friend.LocalTrackCoordinates.Latitude, friend.LocalTrackCoordinates.Longitude
+                        ) <= nearbyRadiusKm)
+                        .Count()
+                })
+                .ToList();
+        }
+
+
+        private async Task GetClosenessScore(int userId)
+        {
+            double minDistance = 10;
+            double maxDistance = 95;
+            double minScore = 0.01;
+            var tracks = await _context.Track.AsNoTracking().ToListAsync();
+            var userTrackObj = await _context.Karter
+                .Where(t => t.Id == userId)
+                .Select(t => new
+                {
+                    Longitude = (t.Track != null ? t.Track.Longitude : 0),
+                    Latitude = (t.Track != null ? t.Track.Latitude : 0)
+                })
+                .SingleOrDefaultAsync();
+            var closeNessScores = tracks
+                .Select(t => new
+                {
+                    TrackId = t.Id,
+                    ClosenessScore = Math.Max(minScore, Math.Min(10, 10 - ((DistanceBetween(t.Longitude, t.Latitude, userTrackObj.Longitude, userTrackObj.Latitude) - minDistance) / (maxDistance - minDistance)) * (10 - minScore) + minScore)),
+                    DistanceDebug = DistanceBetween(t.Latitude, t.Longitude, userTrackObj.Latitude, userTrackObj.Longitude)
+                });
 
         }
+
+
+
+        /*RANKING TRACKS BY
+         * - DISTANCE FROM KARTER
+         * - IF THEY FOLLOW SAID TRACK
+         * - HOW MANY FRIENDS ARE LOCAL TO SAID TRACK
+         * - HOW MANY PEOPLE FOLLOW SAID TRACK
+         * - NUMBER OF BLOG POSTS TAGGING SAID TRACK
+         * - NUMBER OF TIMES USER HAS INTERACTED WITH SAID TRACK (BLOG, UPVOTES, FOLLOW, COMMENTS)
+         * 
+         * 
+         * 
+         * 
+         * 
+         */
     }
 }

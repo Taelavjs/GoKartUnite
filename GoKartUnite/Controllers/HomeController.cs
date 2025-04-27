@@ -27,13 +27,15 @@ namespace GoKartUnite.Controllers
         private readonly IRelationshipHandler _friends;
         private readonly IBlogHandler _blog;
         private readonly IKarterHandler _karter;
+        private readonly ITrackHandler _track;
 
-        public HomeController(ILogger<HomeController> logger, IKarterHandler karters, IRelationshipHandler friends, IBlogHandler blog)
+        public HomeController(ITrackHandler track, ILogger<HomeController> logger, IKarterHandler karters, IRelationshipHandler friends, IBlogHandler blog)
         {
             _logger = logger;
             _friends = friends;
             _blog = blog;
             _karter = karters;
+            _track = track;
         }
         [AllowAnonymous]
         public async Task<IActionResult> Index()
@@ -45,6 +47,7 @@ namespace GoKartUnite.Controllers
             List<BlogPost> blogPosts = new List<BlogPost>();
 
             Karter k = await _karter.GetUserByGoogleId(await _karter.GetCurrentUserNameIdentifier(User), withTrack: true);
+
             if (k != null)
             {
                 List<Karter> friends = await _friends.GetAllFriends(k.Id);
@@ -62,9 +65,7 @@ namespace GoKartUnite.Controllers
             }
 
 
-
-
-
+            await _track.CalculateRecommendedTracksForUser(k.Id);
             return View(await _blog.GetModelToView(blogPosts));
 
         }

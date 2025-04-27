@@ -21,6 +21,8 @@ namespace GoKartUnite.Interfaces
         Task<bool> SetTrackToBeVerified(string TrackName, string GooglePlacesId, string FormattedLocation, Coordinates GeoCoords, string Description);
         Task<List<Track>> GetUnverifiedTracksAdmin();
         Task<bool> VerifyTrack(int trackId);
+        Task CalculateRecommendedTracksForUser(int userId);
+
 
     }
 }

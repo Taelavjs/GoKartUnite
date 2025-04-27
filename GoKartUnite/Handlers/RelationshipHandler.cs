@@ -23,11 +23,12 @@ namespace GoKartUnite.Handlers
 
         public async Task<List<Karter>> GetAllFriends(int id)
         {
-            List<Friendships> friends = _context.Friendships
+            List<Friendships> friends = await _context.Friendships
                 .Include(k => k.KarterFirst)
                 .Include(k => k.KarterSecond)
                 .Where(k => (k.KarterFirstId == id || k.KarterSecondId == id) && k.accepted)
-                .ToList();
+                .AsNoTracking()
+                .ToListAsync();
             List<Karter> result = new List<Karter>();
 
             foreach (var friend in friends)
