@@ -1,4 +1,5 @@
-﻿using GoKartUnite.Data;
+﻿using GoKartUnite.Controllers;
+using GoKartUnite.Data;
 using GoKartUnite.Interfaces;
 using GoKartUnite.Models;
 using GoKartUnite.ViewModel;
@@ -155,7 +156,7 @@ namespace GoKartUnite.Handlers
             return await GetVerifiedTracks().Where(t => t.Id == id).SingleAsync();
         }
 
-        public async Task<bool> SetTrackToBeVerified(string TrackName, string GooglePlacesId, string FormattedLocation, string Description)
+        public async Task<bool> SetTrackToBeVerified(string TrackName, string GooglePlacesId, string FormattedLocation, Coordinates GeoCoords, string Description)
         {
             if (await _context.Track.AnyAsync(x => x.GooglePlacesId == GooglePlacesId))
             {
@@ -177,6 +178,8 @@ namespace GoKartUnite.Handlers
                     Location = Locations.NORTH,
                     Description = Description,
                     IsVerifiedByAdmin = false,
+                    Latitude = GeoCoords.Latitude,
+                    Longitude = GeoCoords.Longitude,
                 };
                 await _context.Track.AddAsync(trackToAddNonVerified);
                 await _context.SaveChangesAsync();
@@ -207,6 +210,9 @@ namespace GoKartUnite.Handlers
             return true;
         }
 
+        public async Task CalculateRecommendedTracksForUser(int uid)
+        {
 
+        }
     }
 }

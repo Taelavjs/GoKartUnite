@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using GoKartUnite.Controllers;
+using System.ComponentModel.DataAnnotations;
 
 namespace GoKartUnite.Models
 {
@@ -13,12 +14,13 @@ namespace GoKartUnite.Models
         public bool IsVerifiedByAdmin { get; set; } = false;
         public string FormattedGoogleLocation { get; set; } = string.Empty;
         public string GooglePlacesId { get; set; } = string.Empty;
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
         // Relationships
         public virtual ICollection<Karter> Karters { get; set; } = new List<Karter>();
         public virtual ICollection<BlogPost> BlogPosts { get; set; } = new List<BlogPost>();
         public virtual ICollection<KarterTrackStats> KarterStats { get; set; } = new List<KarterTrackStats>();
         public virtual ICollection<FollowTrack> Followers { get; set; } = new List<FollowTrack>();
-
     }
 
     public enum Locations

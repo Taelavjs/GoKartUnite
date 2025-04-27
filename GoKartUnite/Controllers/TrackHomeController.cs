@@ -218,7 +218,7 @@ namespace GoKartUnite.Controllers
 
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Add("X-Goog-Api-Key", apiKey);
-            client.DefaultRequestHeaders.Add("X-Goog-FieldMask", "places.displayName,places.formattedAddress,places.id");
+            client.DefaultRequestHeaders.Add("X-Goog-FieldMask", "places.displayName,places.formattedAddress,places.id,places.location");
 
             var response = await client.PostAsync(url, content);
 
@@ -233,8 +233,9 @@ namespace GoKartUnite.Controllers
 
             var placeDTOs = placesResponse.Places.Select(p => new PlaceDTO
             {
-                Name = p.DisplayName.Text,  // Or any other logic for the nested property
+                Name = p.DisplayName.Text,
                 Location = p.FormattedAddress,
+                GeoCoordinates = p.GeoCoordinates,
                 Id = p.Id
             }).ToList();
 
@@ -255,7 +256,7 @@ namespace GoKartUnite.Controllers
                 {
                     return BadRequest(new { success = false, message = "Track ID is not recognised in session storage" });
                 }
-                res = await _tracks.SetTrackToBeVerified(placeSelected.Name, placeSelected.Id, placeSelected.Location, "Short Description as an example");
+                res = await _tracks.SetTrackToBeVerified(placeSelected.Name, placeSelected.Id, placeSelected.Location, placeSelected.GeoCoordinates, "Short Description as an example");
 
             }
             catch (Exception err)
@@ -284,6 +285,8 @@ namespace GoKartUnite.Controllers
 
         [JsonProperty("id")]
         public required string Id { get; set; }
+        [JsonProperty("location")]
+        public Coordinates GeoCoordinates { get; set; }
     }
     public class DisplayName
     {
@@ -293,11 +296,27 @@ namespace GoKartUnite.Controllers
         [JsonProperty("languageCode")]
         public required string LanguageCode { get; set; }
     }
+
+    public class Coordinates
+    {
+        public Coordinates()
+        {
+            Latitude = 0;
+            Longitude = 0;
+        }
+        [JsonProperty("latitude")]
+        public double Latitude { get; set; }
+
+        [JsonProperty("longitude")]
+        public double Longitude { get; set; }
+    }
     [Serializable]
     public class PlaceDTO
     {
         public required string Name { get; set; }
         public required string Location { get; set; }
         public required string Id { get; set; }
+        public required Coordinates GeoCoordinates { get; set; }
     }
+
 }
