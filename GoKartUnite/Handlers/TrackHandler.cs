@@ -214,6 +214,7 @@ namespace GoKartUnite.Handlers
         {
             await GetCloseFriendsScore(userId);
             await GetClosenessScore(userId);
+            await GetInteractionScore(userId);
         }
         public static double DistanceBetween(double lat1, double lon1, double lat2, double lon2)
         {
@@ -286,6 +287,28 @@ namespace GoKartUnite.Handlers
                     ClosenessScore = Math.Max(minScore, Math.Min(10, 10 - ((DistanceBetween(t.Longitude, t.Latitude, userTrackObj.Longitude, userTrackObj.Latitude) - minDistance) / (maxDistance - minDistance)) * (10 - minScore) + minScore)),
                     DistanceDebug = DistanceBetween(t.Latitude, t.Longitude, userTrackObj.Latitude, userTrackObj.Longitude)
                 });
+
+        }
+
+        private async Task GetInteractionScore(int userId)
+        {
+
+            var userTrackObj = await _context.Karter
+                .Where(t => t.Id == userId)
+                .Include(x => x.Comments)
+                .Select(k => new
+                {
+                    CommentCounts = k.Comments
+                    .Where(c => c.BlogPost.TaggedTrack != null)
+                    .GroupBy(c => c.BlogPost.TaggedTrackId)
+                    .Select(group => new
+                    {
+                        TaggedTrackId = group.Key,
+                        CommentCount = group.Count()
+                    })
+                    .ToList()
+                }).SingleOrDefaultAsync();
+
 
         }
 

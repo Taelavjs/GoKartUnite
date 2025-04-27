@@ -32,17 +32,7 @@ namespace GoKartUnite.Data
 
 
             // ---------- Comment ----------
-            modelBuilder.Entity<Comment>()
-                .HasOne(c => c.Author)
-                .WithMany()
-                .HasForeignKey(c => c.AuthorId)
-                .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Comment>()
-                .HasOne(c => c.BlogPost)
-                .WithMany(bp => bp.Comments)
-                .HasForeignKey(c => c.BlogPostId)
-                .OnDelete(DeleteBehavior.Restrict);
 
             // ---------- FollowTrack ----------
             modelBuilder.Entity<FollowTrack>()
