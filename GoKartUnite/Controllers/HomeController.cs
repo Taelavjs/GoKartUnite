@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using GoKartUnite.DataFilterOptions;
 using Microsoft.Extensions.Configuration.UserSecrets;
 using GoKartUnite.Interfaces;
+using PartialViewResult = Microsoft.AspNetCore.Mvc.PartialViewResult;
 
 namespace GoKartUnite.Controllers
 {
@@ -65,8 +66,25 @@ namespace GoKartUnite.Controllers
             }
 
 
-            await _track.CalculateRecommendedTracksForUser(k.Id);
-            return View(await _blog.GetModelToView(blogPosts));
+            List<int> trackIdsRecommended = await _track.CalculateRecommendedTracksForUser(k.Id);
+            List<PartialViewResult> views = new List<PartialViewResult>();
+            List<Track> tracks = new List<Track>();
+
+            foreach (var id in trackIdsRecommended)
+            {
+                var track = await _track.GetTrackById(id);
+                tracks.Add(track);
+            }
+            var t = await _track.ModelToView(tracks);
+
+            var homepg = new HomePageData
+            {
+                Posts = await _blog.GetModelToView(blogPosts),
+                Tracks = t
+            };
+
+
+            return View(homepg);
 
         }
 
@@ -125,5 +143,13 @@ namespace GoKartUnite.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Index", "Home");
         }
+
+
+    }
+
+    class HomePageData
+    {
+        public List<BlogPostView> Posts { get; set; } = new List<BlogPostView>();
+        public List<TrackView> Tracks { get; set; } = new List<TrackView>();
     }
 }

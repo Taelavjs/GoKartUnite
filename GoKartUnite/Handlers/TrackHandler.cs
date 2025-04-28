@@ -3,7 +3,9 @@ using GoKartUnite.Data;
 using GoKartUnite.Interfaces;
 using GoKartUnite.Models;
 using GoKartUnite.ViewModel;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using NuGet.DependencyResolver;
 using System.Collections.Generic;
 using System.Web.Mvc;
@@ -210,11 +212,39 @@ namespace GoKartUnite.Handlers
             return true;
         }
 
-        public async Task CalculateRecommendedTracksForUser(int userId)
+        public async Task<List<int>> CalculateRecommendedTracksForUser(int userId)
         {
-            await GetCloseFriendsScore(userId);
-            await GetClosenessScore(userId);
-            await GetInteractionScore(userId);
+            List<HomeTrackRankScoreCard> scoresRanking = new List<HomeTrackRankScoreCard>();
+
+            scoresRanking.AddRange(await GetCloseFriendsScore(userId));
+            scoresRanking.AddRange(await GetClosenessScore(userId));
+            scoresRanking.AddRange(await GetInteractionScore(userId));
+            Dictionary<int, double> TrackIdsToScore = new Dictionary<int, double>();
+
+            foreach (var Groups in scoresRanking.GroupBy(x => x.TrackId))
+            {
+                double totalScore = 0;
+
+                foreach (var scoreCard in Groups)
+                {
+                    switch (scoreCard.ScoreType)
+                    {
+                        case ScoreCardTypes.LocationDistance:
+                            totalScore += scoreCard.Score * 0.5;
+                            break;
+                        case ScoreCardTypes.FriendsNearToTrack:
+                            totalScore += scoreCard.Score * 1.0;
+                            break;
+                        case ScoreCardTypes.CommentsOnTrackInBlog:
+                            totalScore += scoreCard.Score * 0.8;
+                            break;
+                    }
+                }
+
+                TrackIdsToScore[Groups.Key] = totalScore;
+            }
+
+            return TrackIdsToScore.OrderByDescending(x => x.Value).Where(x => x.Value > 0.3).Select(x => x.Key).ToList();
         }
         public static double DistanceBetween(double lat1, double lon1, double lat2, double lon2)
         {
@@ -230,7 +260,7 @@ namespace GoKartUnite.Handlers
             var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
             return R * c;
         }
-        private async Task GetCloseFriendsScore(int userId)
+        private async Task<IEnumerable<HomeTrackRankScoreCard>> GetCloseFriendsScore(int userId)
         {
             double nearbyRadiusKm = 50;
             var friendInfos = await _context.Friendships
@@ -252,25 +282,27 @@ namespace GoKartUnite.Handlers
             var tracks = await _context.Track.AsNoTracking().ToListAsync();
 
             var tracksWithFriendCounts = tracks
-                .Select(t => new
+                .Select(t => new HomeTrackRankScoreCard
                 {
-                    Track = t,
-                    FriendsNearby = friendInfos
+                    TrackId = t.Id,
+                    Score = Math.Min(friendInfos
                         .Where(friend => DistanceBetween(
                             t.Latitude, t.Longitude,
                             friend.LocalTrackCoordinates.Latitude, friend.LocalTrackCoordinates.Longitude
                         ) <= nearbyRadiusKm)
-                        .Count()
+                        .Count(), friendInfos.Count()) / Math.Max(1, friendInfos.Count()),
+                    ScoreType = ScoreCardTypes.FriendsNearToTrack
                 })
-                .ToList();
+                ;
+
+            return tracksWithFriendCounts;
         }
 
-
-        private async Task GetClosenessScore(int userId)
+        private async Task<IEnumerable<HomeTrackRankScoreCard>> GetClosenessScore(int userId)
         {
             double minDistance = 10;
             double maxDistance = 95;
-            double minScore = 0.01;
+            double minScore = 0.1;
             var tracks = await _context.Track.AsNoTracking().ToListAsync();
             var userTrackObj = await _context.Karter
                 .Where(t => t.Id == userId)
@@ -281,16 +313,16 @@ namespace GoKartUnite.Handlers
                 })
                 .SingleOrDefaultAsync();
             var closeNessScores = tracks
-                .Select(t => new
+                .Select(t => new HomeTrackRankScoreCard
                 {
                     TrackId = t.Id,
-                    ClosenessScore = Math.Max(minScore, Math.Min(10, 10 - ((DistanceBetween(t.Longitude, t.Latitude, userTrackObj.Longitude, userTrackObj.Latitude) - minDistance) / (maxDistance - minDistance)) * (10 - minScore) + minScore)),
-                    DistanceDebug = DistanceBetween(t.Latitude, t.Longitude, userTrackObj.Latitude, userTrackObj.Longitude)
+                    Score = Math.Max(minScore, Math.Min(1, 1 - ((DistanceBetween(t.Longitude, t.Latitude, userTrackObj.Longitude, userTrackObj.Latitude) - minDistance) / (maxDistance - minDistance)) * (1 - minScore) + minScore)),
+                    ScoreType = ScoreCardTypes.LocationDistance,
                 });
-
+            return closeNessScores;
         }
 
-        private async Task GetInteractionScore(int userId)
+        private async Task<IEnumerable<HomeTrackRankScoreCard>> GetInteractionScore(int userId)
         {
 
             var userTrackObj = await _context.Karter
@@ -301,15 +333,16 @@ namespace GoKartUnite.Handlers
                     CommentCounts = k.Comments
                     .Where(c => c.BlogPost.TaggedTrack != null)
                     .GroupBy(c => c.BlogPost.TaggedTrackId)
-                    .Select(group => new
+                    .Select(group => new HomeTrackRankScoreCard
                     {
-                        TaggedTrackId = group.Key,
-                        CommentCount = group.Count()
+                        TrackId = group.Key ?? 0,
+                        Score = Math.Min(group.Count(), 10) / 10.0,
+                        ScoreType = ScoreCardTypes.CommentsOnTrackInBlog,
                     })
                     .ToList()
                 }).SingleOrDefaultAsync();
 
-
+            return userTrackObj?.CommentCounts ?? new List<HomeTrackRankScoreCard>();
         }
 
 
@@ -327,5 +360,20 @@ namespace GoKartUnite.Handlers
          * 
          * 
          */
+
+
+    }
+    class HomeTrackRankScoreCard
+    {
+        public int TrackId { get; set; }
+        public double Score { get; set; }
+        public ScoreCardTypes ScoreType { get; set; }
+    }
+
+    enum ScoreCardTypes
+    {
+        LocationDistance,
+        FriendsNearToTrack,
+        CommentsOnTrackInBlog
     }
 }

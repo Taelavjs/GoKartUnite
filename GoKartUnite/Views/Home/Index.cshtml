@@ -1,7 +1,8 @@
-﻿@{
+﻿@using GoKartUnite.Controllers
+@{
     ViewData["Title"] = "Home Page";
 }
-@model IEnumerable<GoKartUnite.ViewModel.BlogPostView>
+@model HomePageData
 
 <div class="text-center">
     <h1 class="display-4">Go Kart Unite</h1>
@@ -10,15 +11,23 @@
 <div class="container infiniteScrollDiv">
     @if (User.Identity.IsAuthenticated)
     {
-        @await Html.PartialAsync("~/Views/BlogHome/_Posts.cshtml", Model)
+        @await Html.PartialAsync("~/Views/BlogHome/_Posts.cshtml", Model.Posts)
     }
 </div>
 
-@await Html.PartialAsync("~/Views/BlogHome/_Modal.cshtml", Model)
+@await Html.PartialAsync("~/Views/BlogHome/_Modal.cshtml", Model.Posts)
+<div class="container">
+    @foreach (var view in Model.Tracks)
+    {
+        @await Html.PartialAsync("Track", view)
+    }
+</div>
+
 
 @section Scripts {
     <script src="~/js/Blog/UpvoteBlogPost.js" asp-append-version="true"></script>
     <script src="~/js/General/_InfiniteScroll.js" asp-append-version="true"></script>
     @await Html.PartialAsync("~/Views/BlogHome/_Scripts.cshtml")
+    <script src="/js/TrackDetails/FollowRequest.js"></script>
 
 }
