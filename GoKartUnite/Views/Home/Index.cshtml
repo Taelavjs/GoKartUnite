@@ -2,6 +2,8 @@
 @{
     ViewData["Title"] = "Home Page";
 }
+@using PagedList.Mvc;
+
 @model HomePageData
 
 <div class="text-center">
@@ -22,7 +24,21 @@
         @await Html.PartialAsync("Track", view)
     }
 </div>
+<div class="text-center">
+    <div class="pagination">
+        @if (Model.Tracks.PageNumber > 1)
+        {
+            <a href="@Url.Action("Index", new { pageNumber = Model.Tracks.PageNumber - 1 })"> Previous</a>
+        }
 
+        <span>Page @Model.Tracks.PageNumber of @Model.Tracks.PageCount</span>
+
+        @if (!Model.Tracks.IsLastPage)
+        {
+            <a href="@Url.Action("Index", new { pageNumber = Model.Tracks.PageNumber + 1 })">Next </a>
+        }
+    </div>
+</div>
 
 @section Scripts {
     <script src="~/js/Blog/UpvoteBlogPost.js" asp-append-version="true"></script>

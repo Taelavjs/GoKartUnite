@@ -19,6 +19,7 @@ using GoKartUnite.DataFilterOptions;
 using Microsoft.Extensions.Configuration.UserSecrets;
 using GoKartUnite.Interfaces;
 using PartialViewResult = Microsoft.AspNetCore.Mvc.PartialViewResult;
+using PagedList;
 
 namespace GoKartUnite.Controllers
 {
@@ -39,7 +40,7 @@ namespace GoKartUnite.Controllers
             _track = track;
         }
         [AllowAnonymous]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 6)
         {
             if (User.Identity == null || User.Identity.IsAuthenticated == false)
             {
@@ -80,7 +81,7 @@ namespace GoKartUnite.Controllers
             var homepg = new HomePageData
             {
                 Posts = await _blog.GetModelToView(blogPosts),
-                Tracks = t
+                Tracks = t.ToPagedList(pageNumber, pageSize),
             };
 
 
@@ -150,6 +151,6 @@ namespace GoKartUnite.Controllers
     class HomePageData
     {
         public List<BlogPostView> Posts { get; set; } = new List<BlogPostView>();
-        public List<TrackView> Tracks { get; set; } = new List<TrackView>();
+        public IPagedList<TrackView> Tracks { get; set; }
     }
 }
