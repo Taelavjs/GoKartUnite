@@ -20,6 +20,7 @@
                 <th>Blog Posts</th>
                 <th>Notifications</th>
                 <th>Stats</th>
+                <th>Delete</th>
             </tr>
         </thead>
         <tbody>
@@ -38,8 +39,17 @@
                     <td>@(item.BlogPosts)</td>
                     <td>@(item.Notification)</td>
                     <td>@(item.Stats)</td>
+                    <td>
+                        <button type="button" class="btn-danger deleteUser" data-userId="@item.Id">de</button>
+
+                </td>
                 </tr>
             }
         </tbody>
     </table>
 </div>
+
+               
+@section Scripts {
+    <script src="~/js/Admin/DeleteUser.js" asp-append-version="true"></script>
+}

@@ -353,5 +353,18 @@ namespace GoKartUnite.Handlers
                 .ToDictionaryAsync(x => x.Id, x => x.Title);
         }
 
+        public async Task<bool> DeleteUserAdmin(int id)
+        {
+            await _context.Friendships.Where(x => x.KarterSecondId == id || x.KarterSecondId == id).ExecuteDeleteAsync();
+            await _context.Groups.Where(x => x.HostId == id).ExecuteDeleteAsync();
+            await _context.Memberships.Where(x => x.KarterId == id).ExecuteDeleteAsync();
+            await _context.GroupMessages.Where(x => x.AuthorId == id).ExecuteDeleteAsync();
+            await _context.FollowTracks.Where(x => x.KarterId == id).ExecuteDeleteAsync();
+
+            await _context.Karter.Where(x => x.Id == id).ExecuteDeleteAsync();
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
     }
 }

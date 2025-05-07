@@ -32,6 +32,6 @@ namespace GoKartUnite.Interfaces
         Task<List<Models.Groups.Group>> GetAllUsersGroupsAdmin(int id);
         Task<List<GroupMessage>> GetUsersMessagesByGroup(int id, int groupId);
         Task<Dictionary<int, string>> GetUserGroupsList(int id);
-
+        Task<bool> DeleteUserAdmin(int id);
     }
 }

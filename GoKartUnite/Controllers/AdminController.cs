@@ -6,6 +6,7 @@ using GoKartUnite.Models;
 using GoKartUnite.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using SendGrid.Helpers.Mail;
+using System.Web.Helpers;
 using System.Web.Mvc;
 using HttpGetAttribute = Microsoft.AspNetCore.Mvc.HttpGetAttribute;
 using HttpPostAttribute = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
@@ -111,6 +112,20 @@ namespace GoKartUnite.Controllers
             return Json(new { succes = true, message = await _karter.GetUserGroupsList(karterId) });
         }
 
+        [HttpGet]
+        public async Task<IActionResult> DeleteKarterById(int id)
+        {
+            try
+            {
+                bool res = await _karter.DeleteUserAdmin(id);
+                return Json(new { success = res, message = "User Deleted Successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Server Error");
+            }
+
+        }
 
         private async Task<List<KarterAdminView>> KarterModelToAdminView(List<Karter> kartersList)
         {
