@@ -324,12 +324,12 @@ namespace GoKartUnite.Handlers
 
         public async Task<List<BlogPost>> GetAllUserPostsAdmin(int id)
         {
-            return await _context.BlogPosts.Where(k => k.KarterId == id).ToListAsync();
+            return await _context.BlogPosts.Include(k => k.Karter).Where(k => k.KarterId == id).ToListAsync();
         }
 
         public async Task<List<Comment>> GetAllUsersCommentsAdmin(int id)
         {
-            return await _context.Comments.Where(k => k.AuthorId == id).ToListAsync();
+            return await _context.Comments.Include(k => k.BlogPost).Include(k => k.Author).Where(k => k.AuthorId == id).ToListAsync();
         }
 
         public async Task<List<Models.Groups.Group>> GetAllUsersGroupsAdmin(int id)
