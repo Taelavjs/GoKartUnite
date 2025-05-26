@@ -3,6 +3,7 @@ using GoKartUnite.DataFilterOptions;
 using GoKartUnite.Handlers;
 using GoKartUnite.Interfaces;
 using GoKartUnite.Models;
+using GoKartUnite.Projection.Admin;
 using GoKartUnite.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using SendGrid.Helpers.Mail;
@@ -102,6 +103,7 @@ namespace GoKartUnite.Controllers
         [HttpGet]
         public async Task<IActionResult> GetKarterMessagesInGroup(int karterId, int groupId)
         {
+            List<AdminGroupMessage> groupMessages = await _karter.GetUsersMessagesByGroup(karterId, groupId);
             return PartialView("_KarterMessagesByGroup", await _karter.GetUsersMessagesByGroup(karterId, groupId));
         }
 
