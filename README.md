@@ -53,7 +53,10 @@ Welcome to the **Karter Social Media Platform**, a web application built with AS
 5. **Add New Tracks:**
    - Can't find a track? Submit a request to add it to the platform.
    - Admins verify and approve new tracks from the Google Places API.
-
+     
+5. **Algorithmic Content:**
+   - Ranked track recommendation system based on friends local track, distances to tracks, blog interaction and distance.
+     
 ### Backend & API Integrations
 - **Google Places API:** Used for fetching track data when users submit new locations for approval.
 - **ASP.NET Core 8 MVC:** The backend is built with ASP.NET Core 8 MVC for a robust and scalable architecture.
