@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,5 +24,17 @@ namespace UnitTesting
         {
             return new Track { Title = initialName + iter, Location = location, IsVerifiedByAdmin = true };
         }
+    }
+
+    internal class ConstValues
+    {
+        static public Karter SelfKarter = new Karter
+        {
+            Email = "dummy@example.com",
+            NameIdentifier = "123",
+            Name = "Dummy Karter",
+            YearsExperience = 3,
+            TrackId = null
+        };
     }
 }

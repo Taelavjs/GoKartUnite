@@ -24,9 +24,9 @@ namespace UnitTesting
         {
             var claims = new[]
             {
-            new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
-            new Claim(ClaimTypes.Name, "test@example.com"),
-            new Claim(ClaimTypes.Email, "test@example.com"),
+            new Claim(ClaimTypes.NameIdentifier, ConstValues.SelfKarter.NameIdentifier),
+            new Claim(ClaimTypes.Name, ConstValues.SelfKarter.Name),
+            new Claim(ClaimTypes.Email, ConstValues.SelfKarter.Email),
             new Claim(ClaimTypes.Role, "Admin") // or "Admin", etc.
         };
 

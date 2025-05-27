@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using System.Linq;
+using Microsoft.AspNetCore.Hosting.Server;
+using GoKartUnite.Models;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace UnitTesting
 {
@@ -54,6 +57,27 @@ namespace UnitTesting
                 db.Database.EnsureCreated();
 
             });
+        }
+        public async Task SeedUserProfileAsync()
+        {
+            using var scope = Services.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<GoKartUniteContext>();
+            dbContext.Comments.RemoveRange(dbContext.Comments);
+            dbContext.BlogPosts.RemoveRange(dbContext.BlogPosts);
+            dbContext.Karter.RemoveRange(dbContext.Karter);
+            dbContext.BlogNotifications.RemoveRange(dbContext.BlogNotifications);
+            dbContext.BlogPosts.RemoveRange(dbContext.BlogPosts);
+            dbContext.FollowTracks.RemoveRange(dbContext.FollowTracks);
+            dbContext.Role.RemoveRange(dbContext.Role);
+            dbContext.Friendships.RemoveRange(dbContext.Friendships);
+            dbContext.Track.RemoveRange(dbContext.Track);
+            dbContext.TrackAdmin.RemoveRange(dbContext.TrackAdmin);
+            dbContext.UserRoles.RemoveRange(dbContext.UserRoles);
+            dbContext.SaveChanges();
+
+            dbContext.Karter.Add(ConstValues.SelfKarter);
+
+            await dbContext.SaveChangesAsync();
         }
     }
 }
