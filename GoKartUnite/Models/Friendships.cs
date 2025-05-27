@@ -20,21 +20,24 @@ namespace GoKartUnite.Models
         public int requestedByInt { get; set; }
 
         public bool accepted { get; set; } = false;
-        public Friendships(int karterFirstId, int karterSecondId)
+
+        public Friendships() { }
+
+        public Friendships(int SentByKarterId, int ToKarterId)
         {
-            if (karterFirstId > karterSecondId)
+            requestedByInt = SentByKarterId;
+            if (SentByKarterId > ToKarterId)
             {
-                KarterFirstId = karterSecondId;
-                KarterSecondId = karterFirstId;
+                KarterFirstId = ToKarterId;
+                KarterSecondId = SentByKarterId;
             }
             else
             {
-                KarterFirstId = karterFirstId;
-                KarterSecondId = karterSecondId;
+                KarterFirstId = SentByKarterId;
+                KarterSecondId = ToKarterId;
             }
             DateCreated = DateOnly.FromDateTime(DateTime.Now);
         }
-
-
     }
+
 }

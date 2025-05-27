@@ -1,0 +1,68 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model List<GoKartUnite.ViewModel.ListedGroupView>
+
+@foreach (GoKartUnite.ViewModel.ListedGroupView content in Model)
+{
+    <div class="card-body mb-1 border-bottom" id="group-@content.Id">
+        <h5 class="card-title">
+
+            <a class="link-dark link-offset-2 link-underline-opacity-0 link-underline-opacity-100-hover" href="/group/home?groupid=@content.Id">
+                @content.Name
+            </a>
+        </h5>
+        <p class="card-text">@content.Description</p>
+        <div class="d-flex flex-wrap justify-content-between text-muted mb-2">
+            <div>
+                <i class="bi bi-person-circle"></i> Leader: @await Html.PartialAsync("_UserProfileNameWithPreview", @content.LeaderName);
+            </div>
+            <div><i class="bi bi-calendar"></i> Created: @content.DateCreated.ToString("yyyy-MM-dd")</div>
+            <div><i class="bi bi-people"></i> Members: <span id="members-count-@content.Id">@content.NumberMembers</span></div>
+
+            @if (!content.isOwner)
+            {
+                <div id="group-actions-@content.Id">
+                    @if (!content.isMember)
+                    {
+                        <form class="JoinGroupRequest" data-url="@Url.Action("JoinGroup", "Group")" data-groupId="@content.Id">
+                            <button type="submit" class="btn btn-primary btn-sm">Join</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form class="LeaveGroupRequest mx-lg-auto" data-url="@Url.Action("LeaveGroup", "Group")" data-groupId="@content.Id">
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="bi bi-bookmark-star-fill"></i>
+                            </button>
+                        </form>
+
+                    }
+                </div>
+            }
+            else
+            {
+                <div>Owner</div>
+            }
+        </div>
+    </div>
+
+}
+
+@section Scripts {
+    <script src="~/js/GroupContent/GroupListPage.js" asp-append-version="true"></script>
+}
+
+<template id="join-group-template">
+    <form class="JoinGroupRequest mx-lg-auto" data-url="@Url.Action("JoinGroup", "Group")" data-groupId="">
+        <button type="submit" class="btn btn-primary btn-sm">Join</button>
+    </form>
+</template>
+
+<template id="leave-group-template">
+    <form class="LeaveGroupRequest mx-lg-auto" data-url="@Url.Action("LeaveGroup", "Group")" data-groupId="">
+        <button type="submit" class="btn btn-primary btn-sm">
+            <i class="bi bi-bookmark-star-fill"></i>
+        </button>
+    </form>
+</template>

@@ -2,10 +2,21 @@
 
 @foreach (var post in Model)
 {
-        <div class="post" data-postid="@post.Id" data-lastcommentid="0">
+    <div class="post h-100 p-3 border-bottom d-flex flex-column gap-2" style="color: black;" data-postid="@post.Id" data-lastcommentid="0">
         @await Html.PartialAsync("Blog", post)
-            <button data-postid="@post.Id" class="commentBtn">Comments</button>
-            <div class="comment-section-@post.Id comment"></div>
-            <button class="create-comment-btn btn-primary" data-postid="@post.Id">Create Comment</button>
+
+        <div class="d-flex align-items-center gap-2 mt-3">
+            <input id="CommentInput-@post.Id" type="text" class="CommentInput w-100" />
+            <button data-postid="@post.Id" class="btn btn-outline-success btn-sm create-comment-btn">
+                <i class="bi bi-plus-square"></i>
+            </button>
         </div>
+        <div class="d-flex align-items-center gap-2 mt-2 w-100 justify-content-center">
+            <button data-postid="@post.Id" class="btn btn-info btn-sm commentBtn">
+                <i class="bi bi-chat w-100 p-5"></i>
+            </button>
+        </div>
+
+        @await Html.PartialAsync("_BlogFetchCommentsTemplate", post.Id)
+    </div>
 }

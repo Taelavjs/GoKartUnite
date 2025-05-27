@@ -17,50 +17,75 @@ using HttpPostAttribute = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
 using Microsoft.AspNetCore.RateLimiting;
 using GoKartUnite.DataFilterOptions;
 using Microsoft.Extensions.Configuration.UserSecrets;
+using GoKartUnite.Interfaces;
+using PartialViewResult = Microsoft.AspNetCore.Mvc.PartialViewResult;
+using PagedList;
 
 namespace GoKartUnite.Controllers
 {
     public class HomeController : Microsoft.AspNetCore.Mvc.Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly RelationshipHandler _friends;
-        private readonly BlogHandler _blog;
-        private readonly KarterHandler _karters;
+        private readonly IRelationshipHandler _friends;
+        private readonly IBlogHandler _blog;
+        private readonly IKarterHandler _karter;
+        private readonly ITrackHandler _track;
 
-        public HomeController(ILogger<HomeController> logger, KarterHandler karters, RelationshipHandler friends, BlogHandler blog)
+        public HomeController(ITrackHandler track, ILogger<HomeController> logger, IKarterHandler karters, IRelationshipHandler friends, IBlogHandler blog)
         {
             _logger = logger;
             _friends = friends;
             _blog = blog;
-            _karters = karters;
+            _karter = karters;
+            _track = track;
         }
         [AllowAnonymous]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 6)
         {
             if (User.Identity == null || User.Identity.IsAuthenticated == false)
             {
                 return View();
             }
-            Karter k = await _karters.getUserByGoogleId(User.Claims
-.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
-            List<Karter> friends = await _friends.getAllFriends(k.Id);
             List<BlogPost> blogPosts = new List<BlogPost>();
 
-            foreach (var friend in friends)
+            Karter k = await _karter.GetUserByGoogleId(await _karter.GetCurrentUserNameIdentifier(User), withTrack: true);
+
+            if (k != null)
             {
-                BlogFilterOptions filter = new BlogFilterOptions
+                List<Karter> friends = await _friends.GetAllFriends(k.Id);
+                foreach (var friend in friends)
                 {
-                    UserIdFilter = friend.Id,
-                    IncludeUpvotes = true
+                    BlogFilterOptions filter = new BlogFilterOptions
+                    {
+                        UserIdFilter = friend.Id,
+                        IncludeUpvotes = true
 
-                };
-                blogPosts.AddRange(await _blog.GetAllPosts(filter));
+                    };
+                    blogPosts.AddRange(await _blog.GetAllPosts(filter));
+                }
+                blogPosts = blogPosts.OrderByDescending(x => x.DateTimePosted).ToList();
             }
-            blogPosts = blogPosts.OrderByDescending(x => x.DateTimePosted).ToList();
 
 
+            List<int> trackIdsRecommended = await _track.CalculateRecommendedTracksForUser(k.Id);
+            List<PartialViewResult> views = new List<PartialViewResult>();
+            List<Track> tracks = new List<Track>();
 
-            return View(await _blog.getModelToView(blogPosts));
+            foreach (var id in trackIdsRecommended)
+            {
+                var track = await _track.GetTrackById(id);
+                tracks.Add(track);
+            }
+            var t = await _track.ModelToView(tracks);
+
+            var homepg = new HomePageData
+            {
+                Posts = await _blog.GetModelToView(blogPosts),
+                Tracks = t.ToPagedList(pageNumber, pageSize),
+            };
+
+
+            return View(homepg);
 
         }
 
@@ -70,9 +95,8 @@ namespace GoKartUnite.Controllers
         [EnableRateLimiting("slidingPolicy")]
         public async Task<IActionResult> InfiniteScroll(int pagesScrolled = 0)
         {
-            Karter k = await _karters.getUserByGoogleId(User.Claims
-.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value, withTrack: true);
-            List<Karter> friends = await _friends.getAllFriends(k.Id);
+            Karter k = await _karter.GetUserByGoogleId(await _karter.GetCurrentUserNameIdentifier(User), withTrack: true);
+            List<Karter> friends = await _friends.GetAllFriends(k.Id);
             List<BlogPost> blogPosts = new List<BlogPost>();
 
             foreach (var friend in friends)
@@ -86,7 +110,7 @@ namespace GoKartUnite.Controllers
                 blogPosts.AddRange(await _blog.GetAllPosts(filter));
             }
             blogPosts = blogPosts.OrderByDescending(x => x.DateTimePosted).ToList();
-            return PartialView("~/Views/BlogHome/_Posts.cshtml", await _blog.getModelToView(blogPosts));
+            return PartialView("~/Views/BlogHome/_Posts.cshtml", await _blog.GetModelToView(blogPosts));
         }
 
         public IActionResult Privacy()
@@ -120,5 +144,13 @@ namespace GoKartUnite.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Index", "Home");
         }
+
+
+    }
+
+    class HomePageData
+    {
+        public List<BlogPostView> Posts { get; set; } = new List<BlogPostView>();
+        public IPagedList<TrackView> Tracks { get; set; }
     }
 }

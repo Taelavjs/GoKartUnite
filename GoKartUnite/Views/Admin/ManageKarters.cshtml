@@ -1,0 +1,55 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model List<GoKartUnite.ViewModel.KarterAdminView>
+<div class="container" style="color: white; max-width:100%; overflow-x:auto;"W>
+    <table class="table table-bordered mt-4 w-100 text-white" >
+        <thead class="table-dark">
+            <tr>
+                <th>Id</th>
+                <th>Email</th>
+                <th>Name Identifier</th>
+                <th>Name</th>
+                <th>Years Experience</th>
+                <th>Track Id</th>
+                <th>Track Name</th>
+                <th>User Roles</th>
+                <th>Friendships</th>
+                <th>Blog Posts</th>
+                <th>Notifications</th>
+                <th>Stats</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.Email</td>
+                    <td>@item.NameIdentifier</td>
+                    <td><a asp-action="ManageUser" asp-route-id="@item.Id">@item.Name</a>        </td>
+                    <td>@item.YearsExperience</td>
+                    <td>@item.TrackId</td>
+                    <td>@item.Track?.Title</td>
+                    <td>@(item.UserRoles)</td>
+                    <td>@(item.Friendships)</td>
+                    <td>@(item.BlogPosts)</td>
+                    <td>@(item.Notification)</td>
+                    <td>@(item.Stats)</td>
+                    <td>
+                        <button type="button" class="btn-danger deleteUser" data-userId="@item.Id">de</button>
+
+                </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+               
+@section Scripts {
+    <script src="~/js/Admin/DeleteUser.js" asp-append-version="true"></script>
+}

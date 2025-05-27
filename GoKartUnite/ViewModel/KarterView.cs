@@ -16,7 +16,7 @@ namespace GoKartUnite.ViewModel
         public int YearsExperience { get; set; }
         [Display(Name = "Local Track Id")]
         public Track? LocalTrack { get; set; }
-        public int TrackId { get; set; }
+        public int? TrackId { get; set; }
 
         public FriendshipStatus FriendStatus { get; set; } = FriendshipStatus.User;
     }

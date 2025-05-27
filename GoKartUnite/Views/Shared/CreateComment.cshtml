@@ -1,17 +1,18 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@model GoKartUnite.ViewModel.CommentView
-        <form asp-action="CreateComment">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Text" class="control-label"></label>
-                <input asp-for="Text" class="form-control" />
-                <span asp-validation-for="Text" class="text-danger"></span>
+﻿@model GoKartUnite.ViewModel.CommentView
 
-                <input type="hidden" asp-for="blogId" value="@Model.blogId" />
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+<form asp-action="CreateComment" class="p-2 border rounded shadow-sm bg-light">
+    <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+
+    <div class="input-group w-100 h-25 d-flex flex-column justify-content-start align-items-between">
+        <textarea asp-for="Text" class="form-control form-control-sm border-0 shadow-sm w-100 mb-2" 
+                  placeholder="Leave a comment..." rows="3"></textarea>
+
+        <button type="submit" class="btn btn-primary btn-sm w-100">
+            <i class="bi bi-caret-right-fill"></i>
+        </button>
+    </div>
+
+    <span asp-validation-for="Text" class="text-danger small"></span>
+
+    <input type="hidden" asp-for="blogId" value="@Model.blogId" />
+</form>

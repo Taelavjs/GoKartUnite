@@ -1,0 +1,30 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@model GoKartUnite.Models.Track
+
+<tr style="color:white;" id="@Model.Id">
+    <td>
+        @Model.Id
+    </td>
+    <td>
+        @Model.Title
+    </td>
+    <td>
+        @Model.FormattedGoogleLocation
+    </td>
+    <td>
+        @Model.Description
+    </td>
+    <td>
+        @Model.GooglePlacesId
+    </td>
+    <td style="color: white;">
+        <i class="bi p-2 bi-check VerifyTrackBtn" data-TrackId="@Model.Id"></i>
+        <i class="bi p-2 bi-backspace-reverse RemoveVerifyTrack" data-TrackId="@Model.Id"></i>
+    </td>
+</tr>
+

@@ -1,0 +1,90 @@
+﻿
+@model GoKartUnite.ViewModel.GroupHomeView
+
+<div class="container-fluid d-flex flex-column h-100 p-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card p-3 shadow-sm">
+                <h3>@Model.Group.Name</h3>
+                <p class="text-muted mb-2">@Model.Group.Description</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="badge bg-info text-dark p-2">Members: @Model.Group.MemberCount</span>
+                    <span class="badge bg-secondary text-light p-2">Owner: @Model.Group.CreatorName</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <h5>Group Members</h5>
+            <ul class="list-unstyled">
+                @foreach (var member in Model.Members)
+                {
+                    <li>@member.Name</li>
+                }
+            </ul>
+        </div>
+    </div>
+    <div class="row w-100">
+        <div class="col-12 w-100 chat-container border rounded p-3" style="max-height: 35vh; overflow-y: auto;" id="chatContainer">
+            @foreach (var message in Model.Group.Comments)
+            {
+                <div class="message-bubble mb-2">
+                    <div class="fw-bold">
+                        @await Html.PartialAsync("_UserProfileNameWithPreview", @message.AuthorName)
+                        </div>
+                    <div class="text-muted small">@message.TimeSent.TimeOfDay.ToString(@"hh\:mm\:ss")</div>
+                    <div class="message-content">@message.MessageContent</div>
+                </div>
+            }
+        </div>
+    </div>
+    <form id="messageForm">
+        @Html.AntiForgeryToken()
+        <div class="input-group mb-3 mt-2">
+            <input type="text" class="form-control" placeholder="Message --->" id="MessageInput">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" id="MessageInputButton">Button</button>
+            </div>
+        </div>
+    </form>
+    <div hidden class="alert alert-primary" role="alert" id="MessageErrorDiv">
+    </div>
+    <select class="form-select" id="groupStatTrackSelect">
+        @foreach (var track in Model.TrackTitles)
+        {
+            <option value="@track">@track</option>
+        }
+    </select>
+    <div style="position: relative;">
+        <div class="w-100 text-center d-flex justify-content-center align-items-center" id="GroupStatGraphLoading" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;">
+            <div class="spinner-border" role="status">
+                <span class="sr-only"></span>
+            </div>
+        </div>
+        <canvas id="acquisitions" data-groupId="@Model.Group.Id"></canvas>
+    </div>
+
+
+
+</div>
+
+<script>
+    const chatContainer = document.getElementById('chatContainer');
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+</script>
+
+@section Scripts
+{
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="~/js/GroupContent/GroupStatPage.js" asp-append-version="true"></script>
+    <script src="~/js/GroupContent/Messaging.js" asp-append-version="true"></script>
+}
+<template id="messageTemplate">
+    <div class="message-bubble mb-2">
+        <div class="fw-bold message-sender"></div>
+        <div class="text-muted small message-time"></div>
+        <div class="message-content"></div>
+    </div>
+</template>

@@ -1,50 +1,35 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model GoKartUnite.ViewModel.BlogPostView
 
-@model GoKartUnite.Models.BlogPost
-
-<h1>@ViewData["Title"]</h1>
-
-<h4>Blog Create</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
+<div class="w-100">
+    <div class="w-100">
+        <form id="blogPostForm" data-ajax="true" data-ajax-method="POST" data-ajax-update="#response" data-ajax-mode="replace">
             @Html.AntiForgeryToken()
 
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
+
+            <div class="form-group mb-2">
+                <input asp-for="Title" class="form-control form-control-lg" placeholder="Enter Title" id="Title" />
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Descripttion" class="control-label"></label>
-                <input asp-for="Descripttion" class="form-control" />
-                <span asp-validation-for="Descripttion" class="text-danger"></span>
-            </div>
-            <div class="form-group">
 
-                <label asp-for="TaggedTrack">Select Track</label>
-                <select asp-for="TaggedTrack" class="form-control">
-                    <option value="">-- Select a Track --</option>
-                    @foreach (var item in ViewBag.TrackTitles)
+            <div class="form-group mb-2">
+                <textarea asp-for="Description" class="form-control" rows="5" placeholder="Enter Description" id="Description"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-group d-flex justify-content-center align-items-center gap-3 h-100 p-2">
+                <select id="TaggedTrackTitle" name="TaggedTrackTitle" class="form-control">
+                    <option value="">-- Select Track --</option>
+                    @foreach (var item in ViewBag.AllTracks)
                     {
-                        <option value="@item">@item</option>
+                        <option value="@item.Title">@item.Title</option>
                     }
                 </select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+
+                <button type="submit" id="createPostBtn" class="btn btn-primary">Create</button>
             </div>
         </form>
+
+        <div id="response"></div> 
     </div>
 </div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-

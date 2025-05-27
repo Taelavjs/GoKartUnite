@@ -1,0 +1,21 @@
+﻿@model List<GoKartUnite.Projection.Admin.AdminGroupMessage>
+
+<table class="table table-sm table-striped table-bordered align-middle">
+    <thead class="table-light">
+        <tr>
+            <th>Username</th>
+            <th>Message</th>
+            <th>Date Posted</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var message in Model)
+        {
+            <tr class="text-white">
+                <td>@message.Username</td>
+                <td>@message.MessageContent</td>
+                <td>@message.DateSent.ToString("g")</td>
+            </tr>
+        }
+    </tbody>
+</table>

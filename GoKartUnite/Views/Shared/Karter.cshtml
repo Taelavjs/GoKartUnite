@@ -3,40 +3,53 @@
 *@
 @using GoKartUnite.ViewModel
 
-@model GoKartUnite.ViewModel.KarterView
+@model List<GoKartUnite.ViewModel.KarterView>
 
-<tr>
-    <td>@Model.Name</td>
-    <td>@Model.YearsExperience</td>
-    <td>@(Model.LocalTrack == null ? "MISSING" : Model.LocalTrack.Title)</td>
-    <td>
-        <form asp-controller="KarterHome" asp-action="HandleFriendRequest" asp-route-friendId="@Model.Id" method="post" style="display:inline;">
-            @Html.AntiForgeryToken()
-            @switch (Model.FriendStatus)
-            {
-                case FriendshipStatus.Requested:
-                    <button type="submit" name="action" value="Accept" class="btn btn-success">Accept Friend</button>
-                    break;
-                case FriendshipStatus.Friend:
-                    <button type="submit" name="action" value="Remove" class="btn btn-danger">Remove Friend</button>
-                    break;
-                case FriendshipStatus.Received:
-                    <button type="submit" name="action" value="Cancel" class="btn btn-danger">Cancel Request</button>
-                    break;
-                default:
-                    <button type="submit" name="action" value="Add" class="btn btn-danger">Add Friend</button>
-                    break;
-            }
-        </form>
-    </td>
-    @if(User.IsInRole("Admin")){
-                <td><a asp-action="Create" asp-route-id="@Model.Id">Edit</a></td>
-        <td>
-            <form asp-action="Delete" asp-route-id="@Model.Id" method="post" style="display:inline;">
-                @Html.AntiForgeryToken()
-                <input type="submit" value="Delete" class="btn btn-danger" />
-            </form>
+@foreach (var karter in Model)
+{
+        <tr>
+        <td>@karter.Name</td>
+        <td>@karter.YearsExperience</td>
+                <td>@(karter.LocalTrack == null ? "MISSING" : @karter.LocalTrack.Title)</td>
+        <td class="text-center align-middle">
+
+            @await Html.PartialAsync("_KarterFriendshipButton", new GoKartUnite.ViewModel.KarterFriendshipButtonView{
+                friendId = karter.Id,
+                Status = karter.FriendStatus
+            })
+            @* <form asp-controller="KarterHome" asp-action="HandleFriendRequest" asp-route-friendId="@karter.Id" method="post" *@
+            @* class="w-100 h-100 text-center align-middle"> *@
+            @*     @switch (@karter.FriendStatus) *@
+            @*     { *@
+            @*         case FriendshipStatus.Received: *@
+            @*                         <button type="submit" name="action" value="Accept" class="btn-sm btn-success">Accept</button> *@
+            @*             break; *@
+            @*         case FriendshipStatus.Friend: *@
+            @*                         <button type="submit" name="action" value="Remove" class="btn-sm btn-danger">Remove</button> *@
+            @*             break; *@
+            @*         case FriendshipStatus.Requested: *@
+            @*                         <button type="submit" name="action" value="Cancel" class="btn-sm btn-secondary">Cancel</button> *@
+            @*             break; *@
+            @*         default: *@
+            @*                         <button type="submit" name="action" value="Add" class="btn-sm btn-info">Add</button> *@
+            @*             break; *@
+            @*     } *@
+            @* </form> *@
         </td>
-    }
+        @*
+        @if (User.IsInRole("Admin"))
+        {
+                    <td class="d-flex justify-content-around align-items-center">
+                        <a asp-action="Create" asp-route-id="karter.Id"><i class="bi bi-pencil-square"></i></a>
+                    <form asp-action="Delete" asp-route-id="karter.Id" method="post" style="display:inline;">
+                    @Html.AntiForgeryToken()
+                        <button type="submit" class="border-0 bg-transparent p-0 text-danger">
+                            <i class="bi bi-x-lg"></i>                
+                        </button>            
+                    </form>
+                </td>
+        }
+        *@
+    </tr>
+}
 
-</tr>

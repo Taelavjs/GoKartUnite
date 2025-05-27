@@ -19,21 +19,20 @@
 
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11">
 
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
-		<PackageReference Include="SendGrid" Version="9.29.3" />
-		<PackageReference Include="X.PagedList" Version="8.4.7" />
-	</ItemGroup>
-	<ItemGroup>
-		<Folder Include="wwwroot\lib\microsoft\" />
-	</ItemGroup>
-	<ItemGroup>
-		<None Include="wwwroot\js\_InfiniteScroll.js" />
-	</ItemGroup>
-	<ItemGroup>
-		<InternalsVisibleTo Include="GoKartUnite.IntegrationTests" />
-	</ItemGroup>
-
+		<PrivateAssets>all</PrivateAssets>
+	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
+	<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
+	<PackageReference Include="NonFactors.Grid.Core.Mvc6" Version="8.0.0" />
+	<PackageReference Include="PagedList" Version="1.17.0" />
+	<PackageReference Include="PagedList.Mvc" Version="4.5.0" />
+	<PackageReference Include="SendGrid" Version="9.29.3" />
+	<PackageReference Include="X.PagedList" Version="8.4.7" />
+  </ItemGroup>
+  <ItemGroup>
+	<Folder Include="wwwroot\lib\microsoft\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="wwwroot\js\General\_InfiniteScroll.js" />
+  </ItemGroup>
 </Project>

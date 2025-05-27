@@ -7,62 +7,75 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/GoKartUnite.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/Blog.css" asp-append-version="true" />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
+    @Html.AntiForgeryToken()
+
     <header>
         <nav class="nav_bar navBarDyn navbar navbar-dark navbar-expand fixed-bottom">
             <div class="container-fluid justify-content-around">
                 <a data-page="KarterHome" asp-area="" asp-controller="KarterHome" asp-action="Index" class="textEven navbar-brand">
-                    <i class="bi bi-house"></i>
-                    K
+                    <i class="bi bi-person-fill"></i>
                 </a>
                 <a data-page="TrackHome" asp-area="" asp-controller="TrackHome" asp-action="Index" class="textEven navbar-brand">
-                    T
+                    <i class="bi bi-rocket-takeoff"></i>
                 </a>
                 <a data-page="" asp-area="" asp-controller="Home" asp-action="Index" class="textEven navbar-brand">
-                    H
+                    <i class="bi bi-house"></i>
                 </a>
                 <a data-page="BlogHome" asp-area="" asp-controller="BlogHome" asp-action="Index" class="textEven navbar-brand">
-                    B<div id="notifCount">0</div>
+                    <i class="bi bi-chat-text"></i><div id="notifCount">0</div>
+                </a>                
+                <a data-page="GroupHome" asp-area="" asp-controller="Group" asp-action="Index" class="textEven navbar-brand">
+                    Groups
                 </a>
-                @* <a data-page="Home" asp-area="" asp-controller="Home" asp-action="Index" class="textEven navbar-brand" > *@
-                @*     N *@
-                @* </a> *@
             </div>
         </nav>
     </header>
 
-    <div class="container">
-        <main role="main" class="pb-3">
+    <div class="container pb-5">
+        <main role="main" class="pb-5">
             @RenderBody()
         </main>
     </div>
-
-
+    <div class="floating-alerts position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
+        <div id="VerifySuccesAlert" class="alert alert-success d-none shadow" role="alert">
+            ✅ Track verified successfully!
+        </div>
+        <div id="VerifyFailAlert" class="alert alert-danger d-none shadow" role="alert">
+            ❌ Failed to verify the track. Please try again.
+        </div>
+    </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.19.0/jquery.validate.min.js"></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate.unobtrusive/3.2.5/jquery.validate.unobtrusive.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" integrity="sha512-ZwR1/gSZM3ai6vCdI+LVF1zSq/5HznD3ZSTk7kajkaj4D292NLuduDCO1c/NT8Id+jE58KYLKT7hXnbtryGmMg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="~/js/General/SuccessFailAlert.js" asp-append-version="true"></script>
+
     <script src="~/js/signalr/dist/browser/signalr.js"></script>
-    <script src="~/js/NotifBar.js" asp-append-version="true"></script>
+    <script src="~/js/General/NotifBar.js" asp-append-version="true"></script>
+    <script src="~/js/Site.js"></script>
+    <script src="~/js/ProfileHover.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hind+Vadodara:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-    $(document).ready(function () {
-        var currentPath = window.location.pathname.toLowerCase();
-                console.log(currentPath);
 
-        $('a[data-page]').each(function () {
-            var pageValue = $(this).data('page').toLowerCase();
-            if (currentPath == "/" + pageValue) {
-                $(this).addClass('activeColor'); 
-            } else {
-                $(this).removeClass('activeColor'); 
-            }
-        });
-    });
-</script>
+    <div id="hover-card-container" class="mb-5 border-0 shadow-sm" style="color: black;display: none; position: absolute; z-index: 1000;">
+        <div id="profileLoaded">
+
+        </div>
+        <div id="profileLoading" class="spinner-border" role="status">
+            <span class="sr-only"></span>
+        </div>
+    </div>
+
+
 </body>
+
 </html>

@@ -16,6 +16,8 @@ using System.Security.Claims;
 using System.Diagnostics;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
+using GoKartUnite.Interfaces;
+using GoKartUnite.Hubs;
 
 
 namespace GoKartUnite
@@ -28,16 +30,31 @@ namespace GoKartUnite
             builder.Services.AddDbContext<GoKartUniteContext>(options =>
                             options.UseSqlServer(builder.Configuration.GetConnectionString("GoKartUniteContext") ?? throw new InvalidOperationException("Connection string 'GoKartUniteContext' not found.")));
             builder.Services.AddSignalR();
-            builder.Services.AddTransient<RelationshipHandler>();
-            builder.Services.AddTransient<KarterHandler>();
-            builder.Services.AddTransient<TrackHandler>();
-            builder.Services.AddTransient<BlogHandler>();
-            builder.Services.AddTransient<FollowerHandler>();
-            builder.Services.AddTransient<NotificationHandler>();
-            builder.Services.AddTransient<RoleHandler>();
+            builder.Services.AddScoped<IRelationshipHandler, RelationshipHandler>();
+            builder.Services.AddScoped<IKarterHandler, KarterHandler>();
+            builder.Services.AddScoped<ITrackHandler, TrackHandler>();
+            builder.Services.AddScoped<IBlogHandler, BlogHandler>();
+            builder.Services.AddScoped<IFollowerHandler, FollowerHandler>();
+            builder.Services.AddScoped<INotificationHandler, NotificationHandler>();
+            builder.Services.AddScoped<IRoleHandler, RoleHandler>();
+            builder.Services.AddScoped<IKarterStatHandler, KarterStatHandler>();
+            builder.Services.AddScoped<IGroupHandler, GroupHandler>();
+            builder.Logging.AddConsole();
             builder.Services.AddControllers().AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             );
+
+            // SESSION STATE +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
+            builder.Services.AddDistributedMemoryCache();
+
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromSeconds(300);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+            // +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+
             builder.Services.AddRateLimiter(_ => _
                 .AddFixedWindowLimiter(policyName: "fixed", options =>
                 {
@@ -95,7 +112,7 @@ namespace GoKartUnite
                         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                         options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
                     })
-                    .AddCookie() // Cookie-based authentication for maintaining login session
+                    .AddCookie()
                     .AddGoogle(googleOptions =>
                     {
                         googleOptions.ClientId = configuration["ClientId"];
@@ -126,7 +143,6 @@ namespace GoKartUnite
 
                         };
                     });
-            // Add services to the container.
             builder.Services.AddControllersWithViews();
             var app = builder.Build();
 
@@ -135,24 +151,22 @@ namespace GoKartUnite
                 KeepAliveInterval = TimeSpan.FromMinutes(2)
             };
 
-            // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-            // WEBSOCKETS +_+_+_+_+_+_+_+_+_+_+_+_+_+_
-
-            // +_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+
             app.UseAuthentication();
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseSession();
             app.UseRateLimiter();
             app.UseAuthorization();
+            app.MapHub<ChatHub>("/chatHub");
+
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
@@ -163,6 +177,7 @@ namespace GoKartUnite
                 //dummyDbData(context);
                 //dummyDbComments(context);
             }
+
             app.Run();
         }
 
@@ -173,18 +188,18 @@ namespace GoKartUnite
             {
                 BlogPost post = new BlogPost
                 {
-                    AuthorId = 4041,
+                    KarterId = 4041,
                     Title = "NewestPost",
-                    Descripttion = "This is for NewBuckmore",
+                    Description = "This is for NewBuckmore",
                     TaggedTrackId = 1014
                 };
 
                 context.BlogPosts.Add(post);
                 BlogPost post2 = new BlogPost
                 {
-                    AuthorId = 4033,
+                    KarterId = 4033,
                     Title = "NewestPost",
-                    Descripttion = "This is for Alt",
+                    Description = "This is for Alt",
                     TaggedTrackId = 1016
                 };
 

@@ -1,4 +1,6 @@
-﻿namespace GoKartUnite.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace GoKartUnite.Models
 {
     public class Comment
     {
@@ -7,10 +9,12 @@
 
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
-        public int AuthorId { get; set; }
 
+        public int AuthorId { get; set; }
+        [ForeignKey("AuthorId")]
+        public virtual Karter Author { get; set; }
         public int BlogPostId { get; set; }
-        public virtual Karter? Author { get; set; }
-        public virtual BlogPost? BlogPost { get; set; }
+        [ForeignKey("BlogPostId")]
+        public virtual BlogPost BlogPost { get; set; }
     }
 }

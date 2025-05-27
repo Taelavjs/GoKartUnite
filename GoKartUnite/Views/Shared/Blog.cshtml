@@ -5,23 +5,26 @@
 
 @model GoKartUnite.ViewModel.BlogPostView
 
-        <div class="blog-post">
-            <div class="blog-post-title">@Model.Title</div>
-            <div class="blog-post-author">By: @Model.Author</div>
-            <div class="blog-post-description">@Model.Descripttion</div>
-    @if (!string.IsNullOrWhiteSpace(@Model.TaggedTrack))
+<div class="blog-post">
+    <div class="blog-post-title d-flex justify-content-between align-items-end">@Model.Title 
+        @if(User.IsInRole("Admin")){
+            <a asp-action="Create" asp-route-id="@Model.Id"><i class="bi bi-pencil-square fs-4"></i></a>
+        }
+    </div>
+    <div class="blog-post-author">By: @await Html.PartialAsync("_UserProfileNameWithPreview", @Model.Author?.Name)</div>
+    <div class="blog-post-description">@Model.Description</div>
+    @if (!string.IsNullOrWhiteSpace(@Model.TaggedTrack?.Title))
     {
-                <div class="blog-post-description">@Model.TaggedTrack</div>
+            <div class="blog-post-description">@Model.TaggedTrack.Title</div>
     }
-            <div class="blog-post-upvotes">
-                <span>Upvotes: @Model.Upvotes</span>
-                <button
-                type="button"
-                class="upvote-btn"
-                data-id="@Model.Id"
-                data-upvoteCount="@Model.Upvotes"
-                >
-                    Upvote
-                </button>
-            </div>
-        </div>
+    <div class="blog-post-upvotes w-100 d-flex justify-content-between align-items-end">
+        <span><div><i class="bi bi-chevron-up"></i><div id="UpvoteCounter-@Model.Id">@Model.Upvotes</div></div></span>
+        <button
+            type="button"
+            class="upvote-btn"
+            data-id="@Model.Id"
+            data-upvoteCount="@Model.Upvotes">
+            <i class="bi bi-hand-thumbs-up-fill"></i>
+        </button>
+    </div>
+</div>

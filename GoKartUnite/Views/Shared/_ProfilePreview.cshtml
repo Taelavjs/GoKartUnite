@@ -1,0 +1,28 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@model GoKartUnite.ViewModel.KarterProfilePreview
+<div class="profile-section">
+    <div class="profile-header">
+        <div class="profile-image"></div>
+        <div class="profile-details">
+            <div class="profile-name">
+                <a asp-controller="KarterHome" asp-action="Index" asp-route-kartersName="@Model.Name">
+                    @Model.Name
+                </a>
+            </div>
+            <div class="profile-info">
+                <div><label>Local Track:</label> @Model.LocalTrack</div>
+            </div>
+            <div>
+                @await Html.PartialAsync("_KarterFriendshipButton", new GoKartUnite.ViewModel.KarterFriendshipButtonView{
+                    Status = Model.isFriend,
+                    friendId = Model.Id
+                })
+            </div>
+        </div>
+    </div>
+</div>

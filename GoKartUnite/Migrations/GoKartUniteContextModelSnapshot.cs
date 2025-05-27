@@ -30,10 +30,10 @@ namespace GoKartUnite.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AuthorId")
+                    b.Property<int>("BlogID")
                         .HasColumnType("int");
 
-                    b.Property<int>("BlogID")
+                    b.Property<int?>("KarterId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("createdAt")
@@ -47,9 +47,11 @@ namespace GoKartUnite.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AuthorId");
-
                     b.HasIndex("BlogID");
+
+                    b.HasIndex("KarterId");
+
+                    b.HasIndex("userId");
 
                     b.ToTable("BlogNotifications", "dbo");
                 });
@@ -62,15 +64,15 @@ namespace GoKartUnite.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AuthorId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("DateTimePosted")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Descripttion")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("KarterId")
+                        .HasColumnType("int");
 
                     b.Property<int>("PostType")
                         .HasColumnType("int");
@@ -84,7 +86,7 @@ namespace GoKartUnite.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AuthorId");
+                    b.HasIndex("KarterId");
 
                     b.HasIndex("TaggedTrackId");
 
@@ -168,6 +170,104 @@ namespace GoKartUnite.Migrations
                     b.ToTable("Friendships");
                 });
 
+            modelBuilder.Entity("GoKartUnite.Models.Groups.Group", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("HostId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HostId");
+
+                    b.ToTable("Groups");
+                });
+
+            modelBuilder.Entity("GoKartUnite.Models.Groups.GroupMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateTimePosted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("GroupCommentOnId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("MessageContent")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("GroupCommentOnId");
+
+                    b.ToTable("GroupMessages");
+                });
+
+            modelBuilder.Entity("GoKartUnite.Models.Groups.GroupNotification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("StatId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StatId");
+
+                    b.ToTable("GroupNotifications");
+                });
+
+            modelBuilder.Entity("GoKartUnite.Models.Groups.Membership", b =>
+                {
+                    b.Property<int>("GroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("KarterId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MemberRole")
+                        .HasColumnType("int");
+
+                    b.HasKey("GroupId", "KarterId");
+
+                    b.HasIndex("KarterId");
+
+                    b.ToTable("Memberships");
+                });
+
             modelBuilder.Entity("GoKartUnite.Models.Karter", b =>
                 {
                     b.Property<int>("Id")
@@ -199,6 +299,51 @@ namespace GoKartUnite.Migrations
                     b.ToTable("Karter");
                 });
 
+            modelBuilder.Entity("GoKartUnite.Models.KarterTrackStats", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<TimeSpan>("BestLapTime")
+                        .HasColumnType("time");
+
+                    b.Property<DateOnly>("DateOnlyRecorded")
+                        .HasColumnType("date");
+
+                    b.Property<int>("KarterId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RaceLength")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RaceName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TEMPERATURE")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TrackId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WEATHERSTATUS")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("isChampionshipRace")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KarterId");
+
+                    b.HasIndex("TrackId");
+
+                    b.ToTable("KarterTrackStats");
+                });
+
             modelBuilder.Entity("GoKartUnite.Models.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -228,8 +373,25 @@ namespace GoKartUnite.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("FormattedGoogleLocation")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GooglePlacesId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsVerifiedByAdmin")
+                        .HasColumnType("bit");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("float");
+
                     b.Property<int>("Location")
                         .HasColumnType("int");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -269,9 +431,6 @@ namespace GoKartUnite.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("KarterId")
-                        .HasColumnType("int");
-
                     b.Property<int>("PostId")
                         .HasColumnType("int");
 
@@ -280,9 +439,9 @@ namespace GoKartUnite.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("KarterId");
-
                     b.HasIndex("PostId");
+
+                    b.HasIndex("VoterId");
 
                     b.ToTable("Upvotes");
                 });
@@ -312,14 +471,20 @@ namespace GoKartUnite.Migrations
 
             modelBuilder.Entity("GoKartUnite.Models.BlogNotifications", b =>
                 {
-                    b.HasOne("GoKartUnite.Models.Karter", "Author")
-                        .WithMany("Notification")
-                        .HasForeignKey("AuthorId");
-
                     b.HasOne("GoKartUnite.Models.BlogPost", "LinkedPost")
                         .WithMany()
                         .HasForeignKey("BlogID")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GoKartUnite.Models.Karter", null)
+                        .WithMany("Notification")
+                        .HasForeignKey("KarterId");
+
+                    b.HasOne("GoKartUnite.Models.Karter", "Author")
+                        .WithMany()
+                        .HasForeignKey("userId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Author");
@@ -329,9 +494,9 @@ namespace GoKartUnite.Migrations
 
             modelBuilder.Entity("GoKartUnite.Models.BlogPost", b =>
                 {
-                    b.HasOne("GoKartUnite.Models.Karter", "Author")
+                    b.HasOne("GoKartUnite.Models.Karter", "Karter")
                         .WithMany("BlogPosts")
-                        .HasForeignKey("AuthorId")
+                        .HasForeignKey("KarterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -339,7 +504,7 @@ namespace GoKartUnite.Migrations
                         .WithMany("BlogPosts")
                         .HasForeignKey("TaggedTrackId");
 
-                    b.Navigation("Author");
+                    b.Navigation("Karter");
 
                     b.Navigation("TaggedTrack");
                 });
@@ -347,7 +512,7 @@ namespace GoKartUnite.Migrations
             modelBuilder.Entity("GoKartUnite.Models.Comment", b =>
                 {
                     b.HasOne("GoKartUnite.Models.Karter", "Author")
-                        .WithMany()
+                        .WithMany("Comments")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -368,13 +533,13 @@ namespace GoKartUnite.Migrations
                     b.HasOne("GoKartUnite.Models.Karter", "karter")
                         .WithMany()
                         .HasForeignKey("KarterId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("GoKartUnite.Models.Track", "track")
-                        .WithMany()
+                        .WithMany("Followers")
                         .HasForeignKey("TrackId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("karter");
@@ -405,13 +570,93 @@ namespace GoKartUnite.Migrations
                     b.Navigation("KarterSecond");
                 });
 
+            modelBuilder.Entity("GoKartUnite.Models.Groups.Group", b =>
+                {
+                    b.HasOne("GoKartUnite.Models.Karter", "HostKarter")
+                        .WithMany()
+                        .HasForeignKey("HostId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("HostKarter");
+                });
+
+            modelBuilder.Entity("GoKartUnite.Models.Groups.GroupMessage", b =>
+                {
+                    b.HasOne("GoKartUnite.Models.Karter", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GoKartUnite.Models.Groups.Group", "GroupCommentedOn")
+                        .WithMany("GroupMessages")
+                        .HasForeignKey("GroupCommentOnId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+
+                    b.Navigation("GroupCommentedOn");
+                });
+
+            modelBuilder.Entity("GoKartUnite.Models.Groups.GroupNotification", b =>
+                {
+                    b.HasOne("GoKartUnite.Models.KarterTrackStats", "Stat")
+                        .WithMany()
+                        .HasForeignKey("StatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Stat");
+                });
+
+            modelBuilder.Entity("GoKartUnite.Models.Groups.Membership", b =>
+                {
+                    b.HasOne("GoKartUnite.Models.Groups.Group", "Group")
+                        .WithMany("MemberKarters")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GoKartUnite.Models.Karter", "User")
+                        .WithMany()
+                        .HasForeignKey("KarterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("GoKartUnite.Models.Karter", b =>
                 {
                     b.HasOne("GoKartUnite.Models.Track", "Track")
                         .WithMany("Karters")
-                        .HasForeignKey("TrackId");
+                        .HasForeignKey("TrackId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Track");
+                });
+
+            modelBuilder.Entity("GoKartUnite.Models.KarterTrackStats", b =>
+                {
+                    b.HasOne("GoKartUnite.Models.Karter", "ForKarter")
+                        .WithMany("Stats")
+                        .HasForeignKey("KarterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GoKartUnite.Models.Track", "RecordedTrack")
+                        .WithMany("KarterStats")
+                        .HasForeignKey("TrackId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ForKarter");
+
+                    b.Navigation("RecordedTrack");
                 });
 
             modelBuilder.Entity("GoKartUnite.Models.TrackAdmins", b =>
@@ -427,14 +672,16 @@ namespace GoKartUnite.Migrations
 
             modelBuilder.Entity("GoKartUnite.Models.Upvotes", b =>
                 {
-                    b.HasOne("GoKartUnite.Models.Karter", "Karter")
-                        .WithMany()
-                        .HasForeignKey("KarterId");
-
                     b.HasOne("GoKartUnite.Models.BlogPost", "Post")
                         .WithMany("Upvotes")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GoKartUnite.Models.Karter", "Karter")
+                        .WithMany()
+                        .HasForeignKey("VoterId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Karter");
@@ -468,13 +715,24 @@ namespace GoKartUnite.Migrations
                     b.Navigation("Upvotes");
                 });
 
+            modelBuilder.Entity("GoKartUnite.Models.Groups.Group", b =>
+                {
+                    b.Navigation("GroupMessages");
+
+                    b.Navigation("MemberKarters");
+                });
+
             modelBuilder.Entity("GoKartUnite.Models.Karter", b =>
                 {
                     b.Navigation("BlogPosts");
 
+                    b.Navigation("Comments");
+
                     b.Navigation("Friendships");
 
                     b.Navigation("Notification");
+
+                    b.Navigation("Stats");
 
                     b.Navigation("UserRoles");
                 });
@@ -482,6 +740,10 @@ namespace GoKartUnite.Migrations
             modelBuilder.Entity("GoKartUnite.Models.Track", b =>
                 {
                     b.Navigation("BlogPosts");
+
+                    b.Navigation("Followers");
+
+                    b.Navigation("KarterStats");
 
                     b.Navigation("Karters");
                 });

@@ -5,40 +5,42 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using GoKartUnite.CustomAttributes;
+using GoKartUnite.Interfaces;
 
 namespace GoKartUnite.Controllers
 {
+    [Authorize]
+    [AccountConfirmed]
     public class FollowTrackController : Controller
     {
-        private readonly FollowerHandler _follows;
-        private readonly KarterHandler _karters;
-        private readonly TrackHandler _tracks;
-        private readonly BlogHandler _blogs;
-        public FollowTrackController(FollowerHandler follows, BlogHandler blogs, KarterHandler karters, TrackHandler tracks)
+        private readonly IFollowerHandler _follows;
+        private readonly IKarterHandler _karter;
+        private readonly ITrackHandler _tracks;
+        private readonly IBlogHandler _blogs;
+
+        public FollowTrackController(IFollowerHandler follows, IBlogHandler blogs, IKarterHandler karters, ITrackHandler tracks)
         {
             _follows = follows;
-            _karters = karters;
+            _karter = karters;
             _tracks = tracks;
             _blogs = blogs;
         }
 
         [HttpGet]
-        [Authorize]
-        [AccountConfirmed]
-        public async Task<IActionResult> Index(string track, string fullUrl)
+
+        public async Task<IActionResult> Index(string track)
         {
-            string GoogleId = User.Claims
-    .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            Karter k = await _karters.getUserByGoogleId(GoogleId);
-            List<Track> T = await _tracks.getTracksByTitle(track);
+            string GoogleId = await _karter.GetCurrentUserNameIdentifier(User);
+            Karter k = await _karter.GetUserByGoogleId(GoogleId);
+            List<Track> T = await _tracks.GetTracksByTitle(track);
 
-            if (k == null && T.Count == 0)
+            if (k == null || T.Count == 0)
             {
-                return Ok();
+                return NotFound(new { success = false, message = "Bad Inputs" });
             }
-            await _follows.CreateFollow(k.Id, T[0].Id);
-            return Redirect(fullUrl);
-
+            bool success = await _follows.CreateFollow(k.Id, T[0].Id);
+            if (success) return Ok(new { success = true, message = "Successful follow requerst" });
+            return NotFound(new { success = false, message = "Bad Inputs" });
         }
     }
 }

@@ -1,14 +1,45 @@
-﻿
-@{
-    ViewData["Title"] = "Index";
+﻿@{
+	ViewData["Title"] = "Index";
 }
 
-<h1>Track Home</h1>
-<form asp-action="SearchTracks" method="get"> 
-    <label>Friends Name: <input type="text" name="trackSearched" /></label> 
-    @foreach (var location in Enum.GetValues(typeof(GoKartUnite.Models.Locations)))
-    {
-            <label>@location: <input type="checkbox" name="Location" value="@location" checked="true" /></label>
-    }
-    <input type="submit" value="Filter" /> 
-</form> 
+<div class="container py-5">
+	<h1>Track Home</h1>
+
+	<form asp-action="SearchTracks" method="get" class="p-3">
+		<div class="mb-3">
+			<label for="trackSearched" class="form-label fw-bold">Track Search</label>
+			<input type="text" class="form-control" id="trackSearched" name="trackSearched" placeholder="Enter Track Name">
+		</div>
+
+		<div class="d-flex align-items-center gap-3">
+			<div class="dropdown w-50">
+				<button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="locationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+					Select Locations
+				</button>
+				<ul class="dropdown-menu p-3" aria-labelledby="locationDropdown">
+					@foreach (var location in Enum.GetValues(typeof(GoKartUnite.Models.Locations)))
+					{
+						<li class="form-check">
+							<input class="form-check-input" type="checkbox" name="Location" value="@location" id="location_@location" checked>
+							<label class="form-check-label" for="location_@location">@location</label>
+						</li>
+					}
+				</ul>
+			</div>
+			<button type="submit" class="btn btn-primary px-4">Filter</button>
+		</div>
+	</form>
+</div>
+
+
+
+
+<script>
+	function closeDropdown() {
+		const dropdown = document.getElementById('locationDropdown');
+		if (dropdown) {
+			dropdown.click(); 
+		}
+	}
+</script>
+

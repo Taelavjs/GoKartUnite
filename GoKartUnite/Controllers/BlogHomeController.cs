@@ -1,7 +1,6 @@
 ﻿using GoKartUnite.CustomAttributes;
 using GoKartUnite.Handlers;
 using GoKartUnite.Models;
-using GoKartUnite.ViewModel;
 using GoKartUnite.DataFilterOptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
@@ -12,19 +11,25 @@ using Microsoft.AspNetCore.Authorization;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using GoKartUnite.DataFilterOptions;
 using System.Drawing.Printing;
+using GoKartUnite.Interfaces;
+using GoKartUnite.ViewModel;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.IdentityModel.Tokens;
 
 namespace GoKartUnite.Controllers
 {
+    [Authorize]
+    [AccountConfirmed]
     public class BlogHomeController : Controller
     {
-        private readonly BlogHandler _blog;
-        private readonly KarterHandler _karter;
+        private readonly IBlogHandler _blog;
+        private readonly IKarterHandler _karter;
 
-        private readonly TrackHandler _tracks;
-        private readonly NotificationHandler _notification;
-        private readonly RoleHandler _roles;
-        private readonly FollowerHandler _followerHandler;
-        public BlogHomeController(RoleHandler roles, TrackHandler tracks, FollowerHandler followerHandler, BlogHandler blog, KarterHandler karter, NotificationHandler notification)
+        private readonly ITrackHandler _tracks;
+        private readonly INotificationHandler _notification;
+        private readonly IRoleHandler _roles;
+        private readonly IFollowerHandler _followerHandler;
+        public BlogHomeController(IRoleHandler roles, ITrackHandler tracks, IFollowerHandler followerHandler, IBlogHandler blog, IKarterHandler karter, INotificationHandler notification)
         {
             _blog = blog;
             _karter = karter;
@@ -34,19 +39,16 @@ namespace GoKartUnite.Controllers
             _roles = roles;
         }
         [HttpGet]
-        [Authorize]
-        [AccountConfirmed]
-        public async Task<IActionResult> Index(int page = 1, string? track = null)
+
+        public async Task<IActionResult> Index(int page = 1, string track = null, string filterBy = "Recent")
         {
 
-            ViewBag.TotalPages = await _blog.getTotalPageCount();
+            ViewBag.TotalPages = await _blog.GetTotalPageCount();
             page = Math.Max(0, Math.Min(page, ViewBag.TotalPages));
-            string GoogleId = User.Claims
-                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            string GoogleId = await _karter.GetCurrentUserNameIdentifier(User);
 
-            Karter k = await _karter.getUserByGoogleId(GoogleId);
+            Karter k = await _karter.GetUserByGoogleId(GoogleId);
             List<BlogNotifications> notifications = await _notification.GetUserBlogNotifications(k.Id);
-            await _notification.setAllBlogNotifsViewed(k.Id);
             ViewBag.Notifcount = notifications.Count;
             ViewBag.NotifiedTracks = await _notification.GetAllUsersUnseenPosts(k.Id);
             page = Math.Min(page, ViewBag.TotalPages);
@@ -57,72 +59,86 @@ namespace GoKartUnite.Controllers
             {
                 PageSize = 10,
                 PageNo = page,
-                TrackNameFilter = track
+                TrackNameFilter = track,
+                IncludeAuthor = true,
+                IncludeTrack = true,
+                SortByPopular = filterBy == "Popular"
             };
 
             List<BlogPost> allPosts = await _blog.GetAllPosts(blogFilter);
             List<BlogPost> notifiedPosts = await _notification.GetAllUsersUnseenPosts(k.Id);
-            await _notification.setAllBlogNotifsViewed(k.Id);
+            await _notification.SetAllBlogNotifsViewed(k.Id);
             BlogPage blogPage = new BlogPage
             {
-                posts = await _blog.getModelToView(allPosts),
-                notifiedPosts = await _blog.getModelToView(notifiedPosts)
+                posts = await _blog.GetModelToView(allPosts),
+                notifiedPosts = await _blog.GetModelToView(notifiedPosts),
+                SortedBy = filterBy,
+                FilteredTrack = track
             };
+            ViewBag.AllTracks = await _tracks.ModelToView(await _tracks.GetAllTracks());
+
 
             return View(blogPage);
         }
 
-
-        [HttpGet]
-        [Authorize]
-        [AccountConfirmed]
-        public async Task<IActionResult> Create()
-        {
-            ViewBag.TrackTitles = await _tracks.GetAllTrackTitles();
-            return View();
-        }
-
         [HttpPost]
-        [Authorize]
-        [AccountConfirmed]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(BlogPostView post)
+        public async Task<IActionResult> Create(BlogPostView post, int id = -1)
         {
             if (!ModelState.IsValid)
             {
-                return RedirectToAction("Create");
+                var errors = ModelState.SelectMany(kv => kv.Value.Errors)
+                                       .Select(e => e.ErrorMessage)
+                                       .ToList();
+
+                return BadRequest(new { status = "error", message = errors });
+            }
+            string GoogleId = await _karter.GetCurrentUserNameIdentifier(User);
+            Karter k = await _karter.GetUserByGoogleId(GoogleId);
+
+            if (id != -1)
+            {
+                // EDITING AN ALREADY EXISTING POST
+                bool success = await _blog.UpdatePost(post, id, k.Id);
+                if (success) return Ok(new { status = "success", message = "Updated Blog post" });
+                return BadRequest(new { status = "fail", message = "Invalid Model State" });
             }
 
-            string GoogleId = User.Claims
-                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-
-            Karter k = await _karter.getUserByGoogleId(GoogleId);
             int postId;
-            if (post.TaggedTrack != "")
+            if (post.TaggedTrackTitle != string.Empty)
             {
-                Track taggedT = await _tracks.getSingleTrackByTitle(post.TaggedTrack);
-                postId = await _blog.addPost(post, k, taggedT);
+                Track taggedTrack = await _tracks.GetSingleTrackByTitle(post.TaggedTrackTitle);
+                post.Author = k;
+                post.authorId = k.Id;
+                post.TaggedTrack = taggedTrack;
+                postId = await _blog.AddPost(post);
             }
             else
             {
-                postId = await _blog.addPost(post, k);
+                post.Author = k;
+                post.authorId = k.Id;
+                return Ok(new { status = "success", message = "Created Blog Post" });
             }
-            int track = await _tracks.getTrackIdByTitle(post.TaggedTrack);
 
-            List<int> kartersWhoNeedNotif = await _followerHandler.AllUserIdsWhoFollowTrack(track);
-            if (post.TaggedTrack != "")
+            if (post.TaggedTrackTitle.IsNullOrEmpty())
+            {
+                return Ok(new { status = "success", message = "Created Blog Post With Tagged Track ANd Notifs" });
+            }
+            Track taggedT = await _tracks.GetSingleTrackByTitle(post.TaggedTrackTitle);
+
+            List<int> kartersWhoNeedNotif = await _followerHandler.AllUserIdsWhoFollowTrack(taggedT.Id);
+            if (post.TaggedTrackTitle != string.Empty)
             {
                 foreach (int kar in kartersWhoNeedNotif)
                 {
                     await _notification.CreateBlogNotification(kar, postId);
                 }
             }
-            return RedirectToAction("Index");
+            return Ok(new { status = "success", message = "Created Blog Post With Tagged Track ANd Notifs" });
         }
 
         [HttpGet]
-        [Authorize]
-        [AccountConfirmed]
+
         public async Task<IActionResult> CreateAdminPost(string trackTitle)
         {
             ViewBag.TrackTitle = trackTitle;
@@ -130,8 +146,6 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpPost]
-        [Authorize]
-        [AccountConfirmed]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateAdminPost(BlogPostView post)
         {
@@ -140,55 +154,55 @@ namespace GoKartUnite.Controllers
                 return View();
             }
 
-            string GoogleId = User.Claims
-                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            Karter k = await _karter.getUserByGoogleId(GoogleId);
-            int trackAdminIds = await _roles.getTrackUserTrackId(k.Id);
-            Track taggedT = await _tracks.getTrackById(trackAdminIds);
+            string GoogleId = await _karter.GetCurrentUserNameIdentifier(User);
+            Karter k = await _karter.GetUserByGoogleId(GoogleId);
+            int trackAdminIds = await _roles.GetTrackUserTrackId(k.Id);
+            Track taggedT = await _tracks.GetTrackById(trackAdminIds);
             post.blogType = BlogType.TrackNews;
-            int postId = await _blog.addPost(post, k, taggedT);
+
+            post.TaggedTrackTitle = taggedT.Title;
+            post.TaggedTrack = taggedT;
+            int postId = await _blog.AddPost(post);
 
             return RedirectToAction("Index", "BlogHome");
         }
 
         [HttpPost]
-        [Authorize]
-        [AccountConfirmed]
-        public async Task UpvoteBlog(int id)
+        public async Task<IActionResult> UpvoteBlog(int id)
         {
-            string GoogleId = User.Claims
-    .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            BlogPost post = await _blog.getPost(id, inclUpvotes: true);
-            Karter karter = await _karter.getUserByGoogleId(GoogleId);
+            string GoogleId = await _karter.GetCurrentUserNameIdentifier(User);
+            BlogPost post = await _blog.GetPost(id, new BlogPostFilterOptions { IncludeUpvotes = true });
+            Karter karter = await _karter.GetUserByGoogleId(GoogleId);
 
-            bool alreadyUpvoted = post.Upvotes
-                .Any(upvote => upvote.VoterId == karter.Id);
+            Upvotes upvote = post.Upvotes
+                .SingleOrDefault(upvote => upvote.VoterId == karter.Id);
+
+            bool alreadyUpvoted = upvote != null;
 
             if (alreadyUpvoted)
             {
-
-                return;
+                await _blog.DeleteUpvote(upvote);
+                return Ok(new { status = "success", message = -1 });
             }
-            var upvote = new Upvotes();
+            upvote = new Upvotes();
             upvote.PostId = id;
             upvote.VoterId = karter.Id;
-            await _blog.upvotePost(id, upvote);
+            bool success = await _blog.UpvotePost(id, upvote);
+
+            if (success) return Ok(new { status = "success", message = 1 });
+            return BadRequest(new { status = "fail", message = "Upvote could not be applied" });
         }
 
 
         [HttpGet]
-        [Authorize]
-        [AccountConfirmed]
         public async Task<ActionResult<IEnumerable<Comment>>> GetCommentsForBlog(int blogId, int lastCommentId)
         {
-            List<Comment> comments = await _blog.GetAllCommentsForPost(blogId, lastCommentId);
+            List<Comment> comments = await _blog.GetAllCommentsForPostAfterId(blogId, lastCommentId);
             return Ok(await _blog.CommentModelToView(comments));
         }
 
         [HttpGet]
-        [Authorize]
-        [AccountConfirmed]
-        public ActionResult CreateComment(int blogId)
+        public ActionResult CreateComment([FromBody] int blogId)
         {
             CommentView cv = new CommentView();
             cv.blogId = blogId;
@@ -196,31 +210,36 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpPost]
-        [Authorize]
-        [AccountConfirmed]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateComment(CommentView cv)
+        public async Task<IActionResult> CreateComment([FromBody] CreateCommentRequest comment)
         {
-            string GoogleId = User.Claims
-                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            string GoogleId = await _karter.GetCurrentUserNameIdentifier(User);
+            Karter k = await _karter.GetUserByGoogleId(GoogleId);
 
-            Karter k = await _karter.getUserByGoogleId(GoogleId);
-
-            Comment comment = new Comment
+            Comment commentModel = new Comment
             {
                 AuthorId = k.Id,
-                BlogPostId = cv.blogId ?? 0,
-                Text = cv.Text,
+                BlogPostId = comment.BlogId,
+                Text = comment.Comment,
             };
 
-            await _blog.CreateComment(comment);
-
-            string previousUrl = Request.Headers["Referer"].ToString();
-
-            return Redirect(previousUrl);
+            await _blog.CreateComment(commentModel);
+            return Ok(new { status = "success", message = "Comment Created Successfully" });
         }
 
 
 
+        public class CreateCommentRequest
+        {
+            public int BlogId { get; set; }
+            public string Comment { get; set; }
+        }
+    }
+
+    public class JsonObjectForCreatingPosts
+    {
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public string TaggedTrackTitle { get; set; }
     }
 }

@@ -1,11 +1,12 @@
 ﻿using GoKartUnite.Data;
+using GoKartUnite.Interfaces;
 using GoKartUnite.Models;
 using Microsoft.EntityFrameworkCore;
 using static System.Reflection.Metadata.BlobBuilder;
 
 namespace GoKartUnite.Handlers
 {
-    public class FollowerHandler
+    public class FollowerHandler : IFollowerHandler
     {
         private readonly GoKartUniteContext _context;
         public FollowerHandler(GoKartUniteContext context)
@@ -13,21 +14,29 @@ namespace GoKartUnite.Handlers
             _context = context;
         }
 
-        public async Task CreateFollow(int karterId, int trackId)
+        public async Task<bool> CreateFollow(int karterId, int trackId)
         {
-            FollowTrack follow = new FollowTrack(karterId, trackId);
-            if (await doesUserFollow(karterId, trackId))
+            try
             {
-                FollowTrack ftRemove = _context.FollowTracks.Find(karterId, trackId);
-                _context.FollowTracks.Remove(ftRemove);
+                FollowTrack follow = new FollowTrack(karterId, trackId);
+                if (await DoesUserFollow(karterId, trackId))
+                {
+                    FollowTrack ftRemove = _context.FollowTracks.Find(karterId, trackId);
+                    _context.FollowTracks.Remove(ftRemove);
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
+                await _context.FollowTracks.AddAsync(follow);
                 await _context.SaveChangesAsync();
-                return;
+                return true;
             }
-            await _context.FollowTracks.AddAsync(follow);
-            await _context.SaveChangesAsync();
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
-        public async Task<bool> doesUserFollow(int karterId, int trackId)
+        public async Task<bool> DoesUserFollow(int karterId, int trackId)
         {
             return await _context.FollowTracks.AnyAsync(x => x.KarterId == karterId && x.TrackId == trackId);
         }
@@ -48,7 +57,7 @@ namespace GoKartUnite.Handlers
             return Ids;
         }
 
-        public async Task<List<string>> getAllFollowedTracks(int userId)
+        public async Task<List<string>> GetAllFollowedTracks(int userId)
         {
             return await _context.FollowTracks.Where(k => k.KarterId == userId).Select(t => t.track.Title).ToListAsync();
         }

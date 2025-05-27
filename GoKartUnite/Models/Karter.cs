@@ -1,5 +1,4 @@
 ﻿using GoKartUnite.Data;
-using GoKartUnite.Migrations;
 using Humanizer.Localisation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
@@ -27,13 +26,12 @@ namespace GoKartUnite.Models
         public int? TrackId { get; set; }
         public Track? Track { get; set; }
 
-        public virtual ICollection<UserRoles>? UserRoles { get; set; }
-
-        public virtual ICollection<Friendships>? Friendships { get; set; }
-        public virtual ICollection<BlogPost>? BlogPosts { get; set; }
-        public ICollection<BlogNotifications>? Notification { get; set; }
-
-
+        public virtual List<UserRoles> UserRoles { get; set; } = new List<UserRoles>();
+        public virtual List<Friendships> Friendships { get; set; } = new List<Friendships>();
+        public virtual List<BlogPost> BlogPosts { get; set; } = new List<BlogPost>();
+        public virtual List<BlogNotifications> Notification { get; set; } = new List<BlogNotifications>();
+        public virtual List<KarterTrackStats> Stats { get; set; } = new List<KarterTrackStats>();
+        public virtual List<Comment> Comments { get; set; } = new List<Comment>();
     }
 
     public enum FriendshipStatus
@@ -41,7 +39,8 @@ namespace GoKartUnite.Models
         User,
         Requested,
         Received,
-        Friend
+        Friend,
+        UserSelf
     }
 
     public enum SortKartersBy

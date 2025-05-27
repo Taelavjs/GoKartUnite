@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using GoKartUnite.Models;
+using GoKartUnite.Models.Groups;
 using Microsoft.EntityFrameworkCore;
-using GoKartUnite.Models;
 
 namespace GoKartUnite.Data
 {
@@ -16,6 +13,38 @@ namespace GoKartUnite.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // ---------- BlogNotifications ----------
+            modelBuilder.Entity<BlogNotifications>()
+                .ToTable("BlogNotifications", "dbo");
+
+            modelBuilder.Entity<BlogNotifications>()
+                .HasOne(bn => bn.LinkedPost)
+                .WithMany()
+                .HasForeignKey(bn => bn.BlogID);
+
+            modelBuilder.Entity<BlogNotifications>()
+                .HasOne(bn => bn.Author)
+                .WithMany()
+                .HasForeignKey(bn => bn.userId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ---------- BlogPost ----------
+
+
+            // ---------- Comment ----------
+            modelBuilder.Entity<Comment>()
+                .HasOne(c => c.BlogPost)
+                .WithMany(b => b.Comments)
+                .HasForeignKey(c => c.BlogPostId)
+                .OnDelete(DeleteBehavior.Restrict);
+            // ---------- FollowTrack ----------
+            modelBuilder.Entity<FollowTrack>()
+                .HasKey(ft => new { ft.KarterId, ft.TrackId });
+
+            // ---------- Friendships ----------
+            modelBuilder.Entity<Friendships>()
+                .HasKey(f => new { f.KarterFirstId, f.KarterSecondId });
+
             modelBuilder.Entity<Friendships>()
                 .HasOne(f => f.KarterFirst)
                 .WithMany()
@@ -28,41 +57,74 @@ namespace GoKartUnite.Data
                 .HasForeignKey(f => f.KarterSecondId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Friendships>()
-                .HasKey(f => new { f.KarterFirstId, f.KarterSecondId });
-
-            modelBuilder.Entity<FollowTrack>()
-                .HasKey(f => new { f.KarterId, f.TrackId });
-
-            modelBuilder.Entity<BlogNotifications>()
-                .HasOne(bn => bn.LinkedPost)
+            // ---------- Group ----------
+            modelBuilder.Entity<Group>()
+                .HasOne(g => g.HostKarter)
                 .WithMany()
-                .HasForeignKey(bn => bn.BlogID);
+                .HasForeignKey(g => g.HostId)
+                .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete
 
-            modelBuilder.Entity<BlogNotifications>()
-                .ToTable("BlogNotifications", "dbo");
+            // ---------- Membership ----------
+            modelBuilder.Entity<Membership>()
+                .HasKey(m => new { m.GroupId, m.KarterId });
 
-            modelBuilder.Entity<Comment>()
-                .HasOne(c => c.Author)
+            modelBuilder.Entity<Membership>()
+                .HasOne(m => m.User)
                 .WithMany()
-                .HasForeignKey(c => c.AuthorId)
+                .HasForeignKey(m => m.KarterId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Comment>()
-                .HasOne(c => c.BlogPost)
-                .WithMany(bp => bp.Comments)
-                .HasForeignKey(c => c.BlogPostId)
+            modelBuilder.Entity<Membership>()
+                .HasOne(m => m.Group)
+                .WithMany(g => g.MemberKarters)
+                .HasForeignKey(m => m.GroupId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ---------- Upvotes ----------
+            modelBuilder.Entity<Upvotes>()
+                .HasOne(u => u.Karter)
+                .WithMany()
+                .HasForeignKey(u => u.VoterId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ---------- Karter ----------
+            modelBuilder.Entity<Karter>()
+                .HasOne(k => k.Track)
+                .WithMany(t => t.Karters)
+                .HasForeignKey(k => k.TrackId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ---------- FollowTrack ----------
+            modelBuilder.Entity<FollowTrack>()
+                .HasOne(ft => ft.track)
+                .WithMany(t => t.Followers) // matches the property added in Track
+                .HasForeignKey(ft => ft.TrackId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FollowTrack>()
+                .HasOne(ft => ft.karter)
+                .WithMany()
+                .HasForeignKey(ft => ft.KarterId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
-        public DbSet<GoKartUnite.Models.Karter> Karter { get; set; } = default!;
-        public DbSet<GoKartUnite.Models.Track> Track { get; set; } = default!;
-        public DbSet<GoKartUnite.Models.Friendships> Friendships { get; set; } = default!;
-        public DbSet<GoKartUnite.Models.BlogPost> BlogPosts { get; set; } = default!;
-        public DbSet<GoKartUnite.Models.FollowTrack> FollowTracks { get; set; } = default!;
-        public DbSet<GoKartUnite.Models.BlogNotifications> BlogNotifications { get; set; } = default!;
-        public DbSet<GoKartUnite.Models.Comment> Comments { get; set; } = default!;
-        public DbSet<GoKartUnite.Models.UserRoles> UserRoles { get; set; } = default!;
-        public DbSet<GoKartUnite.Models.Role> Role { get; set; } = default!;
-        public DbSet<GoKartUnite.Models.TrackAdmins> TrackAdmin { get; set; } = default!;
+
+        // ---------- DbSet Properties ----------
+        public DbSet<Karter> Karter { get; set; } = default!;
+        public DbSet<Track> Track { get; set; } = default!;
+        public DbSet<Friendships> Friendships { get; set; } = default!;
+        public DbSet<FollowTrack> FollowTracks { get; set; } = default!;
+        public DbSet<BlogPost> BlogPosts { get; set; } = default!;
+        public DbSet<BlogNotifications> BlogNotifications { get; set; } = default!;
+        public DbSet<Comment> Comments { get; set; } = default!;
+        public DbSet<UserRoles> UserRoles { get; set; } = default!;
+        public DbSet<Role> Role { get; set; } = default!;
+        public DbSet<TrackAdmins> TrackAdmin { get; set; } = default!;
+        public DbSet<KarterTrackStats> KarterTrackStats { get; set; } = default!;
+
+        // Group-related
+        public DbSet<Membership> Memberships { get; set; } = default!;
+        public DbSet<Group> Groups { get; set; } = default!;
+        public DbSet<GroupMessage> GroupMessages { get; set; } = default!;
+        public DbSet<GroupNotification> GroupNotifications { get; set; } = default!;
     }
 }
