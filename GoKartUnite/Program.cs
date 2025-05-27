@@ -93,56 +93,64 @@ namespace GoKartUnite
 
             var services = builder.Services;
             var configuration = builder.Configuration;
-            var secretFilePath = Path.Combine(Directory.GetCurrentDirectory(), "secrets.txt");
-            var secretsContent = File.ReadAllText(secretFilePath);
-            var secretPairs = secretsContent.Split(',');
-            foreach (var secret in secretPairs)
-            {
-                var keyValue = secret.Split('=');
-                if (keyValue.Length == 2)
-                {
-                    builder.Configuration[keyValue[0].Trim()] = keyValue[1].Trim();
-                }
-            }
+            var env = builder.Environment;
             builder.Logging.AddConsole();
 
-            builder.Services
-                    .AddAuthentication(options =>
+            if (!env.IsEnvironment("Testing"))
+            {
+                var secretFilePath = Path.Combine(Directory.GetCurrentDirectory(), "secrets.txt");
+                if (File.Exists(secretFilePath))
+                {
+                    var secretsContent = File.ReadAllText(secretFilePath);
+                    var secretPairs = secretsContent.Split(',');
+                    foreach (var secret in secretPairs)
                     {
-                        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                        options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-                    })
-                    .AddCookie()
-                    .AddGoogle(googleOptions =>
-                    {
-                        googleOptions.ClientId = configuration["ClientId"];
-                        googleOptions.ClientSecret = configuration["ClientSecret"];
-                        googleOptions.Events.OnCreatingTicket = ctx =>
+                        var keyValue = secret.Split('=');
+                        if (keyValue.Length == 2)
                         {
-                            var dbContext = ctx.HttpContext.RequestServices.GetRequiredService<GoKartUniteContext>();
-                            var email = ctx.Principal.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
-                            var NameIdentifier = ctx.Principal.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                            var karter = dbContext.Karter.Include(k => k.UserRoles).FirstOrDefault(k => k.Email == email);
-                            var claims = new List<Claim>();
-                            if (karter != null)
+                            builder.Configuration[keyValue[0].Trim()] = keyValue[1].Trim();
+                        }
+                    }
+                }
+                builder.Services.AddAuthentication(options =>
+                {
+                    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+                })
+                .AddCookie()
+                .AddGoogle(googleOptions =>
+                {
+                    googleOptions.ClientId = configuration["ClientId"];
+                    googleOptions.ClientSecret = configuration["ClientSecret"];
+                    googleOptions.Events.OnCreatingTicket = ctx =>
+                    {
+                        var dbContext = ctx.HttpContext.RequestServices.GetRequiredService<GoKartUniteContext>();
+                        var email = ctx.Principal.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+                        var NameIdentifier = ctx.Principal.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                        var karter = dbContext.Karter.Include(k => k.UserRoles).FirstOrDefault(k => k.Email == email);
+                        var claims = new List<Claim>();
+                        if (karter != null)
+                        {
+                            if (karter.UserRoles == null)
                             {
-                                if (karter.UserRoles == null)
-                                {
-                                    ctx.Principal.AddIdentity(new ClaimsIdentity(claims));
-                                    return Task.CompletedTask;
-                                }
-                                foreach (UserRoles role in karter.UserRoles)
-                                {
-                                    Role singleRole = dbContext.Role.FirstOrDefault(r => r.Id == role.RoleId);
-                                    claims.Add(new Claim(ClaimTypes.Role, singleRole.Name));
-                                }
+                                ctx.Principal.AddIdentity(new ClaimsIdentity(claims));
+                                return Task.CompletedTask;
                             }
+                            foreach (UserRoles role in karter.UserRoles)
+                            {
+                                Role singleRole = dbContext.Role.FirstOrDefault(r => r.Id == role.RoleId);
+                                claims.Add(new Claim(ClaimTypes.Role, singleRole.Name));
+                            }
+                        }
 
-                            ctx.Principal.AddIdentity(new ClaimsIdentity(claims));
-                            return Task.CompletedTask;
+                        ctx.Principal.AddIdentity(new ClaimsIdentity(claims));
+                        return Task.CompletedTask;
 
-                        };
-                    });
+                    };
+                });
+            }
+
+
             builder.Services.AddControllersWithViews();
             var app = builder.Build();
 
