@@ -18,6 +18,7 @@ using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
 using GoKartUnite.Interfaces;
 using GoKartUnite.Hubs;
+using Microsoft.AspNetCore.Mvc;
 
 
 namespace GoKartUnite
@@ -147,6 +148,11 @@ namespace GoKartUnite
                         return Task.CompletedTask;
 
                     };
+                });
+
+                builder.Services.AddControllersWithViews(options =>
+                {
+                    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
                 });
             }
 

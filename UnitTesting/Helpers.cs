@@ -24,6 +24,13 @@ namespace UnitTesting
         {
             return new Track { Title = initialName + iter, Location = location, IsVerifiedByAdmin = true };
         }
+
+        public static HttpClient ChangeUserAuthRole(HttpClient client, string RoleName)
+        {
+            client.DefaultRequestHeaders.Remove("Test-Roles");
+            client.DefaultRequestHeaders.Add("Test-Roles", RoleName);
+            return client;
+        }
     }
 
     internal class ConstValues

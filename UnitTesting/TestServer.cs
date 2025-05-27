@@ -11,6 +11,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Hosting.Server;
 using GoKartUnite.Models;
 using static System.Formats.Asn1.AsnWriter;
+using Microsoft.AspNetCore.Mvc;
 
 namespace UnitTesting
 {
@@ -75,10 +76,63 @@ namespace UnitTesting
             dbContext.UserRoles.RemoveRange(dbContext.UserRoles);
             dbContext.SaveChanges();
 
-            dbContext.Karter.Add(ConstValues.SelfKarter);
+            var karter = ConstValues.SelfKarter;
+            dbContext.Karter.Add(karter);
+            await dbContext.SaveChangesAsync();
+        }
+
+        public async Task ClearDatabase()
+        {
+            using var scope = Services.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<GoKartUniteContext>();
+            dbContext.Comments.RemoveRange(dbContext.Comments);
+            dbContext.BlogPosts.RemoveRange(dbContext.BlogPosts);
+            dbContext.Karter.RemoveRange(dbContext.Karter);
+            dbContext.BlogNotifications.RemoveRange(dbContext.BlogNotifications);
+            dbContext.BlogPosts.RemoveRange(dbContext.BlogPosts);
+            dbContext.FollowTracks.RemoveRange(dbContext.FollowTracks);
+            dbContext.Role.RemoveRange(dbContext.Role);
+            dbContext.Friendships.RemoveRange(dbContext.Friendships);
+            dbContext.Track.RemoveRange(dbContext.Track);
+            dbContext.TrackAdmin.RemoveRange(dbContext.TrackAdmin);
+            dbContext.UserRoles.RemoveRange(dbContext.UserRoles);
+            dbContext.SaveChanges();
+        }
+
+        public async Task SeedUserProfileWithAdminAsync()
+        {
+            using var scope = Services.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<GoKartUniteContext>();
+            dbContext.Comments.RemoveRange(dbContext.Comments);
+            dbContext.BlogPosts.RemoveRange(dbContext.BlogPosts);
+            dbContext.Karter.RemoveRange(dbContext.Karter);
+            dbContext.BlogNotifications.RemoveRange(dbContext.BlogNotifications);
+            dbContext.BlogPosts.RemoveRange(dbContext.BlogPosts);
+            dbContext.FollowTracks.RemoveRange(dbContext.FollowTracks);
+            dbContext.Role.RemoveRange(dbContext.Role);
+            dbContext.Friendships.RemoveRange(dbContext.Friendships);
+            dbContext.Track.RemoveRange(dbContext.Track);
+            dbContext.TrackAdmin.RemoveRange(dbContext.TrackAdmin);
+            dbContext.UserRoles.RemoveRange(dbContext.UserRoles);
+            dbContext.SaveChanges();
+
+            var karter = ConstValues.SelfKarter;
+            dbContext.Karter.Add(karter);
+
+            var role = new Role { Id = 1, Name = "Admin" };
+            dbContext.Role.Add(role);
+
+            await dbContext.SaveChangesAsync();
+
+            dbContext.UserRoles.Add(new UserRoles
+            {
+                KarterId = karter.Id,
+                RoleId = role.Id
+            });
 
             await dbContext.SaveChangesAsync();
         }
+
 
         public async Task SeedTrackVerified()
         {
@@ -87,6 +141,7 @@ namespace UnitTesting
 
             dbContext.Track.Add(ConstValues.VerifiedTrack);
             await dbContext.SaveChangesAsync();
+
         }
 
         public async Task SeedTrackNonVerified()

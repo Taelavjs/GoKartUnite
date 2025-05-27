@@ -107,7 +107,15 @@ namespace GoKartUnite.Controllers
 
         [HttpPost]
         [Authorize]
-        [ValidateAntiForgeryToken]
+
+
+
+
+
+
+
+
+
         [AccountConfirmed]
         public async Task<IActionResult> GetKartersPartialViews(string? track, SortKartersBy sortby = SortKartersBy.Alphabetically)
         {
@@ -179,7 +187,7 @@ namespace GoKartUnite.Controllers
         // Login with google but no user account found
         [HttpPost]
         [Authorize]
-        [ValidateAntiForgeryToken]
+
         public async Task<ActionResult> Create(KarterView kv)
         {
             if (!ModelState.IsValid)
@@ -215,7 +223,7 @@ namespace GoKartUnite.Controllers
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [AccountConfirmed]
-        [ValidateAntiForgeryToken]
+
         public async Task<ActionResult> Delete(int id)
         {
             var karter = await _karter.GetUser(id);
@@ -235,7 +243,7 @@ namespace GoKartUnite.Controllers
         [HttpPost]
         [Authorize]
         [AccountConfirmed]
-        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> SendFriendRequestById(int friendId)
         {
             string googleId = await _karter.GetCurrentUserNameIdentifier(User);
@@ -252,7 +260,7 @@ namespace GoKartUnite.Controllers
         [HttpPost]
         [Authorize]
         [AccountConfirmed]
-        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> HandleFriendRequest(int friendId, string action)
         {
             if (action == "Accept")
@@ -277,7 +285,7 @@ namespace GoKartUnite.Controllers
         [HttpPost]
         [Authorize]
         [AccountConfirmed]
-        [ValidateAntiForgeryToken]
+
         private async Task AcceptFriendRequest(int friendId)
         {
             string googleId = await _karter.GetCurrentUserNameIdentifier(User);
@@ -289,7 +297,7 @@ namespace GoKartUnite.Controllers
         [HttpPost]
         [Authorize]
         [AccountConfirmed]
-        [ValidateAntiForgeryToken]
+
         public async Task RemoveFriendRequest(int friendId)
         {
             string googleId = await _karter.GetCurrentUserNameIdentifier(User);

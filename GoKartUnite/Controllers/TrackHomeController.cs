@@ -81,7 +81,7 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+
         [Authorize(Roles = "Admin")]
         [AccountConfirmed]
         public async Task<ActionResult> Delete(int id)

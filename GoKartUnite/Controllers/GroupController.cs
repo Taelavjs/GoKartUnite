@@ -68,7 +68,8 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+
+
         public async Task<ActionResult> CreateGroup(GroupPageView model)
         {
             ListedGroupView listedGroup = new ListedGroupView();
@@ -86,7 +87,7 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> JoinGroup(int GroupId)
         {
             Karter? k = await _karter.GetUserByGoogleId(
@@ -99,7 +100,7 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> LeaveGroup(int GroupId)
         {
             Karter? k = await _karter.GetUserByGoogleId(await _karter.GetCurrentUserNameIdentifier(User), withTrack: true);

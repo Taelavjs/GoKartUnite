@@ -22,13 +22,22 @@ namespace UnitTesting
 
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            var claims = new[]
+            // Default role if header not present
+            var rolesHeader = Request.Headers["Test-Roles"].FirstOrDefault() ?? "User";
+
+            var roles = rolesHeader.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            var claims = new List<Claim>
             {
-            new Claim(ClaimTypes.NameIdentifier, ConstValues.SelfKarter.NameIdentifier),
-            new Claim(ClaimTypes.Name, ConstValues.SelfKarter.Name),
-            new Claim(ClaimTypes.Email, ConstValues.SelfKarter.Email),
-            new Claim(ClaimTypes.Role, "Admin") // or "Admin", etc.
-        };
+                new Claim(ClaimTypes.NameIdentifier, ConstValues.SelfKarter.NameIdentifier),
+                new Claim(ClaimTypes.Name, ConstValues.SelfKarter.Name),
+                new Claim(ClaimTypes.Email, ConstValues.SelfKarter.Email)
+            };
+
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             var identity = new ClaimsIdentity(claims, "Test");
             var principal = new ClaimsPrincipal(identity);

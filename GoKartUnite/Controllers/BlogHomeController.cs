@@ -82,7 +82,8 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+
+
         public async Task<IActionResult> Create(BlogPostView post, int id = -1)
         {
             if (!ModelState.IsValid)
@@ -146,7 +147,7 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> CreateAdminPost(BlogPostView post)
         {
             if (!ModelState.IsValid)
@@ -210,7 +211,7 @@ namespace GoKartUnite.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> CreateComment([FromBody] CreateCommentRequest comment)
         {
             string GoogleId = await _karter.GetCurrentUserNameIdentifier(User);

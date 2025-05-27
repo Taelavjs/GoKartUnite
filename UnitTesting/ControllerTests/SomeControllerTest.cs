@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace UnitTesting.ControllerTests
 {
+    [Collection("Database2")]
     public class SomeControllerTest : IClassFixture<TestServer>
     {
         private readonly TestServer _server;
@@ -35,6 +36,8 @@ namespace UnitTesting.ControllerTests
         [Fact]
         public async Task TrackPageSearchFeature_AccessingPagesWithoutProfile_Successful()
         {
+            await _server.ClearDatabase();
+
             await _server.SeedUserProfileAsync();
 
             HttpClient client = ClientCreationForTesting();
@@ -53,6 +56,7 @@ namespace UnitTesting.ControllerTests
         [Fact]
         public async Task TrackPage_AccessingPagesWithoutProfile_RedirectToCreateAccount()
         {
+            await _server.ClearDatabase();
             HttpClient client = ClientCreationForTesting();
 
             var result = await client.GetAsync("/trackHome");
@@ -69,6 +73,7 @@ namespace UnitTesting.ControllerTests
         [Fact]
         public async Task GroupPage_AccessingPagesWithoutProfile_RedirectToCreateAccount()
         {
+            await _server.ClearDatabase();
             HttpClient client = ClientCreationForTesting();
 
             var result = await client.GetAsync("/group");
@@ -85,6 +90,7 @@ namespace UnitTesting.ControllerTests
         [Fact]
         public async Task ProfilePage_AccessingPagesWithoutProfile_RedirectToCreateAccount()
         {
+            await _server.ClearDatabase();
             HttpClient client = ClientCreationForTesting();
 
             var result = await client.GetAsync("/karterHome");
@@ -101,6 +107,7 @@ namespace UnitTesting.ControllerTests
         [Fact]
         public async Task BlogPage_AccessingPagesWithoutProfile_RedirectToCreateAccount()
         {
+            await _server.ClearDatabase();
             HttpClient client = ClientCreationForTesting();
 
             var result = await client.GetAsync("/blogHome");
@@ -117,6 +124,7 @@ namespace UnitTesting.ControllerTests
         [Fact]
         public async Task HomePage_AccessingPagesWithoutProfile_RedirectToCreateAccount()
         {
+            await _server.ClearDatabase();
             HttpClient client = ClientCreationForTesting();
 
             var result = await client.GetAsync("/");
@@ -139,6 +147,7 @@ namespace UnitTesting.ControllerTests
         [Fact]
         public async Task ProfilePage_AccessingPages_Successful()
         {
+            await _server.ClearDatabase();
             await _server.SeedUserProfileAsync();
 
             HttpClient client = ClientCreationForTesting();
@@ -158,6 +167,7 @@ namespace UnitTesting.ControllerTests
         [Fact]
         public async Task BlogPage_AccessingPages_Successful()
         {
+            await _server.ClearDatabase();
             await _server.SeedUserProfileAsync();
 
             HttpClient client = ClientCreationForTesting();
@@ -176,6 +186,7 @@ namespace UnitTesting.ControllerTests
         [Fact]
         public async Task TrackPage_AccessingPages_Successful()
         {
+            await _server.ClearDatabase();
             await _server.SeedUserProfileAsync();
 
             HttpClient client = ClientCreationForTesting();
@@ -193,6 +204,7 @@ namespace UnitTesting.ControllerTests
         [Fact]
         public async Task TrackPageSearchFeature_AccessingPages_Successful()
         {
+            await _server.ClearDatabase();
             await _server.SeedUserProfileAsync();
 
             HttpClient client = ClientCreationForTesting();
@@ -210,6 +222,7 @@ namespace UnitTesting.ControllerTests
         [Fact]
         public async Task HomePage_AccessingPages_Successful()
         {
+            await _server.ClearDatabase();
             await _server.SeedUserProfileAsync();
 
             HttpClient client = ClientCreationForTesting();
@@ -228,6 +241,7 @@ namespace UnitTesting.ControllerTests
         [Fact]
         public async Task GroupPage_AccessingPages_Successful()
         {
+            await _server.ClearDatabase();
             await _server.SeedUserProfileAsync();
 
             HttpClient client = ClientCreationForTesting();
