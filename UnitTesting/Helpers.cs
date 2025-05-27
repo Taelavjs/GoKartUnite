@@ -36,5 +36,28 @@ namespace UnitTesting
             YearsExperience = 3,
             TrackId = null
         };
+
+        static public Track VerifiedTrack = new Track
+        {
+            Title = "Thunder Raceway",
+            Description = "A fast and twisty track perfect for competitive karting.",
+            Location = Locations.SOUTHWEST,
+            IsVerifiedByAdmin = true,
+            FormattedGoogleLocation = "123 Thunder Rd, Kart City, KC",
+            GooglePlacesId = "ChIJd_dummy_track_id",
+            Latitude = 37.7749,
+        };
+
+        static public Track NonVerifiedTrack = new Track
+        {
+            Title = "Shadow Ridge",
+            Description = "A newly opened track under review for official races.",
+            Location = Locations.EAST,
+            IsVerifiedByAdmin = false,
+            FormattedGoogleLocation = "456 Shadow Ln, Ghostville, GV",
+            GooglePlacesId = "ChIJd_unverified_track_id",
+            Latitude = 34.0522,
+            Longitude = -118.2437
+        };
     }
 }

@@ -79,5 +79,23 @@ namespace UnitTesting
 
             await dbContext.SaveChangesAsync();
         }
+
+        public async Task SeedTrackVerified()
+        {
+            using var scope = Services.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<GoKartUniteContext>();
+
+            dbContext.Track.Add(ConstValues.VerifiedTrack);
+            await dbContext.SaveChangesAsync();
+        }
+
+        public async Task SeedTrackNonVerified()
+        {
+            using var scope = Services.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<GoKartUniteContext>();
+
+            dbContext.Track.Add(ConstValues.NonVerifiedTrack);
+            await dbContext.SaveChangesAsync();
+        }
     }
 }
