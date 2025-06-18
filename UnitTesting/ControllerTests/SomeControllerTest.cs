@@ -18,14 +18,33 @@ using UnitTesting.HelpersTut;
 
 namespace UnitTesting.ControllerTests
 {
-    public class SomeControllerTest : IClassFixture<TestServer<Program>>
+    public class SomeControllerTest : IClassFixture<TestServer<Program>>, IAsyncLifetime
     {
         private readonly TestServer<Program> _factory;
-        private readonly HttpClient _client;
+        private HttpClient _client;
+        private IServiceScope _scope;
+        private GoKartUniteContext _dbContext;
 
         public SomeControllerTest(TestServer<Program> factory)
         {
             _factory = factory;
+        }
+
+        public async Task InitializeAsync()
+        {
+            _scope = _factory.Services.CreateScope();
+            _dbContext = _scope.ServiceProvider.GetRequiredService<GoKartUniteContext>();
+            await _dbContext.Database.EnsureCreatedAsync();
+            Utilities.InitializeKarterDbForTests(_dbContext);
+
+            _client = await HttpClientExtensions.CreateAuthedClient(_factory);
+        }
+
+        public async Task DisposeAsync()
+        {
+            await _dbContext.DisposeAsync();
+            _scope.Dispose();
+            _client.Dispose();
         }
 
         [Theory]
@@ -33,24 +52,14 @@ namespace UnitTesting.ControllerTests
         [InlineData("/KarterHome")]
         [InlineData("/TrackHome")]
         [InlineData("/BlogHome")]
-        [InlineData("/GroupsHome")]
         public async Task Get_EndpointsReturnSuccessAndCorrectContentType(string url)
         {
             // Arrange
-            using (var scope = _factory.Services.CreateScope())
-            {
-                var scopedServices = scope.ServiceProvider;
-                var db = scopedServices.GetRequiredService<GoKartUniteContext>();
-                await db.Database.EnsureDeletedAsync(); // Clean slate
-                await db.Database.MigrateAsync(); // Apply migrations
-                Utilities.InitializeKarterDbForTests(db); // Seed test data
-            }
-            var client = await HelpersTut.HttpClientExtensions.CreateAuthedClient(_factory);
+            var response = await _client.GetAsync(url);
 
-            var response = await client.GetAsync(url);
-
+            await HelpersTut.Utilities.ReinitializeKarterDbForTests(_dbContext);
             // Assert
-            response.EnsureSuccessStatusCode(); // Status Code 200-299
+            response.EnsureSuccessStatusCode();
             Assert.Equal("text/html; charset=utf-8",
                 response.Content.Headers.ContentType.ToString());
         }

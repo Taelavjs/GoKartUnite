@@ -1,10 +1,15 @@
 ﻿using GoKartUnite.Data;
 using GoKartUnite.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace UnitTesting.HelpersTut
 {
@@ -16,7 +21,7 @@ namespace UnitTesting.HelpersTut
             db.SaveChanges();
         }
 
-        public static void ReinitializeKarterDbForTests(GoKartUniteContext db)
+        public static async Task ReinitializeKarterDbForTests(GoKartUniteContext db)
         {
             db.Karter.RemoveRange(db.Karter);
             db.SaveChanges();
