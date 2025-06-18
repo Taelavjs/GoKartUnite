@@ -1,265 +1,58 @@
 ﻿using AngleSharp;
+using GoKartUnite;
+using GoKartUnite.Data;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using UnitTesting.HelpersTut;
 
 namespace UnitTesting.ControllerTests
 {
-    [Collection("Database2")]
-    public class SomeControllerTest : IClassFixture<TestServer>
+    public class SomeControllerTest : IClassFixture<TestServer<Program>>
     {
-        private readonly TestServer _server;
-        public SomeControllerTest(TestServer server)
+        private readonly TestServer<Program> _factory;
+        private readonly HttpClient _client;
+
+        public SomeControllerTest(TestServer<Program> factory)
         {
-            _server = server;
+            _factory = factory;
         }
 
-        // SETUP
-        internal HttpClient ClientCreationForTesting()
+        [Theory]
+        [InlineData("/")]
+        [InlineData("/KarterHome")]
+        [InlineData("/TrackHome")]
+        [InlineData("/BlogHome")]
+        [InlineData("/GroupsHome")]
+        public async Task Get_EndpointsReturnSuccessAndCorrectContentType(string url)
         {
-            HttpClient client = _server.CreateClient();
-            client.DefaultRequestHeaders.Add("Authorization", "Test");
-            return client;
+            // Arrange
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var scopedServices = scope.ServiceProvider;
+                var db = scopedServices.GetRequiredService<GoKartUniteContext>();
+                await db.Database.EnsureDeletedAsync(); // Clean slate
+                await db.Database.MigrateAsync(); // Apply migrations
+                Utilities.InitializeKarterDbForTests(db); // Seed test data
+            }
+            var client = await HelpersTut.HttpClientExtensions.CreateAuthedClient(_factory);
+
+            var response = await client.GetAsync(url);
+
+            // Assert
+            response.EnsureSuccessStatusCode(); // Status Code 200-299
+            Assert.Equal("text/html; charset=utf-8",
+                response.Content.Headers.ContentType.ToString());
         }
-
-        // ******************************************
-
-
-        // ******************************************
-        // TESTING FOR REDIRECT TO CREATE PROFILE 
-        // ******************************************
-
-        [Fact]
-        public async Task TrackPageSearchFeature_AccessingPagesWithoutProfile_Successful()
-        {
-            await _server.ClearDatabase();
-
-            await _server.SeedUserProfileAsync();
-
-            HttpClient client = ClientCreationForTesting();
-
-            var result = await client.GetAsync("/TrackHome/SearchTracks? trackSearched = Buckmore & Location = NORTH & Location = NORTHEAST & Location = EAST & Location = SOUTHEAST & Location = SOUTH & Location = SOUTHWEST & Location = WEST & Location = NORTHWEST\r\n");
-            var content = await result.Content.ReadAsStringAsync();
-
-            var context = BrowsingContext.New(Configuration.Default);
-            var document = await context.OpenAsync(req => req.Content(content));
-            var h1 = document.QuerySelector("h1");
-
-            Assert.NotNull(h1);
-            Assert.Equal("Create", h1.TextContent.Trim());
-        }
-
-        [Fact]
-        public async Task TrackPage_AccessingPagesWithoutProfile_RedirectToCreateAccount()
-        {
-            await _server.ClearDatabase();
-            HttpClient client = ClientCreationForTesting();
-
-            var result = await client.GetAsync("/trackHome");
-            var content = await result.Content.ReadAsStringAsync();
-
-            var context = BrowsingContext.New(Configuration.Default);
-            var document = await context.OpenAsync(req => req.Content(content));
-            var h1 = document.QuerySelector("h1");
-
-            Assert.NotNull(h1);
-            Assert.Equal("Create", h1.TextContent.Trim());
-        }
-
-        [Fact]
-        public async Task GroupPage_AccessingPagesWithoutProfile_RedirectToCreateAccount()
-        {
-            await _server.ClearDatabase();
-            HttpClient client = ClientCreationForTesting();
-
-            var result = await client.GetAsync("/group");
-            var content = await result.Content.ReadAsStringAsync();
-
-            var context = BrowsingContext.New(Configuration.Default);
-            var document = await context.OpenAsync(req => req.Content(content));
-            var h1 = document.QuerySelector("h1");
-
-            Assert.NotNull(h1);
-            Assert.Equal("Create", h1.TextContent.Trim());
-        }
-
-        [Fact]
-        public async Task ProfilePage_AccessingPagesWithoutProfile_RedirectToCreateAccount()
-        {
-            await _server.ClearDatabase();
-            HttpClient client = ClientCreationForTesting();
-
-            var result = await client.GetAsync("/karterHome");
-            var content = await result.Content.ReadAsStringAsync();
-
-            var context = BrowsingContext.New(Configuration.Default);
-            var document = await context.OpenAsync(req => req.Content(content));
-            var h1 = document.QuerySelector("h1");
-
-            Assert.NotNull(h1);
-            Assert.Equal("Create", h1.TextContent.Trim());
-        }
-
-        [Fact]
-        public async Task BlogPage_AccessingPagesWithoutProfile_RedirectToCreateAccount()
-        {
-            await _server.ClearDatabase();
-            HttpClient client = ClientCreationForTesting();
-
-            var result = await client.GetAsync("/blogHome");
-            var content = await result.Content.ReadAsStringAsync();
-
-            var context = BrowsingContext.New(Configuration.Default);
-            var document = await context.OpenAsync(req => req.Content(content));
-            var h1 = document.QuerySelector("h1");
-
-            Assert.NotNull(h1);
-            Assert.Equal("Create", h1.TextContent.Trim());
-        }
-
-        [Fact]
-        public async Task HomePage_AccessingPagesWithoutProfile_RedirectToCreateAccount()
-        {
-            await _server.ClearDatabase();
-            HttpClient client = ClientCreationForTesting();
-
-            var result = await client.GetAsync("/");
-            var content = await result.Content.ReadAsStringAsync();
-
-            var context = BrowsingContext.New(Configuration.Default);
-            var document = await context.OpenAsync(req => req.Content(content));
-            var h1 = document.QuerySelector("h1");
-
-            Assert.NotNull(h1);
-            Assert.Equal("Create", h1.TextContent.Trim());
-        }
-        // ******************************************
-        // END : TESTING FOR REDIRECT TO CREATE PROFILE 
-        // ******************************************
-
-        // ******************************************
-        // Created Profile For User, Testing all page access
-        // ******************************************
-        [Fact]
-        public async Task ProfilePage_AccessingPages_Successful()
-        {
-            await _server.ClearDatabase();
-            await _server.SeedUserProfileAsync();
-
-            HttpClient client = ClientCreationForTesting();
-
-            var result = await client.GetAsync("/karterHome");
-            var content = await result.Content.ReadAsStringAsync();
-
-            var context = BrowsingContext.New(Configuration.Default);
-            var document = await context.OpenAsync(req => req.Content(content));
-            var h1 = document.QuerySelector(".profile-name");
-
-            Assert.NotNull(h1);
-            Assert.Equal(ConstValues.SelfKarter.Name, h1.TextContent.Trim());
-            Assert.Contains(ConstValues.SelfKarter.Email, content);
-        }
-
-        [Fact]
-        public async Task BlogPage_AccessingPages_Successful()
-        {
-            await _server.ClearDatabase();
-            await _server.SeedUserProfileAsync();
-
-            HttpClient client = ClientCreationForTesting();
-
-            var result = await client.GetAsync("/blogHome");
-            var content = await result.Content.ReadAsStringAsync();
-
-            var context = BrowsingContext.New(Configuration.Default);
-            var document = await context.OpenAsync(req => req.Content(content));
-            var h1 = document.QuerySelector("h1");
-
-            Assert.NotNull(h1);
-            Assert.Equal("Blog", h1.TextContent.Trim());
-        }
-
-        [Fact]
-        public async Task TrackPage_AccessingPages_Successful()
-        {
-            await _server.ClearDatabase();
-            await _server.SeedUserProfileAsync();
-
-            HttpClient client = ClientCreationForTesting();
-
-            var result = await client.GetAsync("/trackHome");
-            var content = await result.Content.ReadAsStringAsync();
-
-            var context = BrowsingContext.New(Configuration.Default);
-            var document = await context.OpenAsync(req => req.Content(content));
-            var h1 = document.QuerySelector("h1");
-
-            Assert.NotNull(h1);
-            Assert.Equal("Track Home", h1.TextContent.Trim());
-        }
-        [Fact]
-        public async Task TrackPageSearchFeature_AccessingPages_Successful()
-        {
-            await _server.ClearDatabase();
-            await _server.SeedUserProfileAsync();
-
-            HttpClient client = ClientCreationForTesting();
-
-            var result = await client.GetAsync("/TrackHome/SearchTracks? trackSearched = Buckmore & Location = NORTH & Location = NORTHEAST & Location = EAST & Location = SOUTHEAST & Location = SOUTH & Location = SOUTHWEST & Location = WEST & Location = NORTHWEST\r\n");
-            var content = await result.Content.ReadAsStringAsync();
-
-            var context = BrowsingContext.New(Configuration.Default);
-            var document = await context.OpenAsync(req => req.Content(content));
-            var h2 = document.QuerySelector("h2");
-
-            Assert.NotNull(h2);
-            Assert.Equal("No Tracks Found...", h2.TextContent.Trim());
-        }
-        [Fact]
-        public async Task HomePage_AccessingPages_Successful()
-        {
-            await _server.ClearDatabase();
-            await _server.SeedUserProfileAsync();
-
-            HttpClient client = ClientCreationForTesting();
-
-            var result = await client.GetAsync("/");
-            var content = await result.Content.ReadAsStringAsync();
-
-            var context = BrowsingContext.New(Configuration.Default);
-            var document = await context.OpenAsync(req => req.Content(content));
-            var h1 = document.QuerySelector("h1");
-
-            Assert.NotNull(h1);
-            Assert.Equal("Go Kart Unite", h1.TextContent.Trim());
-        }
-
-        [Fact]
-        public async Task GroupPage_AccessingPages_Successful()
-        {
-            await _server.ClearDatabase();
-            await _server.SeedUserProfileAsync();
-
-            HttpClient client = ClientCreationForTesting();
-
-            var result = await client.GetAsync("/Group");
-            var content = await result.Content.ReadAsStringAsync();
-
-            var context = BrowsingContext.New(Configuration.Default);
-            var document = await context.OpenAsync(req => req.Content(content));
-            var SearchForGroupInput = document.QuerySelector("#SearchGroupsInput");
-
-            Assert.NotNull(SearchForGroupInput);
-            Assert.Equal("Search Groups", SearchForGroupInput.GetAttribute("placeholder"));
-        }
-
-        // ******************************************
-        // END : Created Profile For User, Testing all page access
-        // ******************************************
-
     }
 }

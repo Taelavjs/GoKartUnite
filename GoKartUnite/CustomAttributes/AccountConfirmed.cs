@@ -27,7 +27,23 @@ namespace GoKartUnite.CustomAttributes
                 context.Result = new RedirectResult("/login");
                 return;
             }
-
+            try
+            {
+                var tables = dbContext.Database.GetPendingMigrations(); // This might give a hint
+                var connection = dbContext.Database.GetDbConnection();
+                connection.Open(); // Just in case it closed for some reason
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name='Karter';";
+                    var result = command.ExecuteScalar();
+                    // result should not be null if the table exists
+                    System.Diagnostics.Debug.WriteLine($"Karter table exists? {result != null}");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error checking table: {ex.Message}");
+            }
             var userExists = dbContext.Karter
                 .Any(u => u.NameIdentifier == NameIdentifier.Value);
 
