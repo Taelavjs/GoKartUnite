@@ -21,9 +21,6 @@ namespace UnitTesting
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            var dbName = $"GoKartUniteTestDb_{Guid.NewGuid()}";
-
-            var _connectionString = $"Server=(localdb)\\mssqllocaldb;Database={dbName};Trusted_Connection=True;MultipleActiveResultSets=true";
 
             builder.ConfigureServices(services =>
             {

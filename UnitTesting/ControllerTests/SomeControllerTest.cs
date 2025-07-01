@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Respawn;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using UnitTesting.HelpersTut;
-
+using Respawn;
 namespace UnitTesting.ControllerTests
 {
     public class SomeControllerTest : IClassFixture<TestServer<Program>>, IAsyncLifetime
@@ -24,10 +25,21 @@ namespace UnitTesting.ControllerTests
         private HttpClient _client;
         private IServiceScope _scope;
         private GoKartUniteContext _dbContext;
+        private static Checkpoint _checkpoint;
+        private string _connectionString = "Server=(localdb)\\mssqllocaldb;Database=GoKartUniteTestDb;Trusted_Connection=True;MultipleActiveResultSets=true";
 
         public SomeControllerTest(TestServer<Program> factory)
         {
             _factory = factory;
+            // Initialize Respawn checkpoint only once
+            if (_checkpoint == null)
+            {
+                _checkpoint = new Checkpoint
+                {
+                    TablesToIgnore = new[] { new Respawn.Graph.Table("__EFMigrationsHistory") },
+                    DbAdapter = DbAdapter.SqlServer,
+                };
+            }
         }
 
         public async Task InitializeAsync()
@@ -35,6 +47,8 @@ namespace UnitTesting.ControllerTests
             _scope = _factory.Services.CreateScope();
             _dbContext = _scope.ServiceProvider.GetRequiredService<GoKartUniteContext>();
             await _dbContext.Database.EnsureCreatedAsync();
+            await _checkpoint.Reset(_connectionString);
+
             Utilities.InitializeKarterDbForTests(_dbContext);
 
             _client = await HttpClientExtensions.CreateAuthedClient(_factory);

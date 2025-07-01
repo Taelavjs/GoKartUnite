@@ -155,7 +155,7 @@ namespace GoKartUnite.Handlers
 
         public async Task<Track> GetTrackById(int id)
         {
-            return await GetVerifiedTracks().Where(t => t.Id == id).SingleAsync();
+            return await GetVerifiedTracks().Where(t => t.Id == id).SingleOrDefaultAsync();
         }
 
         public async Task<bool> SetTrackToBeVerified(string TrackName, string GooglePlacesId, string FormattedLocation, Coordinates GeoCoords, string Description)

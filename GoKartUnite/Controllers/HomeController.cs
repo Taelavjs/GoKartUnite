@@ -74,6 +74,7 @@ namespace GoKartUnite.Controllers
             foreach (var id in trackIdsRecommended)
             {
                 var track = await _track.GetTrackById(id);
+                if (track == null) { continue; }
                 tracks.Add(track);
             }
             var t = await _track.ModelToView(tracks);
