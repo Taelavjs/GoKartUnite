@@ -4,24 +4,22 @@
 @{
 }
 @model GoKartUnite.ViewModel.KarterFriendshipButtonView
-<form asp-controller="KarterHome" asp-action="HandleFriendRequest" asp-route-friendId="@Model.friendId" method="post"
-class="w-100 h-100 text-center align-middle">
-    @switch (@Model.Status)
-    {
-        case FriendshipStatus.Received:
-            <button type="submit" name="action" value="Accept" class="btn-sm btn-success">Accept</button>
-            break;
-        case FriendshipStatus.Friend:
-            <button type="submit" name="action" value="Remove" class="btn-sm btn-danger">Remove</button>
-            break;
-        case FriendshipStatus.Requested:
-            <button type="submit" name="action" value="Cancel" class="btn-sm btn-secondary">Cancel</button>
-            break;
-        case FriendshipStatus.User:
-            <button type="submit" name="action" value="Add" class="btn-sm btn-info">Add</button>
-            break;
-        default:
-            <div>You</div>
-            break;
-    }
-</form>
+@switch (@Model.Status)
+{
+    case FriendshipStatus.Received:
+        <button type="submit" data-friendid="@Model.friendId" name="action" value="Accept" class="btn-sm btn-success">Accept</button>
+        break;
+    case FriendshipStatus.Friend:
+        <button type="submit" data-friendid="@Model.friendId" name="action" value="Remove" class="btn-sm btn-danger">Remove</button>
+        break;
+    case FriendshipStatus.Requested:
+        <button type="submit" data-friendid="@Model.friendId" name="action" value="Cancel" class="btn-sm btn-secondary">Cancel</button>
+        break;
+    case FriendshipStatus.User:
+        <button type="submit" data-friendid="@Model.friendId" name="action" value="Add" class="btn-sm btn-info">Add</button>
+        break;
+    default:
+        <div>You</div>
+        break;
+}
+

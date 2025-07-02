@@ -109,7 +109,7 @@ namespace GoKartUnite.Handlers
             return true;
         }
 
-        public async Task RemoveFriendShip(int sentbyId, int friendId)
+        public async Task<bool> RemoveFriendShip(int sentbyId, int friendId)
         {
             Friendships? friendReq = await _context.Friendships
             .SingleOrDefaultAsync(k =>
@@ -118,12 +118,21 @@ namespace GoKartUnite.Handlers
 
             if (friendReq == null)
             {
-                return;
+                return false;
             }
 
-            _context.Friendships.Remove(friendReq);
+            try
+            {
+                _context.Friendships.Remove(friendReq);
 
-            _context.SaveChanges();
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+
+            return true;
 
         }
 

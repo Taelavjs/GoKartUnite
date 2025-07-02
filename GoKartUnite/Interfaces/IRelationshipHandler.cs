@@ -10,7 +10,7 @@ namespace GoKartUnite.Interfaces
         Task<List<Karter>> GetAllFriendRequests(int id);
         Task<List<Karter>> GetAllSentRequests(int id);
         Task<bool> AcceptFriendRequest(int acceptorsId, int senderId);
-        Task RemoveFriendShip(int sentbyId, int friendId);
+        Task<bool> RemoveFriendShip(int sentbyId, int friendId);
         Task<Friendships> GetFriendshipByIds(int id1, int id2);
         Task<List<KarterView>> AddStatusToKarters(List<KarterView> karters, int userId);
         Task<FriendshipStatus> GetFriendshipStatus(int id1, int id2);

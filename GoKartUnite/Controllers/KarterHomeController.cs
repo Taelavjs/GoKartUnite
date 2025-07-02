@@ -107,15 +107,6 @@ namespace GoKartUnite.Controllers
 
         [HttpPost]
         [Authorize]
-
-
-
-
-
-
-
-
-
         [AccountConfirmed]
         public async Task<IActionResult> GetKartersPartialViews(string? track, SortKartersBy sortby = SortKartersBy.Alphabetically)
         {
@@ -244,16 +235,12 @@ namespace GoKartUnite.Controllers
         [Authorize]
         [AccountConfirmed]
 
-        public async Task<IActionResult> SendFriendRequestById(int friendId)
+        public async Task<bool> SendFriendRequestById(int friendId)
         {
             string googleId = await _karter.GetCurrentUserNameIdentifier(User);
             Karter sentBy = await _karter.GetUserByGoogleId(googleId);
             Karter sendTo = await _karter.GetUser(friendId);
-            if (!await _karter.SendFriendRequest(sentBy, sendTo))
-            {
-                return View("Index");
-            }
-            return View("Index");
+            return await _karter.SendFriendRequest(sentBy, sendTo);
         }
 
         // Handles different button presses via partial karter view
@@ -261,50 +248,49 @@ namespace GoKartUnite.Controllers
         [Authorize]
         [AccountConfirmed]
 
-        public async Task<IActionResult> HandleFriendRequest(int friendId, string action)
+        public async Task<IActionResult> HandleFriendRequest(int friendId, string friendAction)
         {
-            if (action == "Accept")
+            IActionResult result = BadRequest(new { message = "Id Not Found" });
+            if (friendAction == "Accept")
             {
-                await AcceptFriendRequest(friendId);
+                result = await AcceptFriendRequest(friendId) ? Ok(new { message = "Accepted", NewFriendStatus = "Remove" }) : BadRequest(new { message = "Error" });
             }
-            else if (action == "Add")
+            else if (friendAction == "Add")
             {
-                await SendFriendRequestById(friendId);
+                result = await SendFriendRequestById(friendId) ? Ok(new { message = "Sent", NewFriendStatus = "Cancel" }) : BadRequest(new { message = "Error" });
             }
-            else if (action == "Remove")
+            else if (friendAction == "Remove")
             {
-                await RemoveFriendRequest(friendId);
+                result = await RemoveFriendRequest(friendId) ? Ok(new { message = "Removed", NewFriendStatus = "Add" }) : BadRequest(new { message = "Error" });
             }
-            else if (action == "Cancel")
+            else if (friendAction == "Cancel")
             {
-                await RemoveFriendRequest(friendId);
+                result = await RemoveFriendRequest(friendId) ? Ok(new { message = "Cancelled", NewFriendStatus = "Add" }) : BadRequest(new { message = "Error" });
             }
-
-            return RedirectToAction("Index");
+            return result;
         }
         [HttpPost]
         [Authorize]
         [AccountConfirmed]
 
-        private async Task AcceptFriendRequest(int friendId)
+        private async Task<bool> AcceptFriendRequest(int friendId)
         {
             string googleId = await _karter.GetCurrentUserNameIdentifier(User);
-
             Karter k = await _karter.GetUserByGoogleId(googleId);
 
-            await _friendships.AcceptFriendRequest(k.Id, friendId);
+            return await _friendships.AcceptFriendRequest(k.Id, friendId);
         }
         [HttpPost]
         [Authorize]
         [AccountConfirmed]
 
-        public async Task RemoveFriendRequest(int friendId)
+        public async Task<bool> RemoveFriendRequest(int friendId)
         {
             string googleId = await _karter.GetCurrentUserNameIdentifier(User);
 
             Karter k = await _karter.GetUserByGoogleId(googleId);
 
-            await _friendships.RemoveFriendShip(k.Id, friendId);
+            return await _friendships.RemoveFriendShip(k.Id, friendId);
         }
         // ======================================
         // FRIEND REQUEST METHODS

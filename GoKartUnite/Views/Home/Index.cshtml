@@ -14,31 +14,32 @@
     @if (User.Identity.IsAuthenticated)
     {
         @await Html.PartialAsync("~/Views/BlogHome/_Posts.cshtml", Model.Posts)
+        @await Html.PartialAsync("~/Views/BlogHome/_Modal.cshtml", Model.Posts)
+        <div class="container">
+            @foreach (var view in Model.Tracks)
+            {
+                @await Html.PartialAsync("Track", view)
+            }
+        </div>
+        <div class="text-center">
+            <div class="pagination">
+                @if (Model.Tracks.PageNumber > 1)
+                {
+                    <a href="@Url.Action("Index", new { pageNumber = Model.Tracks.PageNumber - 1 })"> Previous</a>
+                }
+
+                <span>Page @Model.Tracks.PageNumber of @Model.Tracks.PageCount</span>
+
+                @if (!Model.Tracks.IsLastPage)
+                {
+                    <a href="@Url.Action("Index", new { pageNumber = Model.Tracks.PageNumber + 1 })">Next </a>
+                }
+            </div>
+        </div>
     }
 </div>
 
-@await Html.PartialAsync("~/Views/BlogHome/_Modal.cshtml", Model.Posts)
-<div class="container">
-    @foreach (var view in Model.Tracks)
-    {
-        @await Html.PartialAsync("Track", view)
-    }
-</div>
-<div class="text-center">
-    <div class="pagination">
-        @if (Model.Tracks.PageNumber > 1)
-        {
-            <a href="@Url.Action("Index", new { pageNumber = Model.Tracks.PageNumber - 1 })"> Previous</a>
-        }
 
-        <span>Page @Model.Tracks.PageNumber of @Model.Tracks.PageCount</span>
-
-        @if (!Model.Tracks.IsLastPage)
-        {
-            <a href="@Url.Action("Index", new { pageNumber = Model.Tracks.PageNumber + 1 })">Next </a>
-        }
-    </div>
-</div>
 
 @section Scripts {
     <script src="~/js/Blog/UpvoteBlogPost.js" asp-append-version="true"></script>
