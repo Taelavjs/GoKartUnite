@@ -14,9 +14,24 @@ $(document).ready(function () {
                 console.log(response);
                 const $newButton = buildFriendshipButton(friendId, response.newFriendStatus);
                 $btn.replaceWith($newButton);
+                let messageContent = "";
+                switch (action) {
+                    case "Add":
+                        messageContent = "Friend Added Successfully";
+                        break;
+                    case "Cancel":
+                        messageContent = "Friend Request Cancelled";
+                        break;
+                    case "Remove":
+                        messageContent = "Friend Removed";
+                    case "Accept":
+                        messageContent = "Request Accepted";
+                        break;
+                }
+                ShowSuccessMessage(messageContent);
             },
             error: function (xhr, status, error) {
-                alert("An error occurred: " + error);
+                ShowErrorMessage("Error With Friend Requests");
             }
         });
     });
