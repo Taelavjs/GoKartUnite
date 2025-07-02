@@ -15,10 +15,14 @@ namespace UnitTesting.HelpersTut
 {
     public static class Utilities
     {
-        public static void InitializeKarterDbForTests(GoKartUniteContext db)
+
+
+        public static List<int> InitializeKarterDbForTests(GoKartUniteContext db)
         {
-            db.Karter.AddRange(GetSeedingMessages());
+            var karters = GetSeedingMessages();
+            db.Karter.AddRange(karters);
             db.SaveChanges();
+            return karters.Select(x => x.Id).ToList();
         }
 
         public static async Task ReinitializeKarterDbForTests(GoKartUniteContext db)
