@@ -32,6 +32,8 @@ namespace GoKartUnite.Models
         public virtual List<BlogNotifications> Notification { get; set; } = new List<BlogNotifications>();
         public virtual List<KarterTrackStats> Stats { get; set; } = new List<KarterTrackStats>();
         public virtual List<Comment> Comments { get; set; } = new List<Comment>();
+        public virtual List<FriendStatusNotifications> FriendStatusNotifications { get; set; } = new List<FriendStatusNotifications>();
+
     }
 
     public enum FriendshipStatus

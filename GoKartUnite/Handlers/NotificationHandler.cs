@@ -61,5 +61,21 @@ namespace GoKartUnite.Handlers
                 .ToListAsync() ?? new List<BlogPost>();
         }
 
+        public async Task<bool> CreateFriendNotification(int forId, int friendId, FriendUpdatedStatus status)
+        {
+            var friend = _context.Karter.SingleOrDefault(x => x.Id == friendId);
+            if (friend == null)
+                return false;
+
+            var notification = new FriendStatusNotifications(friendId, friend.Name, forId, status);
+
+            _context.FriendStatusNotifications.Add(notification);
+            _context.SaveChanges();
+
+            var dd = _context.FriendStatusNotifications.ToList();
+            return true;
+
+        }
+
     }
 }

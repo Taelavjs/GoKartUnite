@@ -25,14 +25,16 @@ namespace GoKartUnite.Controllers
         private readonly IRoleHandler _roles;
         private readonly IRelationshipHandler _friendships;
         private readonly IKarterStatHandler _statHandler;
+        private readonly INotificationHandler _notifications;
 
-        public KarterHomeController(IKarterStatHandler statHandler, IRelationshipHandler friendships, IKarterHandler karters, ITrackHandler tracks, IRoleHandler roles)
+        public KarterHomeController(INotificationHandler notifications, IKarterStatHandler statHandler, IRelationshipHandler friendships, IKarterHandler karters, ITrackHandler tracks, IRoleHandler roles)
         {
             _karter = karters;
             _tracks = tracks;
             _roles = roles;
             _friendships = friendships;
             _statHandler = statHandler;
+            _notifications = notifications;
         }
         [HttpGet]
         [Authorize]
@@ -250,22 +252,60 @@ namespace GoKartUnite.Controllers
 
         public async Task<IActionResult> HandleFriendRequest(int friendId, string friendAction)
         {
+            var listKarters = await _karter.GetAllUsers();
             IActionResult result = BadRequest(new { message = "Id Not Found" });
+
+            string googleId = await _karter.GetCurrentUserNameIdentifier(User);
+            var currentUser = await _karter.GetUserByGoogleId(googleId);
+            int currentUserId = currentUser.Id;
+
             if (friendAction == "Accept")
             {
-                result = await AcceptFriendRequest(friendId) ? Ok(new { message = "Accepted", NewFriendStatus = "Remove" }) : BadRequest(new { message = "Error" });
+                if (await AcceptFriendRequest(friendId))
+                {
+                    await _notifications.CreateFriendNotification(friendId, currentUserId, FriendUpdatedStatus.FriendToUser);
+                    result = Ok(new { message = "Accepted", NewFriendStatus = "Remove" });
+                }
+                else
+                {
+                    result = BadRequest(new { message = "Error" });
+                }
             }
             else if (friendAction == "Add")
             {
-                result = await SendFriendRequestById(friendId) ? Ok(new { message = "Sent", NewFriendStatus = "Cancel" }) : BadRequest(new { message = "Error" });
+                if (await SendFriendRequestById(friendId))
+                {
+                    await _notifications.CreateFriendNotification(friendId, currentUserId, FriendUpdatedStatus.UserToRequested);
+                    result = Ok(new { message = "Sent", NewFriendStatus = "Cancel" });
+                }
+                else
+                {
+                    result = BadRequest(new { message = "Error" });
+                }
             }
             else if (friendAction == "Remove")
             {
-                result = await RemoveFriendRequest(friendId) ? Ok(new { message = "Removed", NewFriendStatus = "Add" }) : BadRequest(new { message = "Error" });
+                if (await RemoveFriendRequest(friendId))
+                {
+                    await _notifications.CreateFriendNotification(friendId, currentUserId, FriendUpdatedStatus.FriendToUser);
+                    result = Ok(new { message = "Removed", NewFriendStatus = "Add" });
+                }
+                else
+                {
+                    result = BadRequest(new { message = "Error" });
+                }
             }
             else if (friendAction == "Cancel")
             {
-                result = await RemoveFriendRequest(friendId) ? Ok(new { message = "Cancelled", NewFriendStatus = "Add" }) : BadRequest(new { message = "Error" });
+                if (await RemoveFriendRequest(friendId))
+                {
+                    await _notifications.CreateFriendNotification(friendId, currentUserId, FriendUpdatedStatus.RequestedToWithdrawn);
+                    result = Ok(new { message = "Cancelled", NewFriendStatus = "Add" });
+                }
+                else
+                {
+                    result = BadRequest(new { message = "Error" });
+                }
             }
             return result;
         }

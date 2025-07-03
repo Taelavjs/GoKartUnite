@@ -8,5 +8,7 @@ namespace GoKartUnite.Interfaces
         Task<List<BlogNotifications>> GetUserBlogNotifications(int userId, bool isViewed = false);
         Task SetAllBlogNotifsViewed(int userId);
         Task<List<BlogPost>> GetAllUsersUnseenPosts(int userId);
+        Task<bool> CreateFriendNotification(int forId, int friendId, FriendUpdatedStatus status);
+
     }
 }

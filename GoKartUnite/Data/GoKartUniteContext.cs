@@ -106,6 +106,12 @@ namespace GoKartUnite.Data
                 .WithMany()
                 .HasForeignKey(ft => ft.KarterId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FriendStatusNotifications>()
+            .HasOne<Karter>(fsn => fsn.karter)     // navigation property to Karter
+            .WithMany(k => k.FriendStatusNotifications) // navigation collection in Karter
+            .HasForeignKey(fsn => fsn.UserId)        // foreign key in FriendStatusNotifications referencing Karter.Id
+            .OnDelete(DeleteBehavior.Restrict);
         }
 
         // ---------- DbSet Properties ----------
@@ -126,5 +132,6 @@ namespace GoKartUnite.Data
         public DbSet<Group> Groups { get; set; } = default!;
         public DbSet<GroupMessage> GroupMessages { get; set; } = default!;
         public DbSet<GroupNotification> GroupNotifications { get; set; } = default!;
+        public DbSet<FriendStatusNotifications> FriendStatusNotifications { get; set; } = default!;
     }
 }
