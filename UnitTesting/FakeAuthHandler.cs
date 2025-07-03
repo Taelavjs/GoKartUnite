@@ -8,6 +8,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
 
 namespace UnitTesting
 {
