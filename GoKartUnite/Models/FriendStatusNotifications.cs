@@ -32,6 +32,9 @@
                 case FriendUpdatedStatus.RequestedToWithdrawn:
                     NotificationMessage = $"{friendName} has rejected your friend request";
                     break;
+                case FriendUpdatedStatus.RequestedToAccepted:
+                    NotificationMessage = $"{friendName} has Accepted your friend request";
+                    break;
             }
         }
     }
@@ -41,6 +44,7 @@
         FriendToUser,
         RequestedToWithdrawn,
         RequestedToDeclined,
+        RequestedToAccepted,
         UserToRequested
     }
 }

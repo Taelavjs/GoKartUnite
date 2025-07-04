@@ -263,7 +263,7 @@ namespace GoKartUnite.Controllers
             {
                 if (await AcceptFriendRequest(friendId))
                 {
-                    await _notifications.CreateFriendNotification(friendId, currentUserId, FriendUpdatedStatus.FriendToUser);
+                    await _notifications.CreateFriendNotification(friendId, currentUserId, FriendUpdatedStatus.RequestedToAccepted);
                     result = Ok(new { message = "Accepted", NewFriendStatus = "Remove" });
                 }
                 else
@@ -397,5 +397,6 @@ namespace GoKartUnite.Controllers
 
             return PartialView("_ProfilePreview", ret);
         }
+
     }
 }

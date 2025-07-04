@@ -1,5 +1,7 @@
 ﻿using GoKartUnite;
+using GoKartUnite.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +11,9 @@ using UnitTesting.ControllerTests.Bases;
 
 namespace UnitTesting.ControllerTests
 {
-    public class ProfileTests : BaseControllerClass, IClassFixture<TestServer<Program>>
+    public class FriendshipStatusUpdatingTests : BaseControllerClass, IClassFixture<TestServer<Program>>
     {
-        public ProfileTests(TestServer<Program> server) : base(server) { }
+        public FriendshipStatusUpdatingTests(TestServer<Program> server) : base(server) { }
 
         // Friend Request : Add ******************************************
 
@@ -36,6 +38,7 @@ namespace UnitTesting.ControllerTests
 
             // Assert
             Assert.Equal("Cancel", newFriendStatus);  // Because Add returns NewFriendStatus = "Cancel"
+            Assert.True(await IsFriendshipStatusNotificationCreated(userId, otherUserId, FriendUpdatedStatus.UserToRequested), "Notification Error");
         }
 
         [Fact]
@@ -59,6 +62,7 @@ namespace UnitTesting.ControllerTests
             // Act
             var response = await _client.PostAsync("/KarterHome/HandleFriendRequest", content);
             Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.False(await IsFriendshipStatusNotificationCreated(userId, otherUserId, FriendUpdatedStatus.UserToRequested), "Notification Error");
         }
 
         // ******************************************************************
@@ -95,6 +99,7 @@ namespace UnitTesting.ControllerTests
 
             // Assert
             Assert.Equal("Remove", newFriendStatus);
+            Assert.True(await IsFriendshipStatusNotificationCreated(userId, otherUserId, FriendUpdatedStatus.RequestedToAccepted), "Notification Error");
         }
 
         [Fact]
@@ -119,6 +124,7 @@ namespace UnitTesting.ControllerTests
             // Act
             var response = await _client.PostAsync("/KarterHome/HandleFriendRequest", content);
             Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.False(await IsFriendshipStatusNotificationCreated(userId, otherUserId, FriendUpdatedStatus.RequestedToAccepted), "Notification Error");
         }
 
         // ******************************************************************
@@ -155,6 +161,7 @@ namespace UnitTesting.ControllerTests
 
             // Assert
             Assert.Equal("Add", newFriendStatus);
+            Assert.True(await IsFriendshipStatusNotificationCreated(userId, otherUserId, FriendUpdatedStatus.RequestedToWithdrawn), "Notification Error");
         }
 
         [Fact]
@@ -186,6 +193,7 @@ namespace UnitTesting.ControllerTests
             // Act
             var response = await _client.PostAsync("/KarterHome/HandleFriendRequest", content);
             Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
+            Assert.True(await IsFriendshipStatusNotificationCreated(userId, otherUserId, FriendUpdatedStatus.RequestedToWithdrawn), "Notification Error");
 
 
         }
@@ -225,8 +233,30 @@ namespace UnitTesting.ControllerTests
 
             // Assert
             Assert.Equal("Add", newFriendStatus);
+            Assert.True(await IsFriendshipStatusNotificationCreated(userId, otherUserId, FriendUpdatedStatus.FriendToUser), "Notification Error");
         }
 
         // ******************************************************************
+
+
+        private async Task<bool> IsFriendshipStatusNotificationCreated(int fromId, int toId, FriendUpdatedStatus statusInNotif)
+        {
+            List<FriendStatusNotifications> notifs = await _dbContext.FriendStatusNotifications.ToListAsync();
+
+            if (notifs.Count != 1)
+            {
+                return false;
+            }
+
+            if (notifs[0].status == statusInNotif &&
+                notifs[0].UserId == toId &&
+                notifs[0].FriendId == fromId)
+            {
+                return true;
+            }
+            return false;
+
+        }
+
     }
 }
