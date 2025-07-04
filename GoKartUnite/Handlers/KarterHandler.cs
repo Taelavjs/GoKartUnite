@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using GoKartUnite.Models.Groups;
 using X.PagedList;
 using GoKartUnite.Projection.Admin;
+using GoKartUnite.Projection;
 
 namespace GoKartUnite.Handlers
 {
@@ -181,6 +182,17 @@ namespace GoKartUnite.Handlers
             }
             var karterInDb = await _context.Karter.FirstOrDefaultAsync(k => k.NameIdentifier == GoogleId);
             return karterInDb;
+        }
+
+        public async Task<List<FriendStatusNotification>> GetUsersFriendNotifications(int userId, int Skip = 0, int Take = 5)
+        {
+            var AllFriendNotifs = await _context.FriendStatusNotifications.Where(x => x.UserId == userId)
+                .OrderByDescending(x => x.DateCreated)
+                .Skip(Skip)
+                .Take(Take)
+                .ToListAsync();
+
+            return (await Task.WhenAll(AllFriendNotifs.Select(x => x.ModelToView()))).ToList();
         }
 
         public async Task<List<KarterView>> KarterModelToView(List<Karter> karters, FriendshipStatus status)

@@ -1,6 +1,7 @@
 ﻿using GoKartUnite.DataFilterOptions;
 using GoKartUnite.Models;
 using GoKartUnite.Models.Groups;
+using GoKartUnite.Projection;
 using GoKartUnite.Projection.Admin;
 using GoKartUnite.ViewModel;
 using System.Security.Claims;
@@ -34,5 +35,7 @@ namespace GoKartUnite.Interfaces
         Task<List<AdminGroupMessage>> GetUsersMessagesByGroup(int id, int groupId);
         Task<Dictionary<int, string>> GetUserGroupsList(int id);
         Task<bool> DeleteUserAdmin(int id);
+        Task<List<FriendStatusNotification>> GetUsersFriendNotifications(int userId, int Skip = 0, int Take = 5);
+
     }
 }

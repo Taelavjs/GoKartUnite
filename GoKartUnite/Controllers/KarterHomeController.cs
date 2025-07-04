@@ -398,5 +398,18 @@ namespace GoKartUnite.Controllers
             return PartialView("_ProfilePreview", ret);
         }
 
+        [HttpGet]
+        [AccountConfirmed]
+        public async Task<IActionResult> GetUsersFriendNotifs(int Skip = 0, int Take = 5)
+        {
+            string googleId = await _karter.GetCurrentUserNameIdentifier(User);
+            var k = await _karter.GetUserByGoogleId(googleId, false);
+            var notifs = await _karter.GetUsersFriendNotifications(k.Id, Skip, Take);
+
+            if (k == null) return BadRequest();
+
+            return Ok(new { notifications = k.FriendStatusNotifications });
+        }
+
     }
 }

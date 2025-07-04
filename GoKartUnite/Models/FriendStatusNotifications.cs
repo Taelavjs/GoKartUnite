@@ -1,4 +1,6 @@
-﻿namespace GoKartUnite.Models
+﻿using GoKartUnite.Projection;
+
+namespace GoKartUnite.Models
 {
     public class FriendStatusNotifications
     {
@@ -11,6 +13,8 @@
         public string FriendName { get; set; }
         public int UserId { get; set; }
         public Karter karter { get; set; }
+        public DateTime DateCreated { get; set; } = DateTime.Now.Date;
+        public bool IsViewed { get; set; } = false;
         public FriendStatusNotifications(int friendId, string friendName, int userId, FriendUpdatedStatus status)
         {
             UserId = userId;
@@ -36,6 +40,18 @@
                     NotificationMessage = $"{friendName} has Accepted your friend request";
                     break;
             }
+        }
+
+        public async Task<FriendStatusNotification> ModelToView()
+        {
+            return new FriendStatusNotification
+            {
+                FromId = FriendId,
+                NotificationMessage = NotificationMessage,
+                DateCreated = DateCreated,
+                isViewed = IsViewed,
+                Status = status
+            };
         }
     }
 
